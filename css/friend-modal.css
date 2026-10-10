@@ -1,0 +1,257 @@
+/* =========================================
+   MODAL - ADICIONAR AMIGO
+========================================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(5, 8, 18, 0.78);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+  z-index: 1000;
+}
+.modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+/* =========================================
+   CAIXA DO MODAL
+========================================= */
+.add-friend-modal {
+  width: 100%;
+  max-width: 480px;
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: linear-gradient(145deg, #171d31, #101525);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.55);
+  transform: translateY(15px) scale(0.97);
+  transition: transform 0.2s ease;
+}
+.modal-overlay.open .add-friend-modal {
+  transform: translateY(0) scale(1);
+}
+/* =========================================
+   CABEÇALHO
+========================================= */
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.modal-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #7f8cff;
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #ffffff;
+}
+.modal-header p {
+  margin: 7px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #8d96ad;
+}
+/* =========================================
+   BOTÃO FECHAR
+========================================= */
+.modal-close {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #9ca5bb;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+/* =========================================
+   CAMPO DE PESQUISA
+========================================= */
+.add-friend-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 50px;
+  margin-top: 25px;
+  padding: 0 15px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 11px;
+  background: rgba(7, 10, 20, 0.65);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.add-friend-search:focus-within {
+  border-color: rgba(127, 140, 255, 0.65);
+  box-shadow: 0 0 0 3px rgba(127, 140, 255, 0.08);
+}
+.add-friend-search > span {
+  font-size: 18px;
+  font-weight: 600;
+  color: #7f8cff;
+}
+.add-friend-search input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 15px;
+}
+.add-friend-search input::placeholder {
+  color: #5e667b;
+}
+/* =========================================
+   ERRO
+========================================= */
+.add-friend-error {
+  min-height: 20px;
+  margin-top: 9px;
+  font-size: 13px;
+  color: #ff7888;
+}
+/* =========================================
+   RESULTADO
+========================================= */
+.add-friend-result {
+  display: none;
+  align-items: center;
+  gap: 13px;
+  margin-top: 5px;
+  padding: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+}
+.add-friend-result.visible {
+  display: flex;
+}
+.result-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #252c43;
+  font-size: 21px;
+}
+.result-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+.result-info strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #ffffff;
+  font-size: 14px;
+}
+.result-info span {
+  color: #7f889e;
+  font-size: 13px;
+}
+#sendFriendRequest {
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 13px;
+  background: #6875f5;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease;
+}
+#sendFriendRequest:hover {
+  background: #7884ff;
+  transform: translateY(-1px);
+}
+/* =========================================
+   RODAPÉ
+========================================= */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+.modal-footer button {
+  height: 40px;
+  padding: 0 17px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
+}
+.modal-cancel {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #aab2c5;
+}
+.modal-cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+.modal-search-button {
+  border: 0;
+  background: #6875f5;
+  color: #ffffff;
+}
+.modal-search-button:hover {
+  background: #7884ff;
+  transform: translateY(-1px);
+}
+/* =========================================
+   RESPONSIVO
+========================================= */
+@media (max-width: 520px) {
+  .add-friend-modal {
+    padding: 21px;
+    border-radius: 15px;
+  }
+  .modal-header h2 {
+    font-size: 21px;
+  }
+  .add-friend-result {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  #sendFriendRequest {
+    width: 100%;
+  }
+}

@@ -1,0 +1,304 @@
+/* =========================================
+   PÁGINA DE AMIGOS
+========================================= */
+.friends-page {
+  padding: 42px 50px;
+  overflow-y: auto;
+}
+/* =========================================
+   CABEÇALHO DOS AMIGOS
+========================================= */
+.friends-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+.friends-title h2 {
+  margin: 5px 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+}
+.friends-title p {
+  margin: 0;
+  color: #8d95aa;
+  font-size: 14px;
+}
+/* =========================================
+   BOTÃO ADICIONAR AMIGO
+========================================= */
+.add-friend-button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-radius: 10px;
+  padding: 12px 17px;
+  background: #252c3d;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.add-friend-button span {
+  font-size: 20px;
+  line-height: 14px;
+}
+.add-friend-button:hover {
+  background: #30394e;
+  transform: translateY(-1px);
+}
+/* =========================================
+   PESQUISA DE AMIGOS
+========================================= */
+.friends-search {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #151a27;
+  border: 1px solid #252c3d;
+  border-radius: 12px;
+  padding: 13px 16px;
+  margin-bottom: 25px;
+}
+.search-icon {
+  font-size: 15px;
+  opacity: 0.65;
+}
+.friends-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 14px;
+}
+.friends-search input::placeholder {
+  color: #687086;
+}
+/* =========================================
+   ABAS
+========================================= */
+.friends-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #252c3d;
+  margin-bottom: 25px;
+}
+.friends-tab {
+  position: relative;
+  background: transparent;
+  color: #737c92;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.friends-tab:hover {
+  color: #ffffff;
+}
+.friends-tab.active {
+  color: #ffffff;
+}
+.friends-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  background: #ffffff;
+  border-radius: 10px;
+}
+.request-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 5px;
+  padding: 0 5px;
+  border-radius: 20px;
+  background: #252c3d;
+  font-size: 10px;
+}
+/* =========================================
+   TÍTULO DA LISTA
+========================================= */
+.friends-list-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.friends-list-title h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8d95aa;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+.friends-list-title span {
+  color: #596176;
+  font-size: 12px;
+}
+/* =========================================
+   LISTA DE AMIGOS
+========================================= */
+.friends-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/* =========================================
+   CARTÃO DE AMIGO
+========================================= */
+.friend-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #151a27;
+  border: 1px solid transparent;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+.friend-card:hover {
+  background: #1b2130;
+  border-color: #252c3d;
+}
+/* =========================================
+   AVATAR DO AMIGO
+========================================= */
+.friend-avatar {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #252c3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.friend-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.friend-avatar-placeholder {
+  color: #8992a8;
+  font-size: 18px;
+}
+.friend-status {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 3px solid #151a27;
+  background: #596176;
+}
+.friend-status.online {
+  background: #6bcf8b;
+}
+/* =========================================
+   INFORMAÇÕES DO AMIGO
+========================================= */
+.friend-info {
+  flex: 1;
+  min-width: 0;
+}
+.friend-name {
+  display: block;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.friend-username {
+  display: block;
+  margin-top: 3px;
+  color: #70798e;
+  font-size: 12px;
+}
+/* =========================================
+   AÇÕES DOS AMIGOS
+========================================= */
+.friend-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.friend-action {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #202637;
+  color: #aab2c4;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.friend-action:hover {
+  background: #2b3348;
+  color: #ffffff;
+}
+/* =========================================
+   ESTADO VAZIO - AMIGOS
+========================================= */
+.friends-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 70px 20px;
+  color: #737c92;
+}
+.friends-empty.visible {
+  display: flex;
+}
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #151a27;
+  color: #687086;
+  font-size: 28px;
+  margin-bottom: 18px;
+}
+.friends-empty h3 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 17px;
+}
+.friends-empty p {
+  margin: 0 0 20px;
+  font-size: 13px;
+}
+.friends-empty button {
+  border-radius: 9px;
+  padding: 10px 16px;
+  background: #252c3d;
+  color: #ffffff;
+}
+.friends-empty button:hover {
+  background: #30394e;
+}

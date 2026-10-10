@@ -1,0 +1,162 @@
+/* =========================================
+   PÁGINA DE MENSAGENS
+========================================= */
+.messages-page {
+  padding: 42px 50px;
+  overflow-y: auto;
+}
+/* =========================================
+   CABEÇALHO DAS MENSAGENS
+========================================= */
+.messages-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+.messages-header h2 {
+  margin: 5px 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #e7edff;
+}
+.messages-header p {
+  margin: 0;
+  color: #8d95aa;
+  font-size: 14px;
+}
+/* =========================================
+   NOVA CONVERSA
+========================================= */
+.new-conversation-button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-radius: 10px;
+  padding: 12px 17px;
+  background: #252c3d;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+.new-conversation-button span {
+  font-size: 20px;
+  line-height: 14px;
+}
+.new-conversation-button:hover {
+  background: #30394e;
+  transform: translateY(-1px);
+}
+/* =========================================
+   PESQUISA DE MENSAGENS
+========================================= */
+.messages-search {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #151a27;
+  border: 1px solid #252c3d;
+  border-radius: 12px;
+  padding: 13px 16px;
+  margin-bottom: 25px;
+}
+.messages-search span {
+  font-size: 15px;
+  opacity: 0.65;
+}
+.messages-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 14px;
+}
+.messages-search input::placeholder {
+  color: #687086;
+}
+/* =========================================
+   SEÇÃO DE CONVERSAS
+========================================= */
+.conversations-section {
+  width: 100%;
+}
+.conversations-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.conversations-title h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8d95aa;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+/* =========================================
+   LISTA DE CONVERSAS
+========================================= */
+.conversations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/* =========================================
+   ESTADO VAZIO - MENSAGENS
+========================================= */
+.messages-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 330px;
+  padding: 60px 20px;
+  color: #737c92;
+}
+.messages-empty.visible {
+  display: flex;
+}
+.messages-empty .empty-icon {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #151a27;
+  color: #687086;
+  font-size: 28px;
+  margin-bottom: 18px;
+}
+.messages-empty h3 {
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: 18px;
+}
+.messages-empty p {
+  max-width: 360px;
+  margin: 0 0 20px;
+  color: #737c92;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.messages-empty button {
+  border-radius: 9px;
+  padding: 10px 17px;
+  background: #252c3d;
+  color: #ffffff;
+  font-size: 13px;
+  transition: 0.2s ease;
+}
+.messages-empty button:hover {
+  background: #30394e;
+  transform: translateY(-1px);
+}

@@ -1,0 +1,99 @@
+/* =========================================
+   RESPONSIVO - AMIGOS
+========================================= */
+@media (max-width: 900px) {
+  .content-sidebar {
+    width: 230px;
+  }
+  .main-content {
+    padding: 40px 35px;
+  }
+}
+/* =========================================
+   RESPONSIVO - PRINCIPAL
+========================================= */
+@media (max-width: 700px) {
+  .main-sidebar {
+    width: 65px;
+  }
+  .content-sidebar {
+    width: 210px;
+  }
+  .main-content {
+    padding: 35px 25px;
+  }
+  .content-header h2 {
+    font-size: 28px;
+  }
+}
+/* =========================================
+   RESPONSIVO - AMIGOS
+========================================= */
+@media (max-width: 800px) {
+  .friends-page {
+    padding: 30px 25px;
+  }
+  .friends-header {
+    flex-direction: column;
+  }
+  .add-friend-button {
+    align-self: flex-start;
+  }
+}
+/* =========================================
+   RESPONSIVO - MENSAGENS
+========================================= */
+@media (max-width: 800px) {
+  .messages-page {
+    padding: 30px 25px;
+  }
+  .messages-header {
+    flex-direction: column;
+  }
+  .new-conversation-button {
+    align-self: flex-start;
+  }
+}
+/* =========================================
+   RESPONSIVO - TELAS PEQUENAS
+========================================= */
+@media (max-width: 600px) {
+  .friends-page,
+  .messages-page {
+    padding: 25px 18px;
+  }
+  .friends-title h2,
+  .messages-header h2 {
+    font-size: 27px;
+  }
+  .friend-card {
+    padding: 10px;
+  }
+  .friend-actions {
+    gap: 4px;
+  }
+  .friend-action {
+    width: 31px;
+    height: 31px;
+  }
+}
+/* =========================================
+   SCROLLBAR
+========================================= */
+.friends-page::-webkit-scrollbar,
+.messages-page::-webkit-scrollbar {
+  width: 6px;
+}
+.friends-page::-webkit-scrollbar-track,
+.messages-page::-webkit-scrollbar-track {
+  background: transparent;
+}
+.friends-page::-webkit-scrollbar-thumb,
+.messages-page::-webkit-scrollbar-thumb {
+  background: #252c3d;
+  border-radius: 10px;
+}
+.friends-page::-webkit-scrollbar-thumb:hover,
+.messages-page::-webkit-scrollbar-thumb:hover {
+  background: #30394e;
+}

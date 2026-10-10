@@ -1,0 +1,397 @@
+/* =========================================
+   NIGHTCALL - CSS
+========================================= */
+/* =========================================
+   RESET
+========================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #070b16;
+  color: #dfe7ff;
+  overflow: hidden;
+}
+button,
+a {
+  font-family: inherit;
+}
+button {
+  border: none;
+  cursor: pointer;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+/* =========================================
+   APLICAÇÃO
+========================================= */
+.app {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  background:
+    radial-gradient(circle at 80% 10%, rgba(62, 91, 160, 0.1), transparent 30%),
+    #070b16;
+}
+/* =========================================
+   SIDEBAR PRINCIPAL
+========================================= */
+.main-sidebar {
+  width: 88px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 22px;
+  background: rgba(7, 12, 25, 0.95);
+  border-right: 1px solid rgba(130, 155, 210, 0.1);
+}
+/* =========================================
+   LOGO
+========================================= */
+.logo {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 31px;
+  color: #9ebcff;
+  margin-bottom: 28px;
+  filter: drop-shadow(0 0 10px rgba(117, 155, 255, 0.55));
+}
+/* =========================================
+   NAVEGAÇÃO PRINCIPAL
+========================================= */
+.main-navigation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.nav-button {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  color: #9ba8c7;
+  font-size: 21px;
+  transition: 0.2s ease;
+}
+.nav-button:hover {
+  background: rgba(87, 116, 181, 0.12);
+  color: #dce6ff;
+}
+.nav-button.active {
+  background: linear-gradient(145deg, #263454, #1a2540);
+  color: #dce7ff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 5px 20px rgba(0, 0, 0, 0.2);
+}
+.add-button {
+  margin-top: 10px;
+  background: rgba(77, 108, 180, 0.08);
+  color: #a9c3ff;
+  font-size: 27px;
+}
+/* =========================================
+   SIDEBAR DE CONTEÚDO
+========================================= */
+.content-sidebar {
+  width: 280px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(9, 14, 27, 0.92);
+  border-right: 1px solid rgba(130, 155, 210, 0.1);
+}
+/* =========================================
+   HEADER SIDEBAR
+========================================= */
+.sidebar-header {
+  height: 78px;
+  display: flex;
+  align-items: center;
+  padding: 0 22px;
+}
+.sidebar-header h1 {
+  font-size: 22px;
+  letter-spacing: 0.3px;
+  color: #dce6ff;
+}
+/* =========================================
+   MENU SIDEBAR
+========================================= */
+.sidebar-navigation {
+  padding: 10px 13px;
+}
+.sidebar-link {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 0 15px;
+  border-radius: 12px;
+  color: #94a2c2;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+.sidebar-link:hover {
+  background: rgba(73, 99, 157, 0.1);
+  color: #d8e2ff;
+}
+.sidebar-link.active {
+  background: linear-gradient(
+    90deg,
+    rgba(54, 76, 126, 0.48),
+    rgba(34, 49, 84, 0.45)
+  );
+  color: #e3eaff;
+}
+.sidebar-link .icon {
+  width: 18px;
+  font-size: 17px;
+  color: #9bb6f5;
+}
+/* =========================================
+   MENSAGENS DIRETAS
+========================================= */
+.direct-messages {
+  padding: 22px 20px;
+}
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  color: #7785a5;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: bold;
+}
+.add-message {
+  background: transparent;
+  color: #8c9bc0;
+  font-size: 19px;
+  line-height: 1;
+  transition: 0.2s ease;
+}
+.add-message:hover {
+  color: #c8d6fa;
+  transform: scale(1.08);
+}
+/* =========================================
+   SIDEBAR - NENHUMA CONVERSA
+========================================= */
+.direct-messages-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 45px;
+  padding: 10px;
+  border-radius: 9px;
+  color: #59657f;
+  font-size: 11px;
+  text-align: center;
+}
+/* =========================================
+   PERFIL
+========================================= */
+.user-profile {
+  margin-top: auto;
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-top: 1px solid rgba(130, 155, 210, 0.08);
+}
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-left: 10px;
+}
+.user-info strong {
+  font-size: 13px;
+  color: #e0e7fa;
+}
+.user-info span {
+  font-size: 11px;
+  color: #7785a5;
+}
+.profile-actions {
+  display: flex;
+  gap: 5px;
+  margin-left: auto;
+}
+.profile-actions button {
+  width: 25px;
+  height: 25px;
+  background: transparent;
+  color: #8e9dc0;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+.profile-actions button:hover {
+  background: rgba(95, 122, 181, 0.12);
+  color: #cbd8fa;
+}
+/* =========================================
+   CONTEÚDO PRINCIPAL
+========================================= */
+.main-content {
+  position: relative;
+  flex: 1;
+  height: 100vh;
+  padding: 52px 64px;
+  overflow: hidden;
+}
+/* =========================================
+   DECORAÇÃO DO FUNDO
+========================================= */
+.background-decoration {
+  position: absolute;
+  top: 30px;
+  right: 35px;
+  width: 320px;
+  height: 220px;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 75% 30%,
+      rgba(87, 119, 190, 0.15),
+      transparent 30%
+    ),
+    radial-gradient(circle at 40% 60%, rgba(43, 69, 122, 0.1), transparent 50%);
+  opacity: 0.8;
+}
+/* =========================================
+   SISTEMA DE PÁGINAS
+========================================= */
+.page-section {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+.page-section.active-page {
+  display: block;
+}
+/* =========================================
+   HEADER PRINCIPAL
+========================================= */
+.content-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  max-width: 1050px;
+}
+.page-label {
+  display: block;
+  margin-bottom: 22px;
+  color: #8da6dc;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+.content-header h2 {
+  font-size: 34px;
+  line-height: 1.2;
+  color: #e7edff;
+  margin-bottom: 13px;
+  letter-spacing: -0.5px;
+}
+.content-header p {
+  font-size: 16px;
+  color: #7e8baa;
+}
+/* =========================================
+   ONLINE
+========================================= */
+.online-section {
+  position: relative;
+  max-width: 1050px;
+  margin-top: 66px;
+}
+.section-heading {
+  margin-bottom: 18px;
+}
+.online-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+.online-title h3 {
+  font-size: 17px;
+  color: #dce5fb;
+}
+.online-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #57d6a1;
+  box-shadow: 0 0 10px rgba(87, 214, 161, 0.45);
+}
+.online-count {
+  display: block;
+  margin-left: 18px;
+  color: #7c8aa8;
+  font-size: 12px;
+}
+/* =========================================
+   NINGUÉM ONLINE
+========================================= */
+.online-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 230px;
+  padding: 45px 20px;
+  border: 1px solid rgba(120, 148, 205, 0.1);
+  border-radius: 20px;
+  background: linear-gradient(
+    120deg,
+    rgba(21, 30, 52, 0.48),
+    rgba(13, 20, 37, 0.38)
+  );
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+.online-empty .empty-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: #151d31;
+  color: #647291;
+  font-size: 22px;
+}
+.online-empty h3 {
+  margin-bottom: 8px;
+  color: #dce5fb;
+  font-size: 17px;
+}
+.online-empty p {
+  max-width: 360px;
+  color: #737f9d;
+  font-size: 13px;
+  line-height: 1.6;
+}

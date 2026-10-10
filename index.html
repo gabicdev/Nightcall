@@ -1,1734 +1,1000 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Nightcall</title>
 
-    <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/friends.css" />
+    <link rel="stylesheet" href="css/messages.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <link rel="stylesheet" href="css/friend-modal.css" />
+    <link rel="stylesheet" href="css/settings-controls.css" />
+    <link rel="stylesheet" href="css/settings-layout.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+  </head>
 
-<body>
-
-    <!-- =========================================
+  <body>
+    <main id="authPage" class="auth-page">
+      <section class="auth-card" aria-label="Conta Nightcall">
+        <h1>Nightcall</h1>
+        <p>Entre para conversar.</p>
+        <form id="loginForm">
+          <label
+            >Usuário<input
+              name="username"
+              required
+              minlength="3"
+              maxlength="24"
+              autocomplete="username"
+          /></label>
+          <label
+            >Senha<input
+              name="password"
+              type="password"
+              required
+              minlength="10"
+              maxlength="128"
+              autocomplete="current-password"
+          /></label>
+          <button type="submit">Entrar</button>
+        </form>
+        <form id="registerForm" hidden>
+          <label
+            >Nome<input name="name" required maxlength="60" autocomplete="name"
+          /></label>
+          <label
+            >Usuário<input
+              name="username"
+              required
+              pattern="[a-zA-Z0-9_]{3,24}"
+              minlength="3"
+              maxlength="24"
+              autocomplete="username"
+          /></label>
+          <label
+            >Senha (mínimo 10 caracteres)<input
+              name="password"
+              type="password"
+              required
+              minlength="10"
+              maxlength="128"
+              autocomplete="new-password"
+          /></label>
+          <button type="submit">Criar conta</button>
+        </form>
+        <button id="authSwitch" type="button">Criar uma conta</button>
+        <p id="authStatus" role="status" aria-live="polite">
+          Verificando sessão…
+        </p>
+      </section>
+    </main>
+    <div id="applicationRoot" hidden>
+      <!-- =========================================
          APLICAÇÃO
     ========================================== -->
 
-    <div class="app">
-
-
+      <div class="app">
         <!-- =====================================
              BARRA LATERAL PRINCIPAL
         ====================================== -->
 
         <aside class="main-sidebar">
+          <div class="logo">🌙</div>
+          <button id="logoutButton" type="button" title="Sair da conta">
+            Sair
+          </button>
 
-            <div class="logo">
-                🌙
-            </div>
+          <nav class="main-navigation">
+            <a href="#" class="nav-button active" title="Início"> 🏠 </a>
 
+            <a href="#" class="nav-button" title="Mensagens"> 💬 </a>
 
-            <nav class="main-navigation">
-
-                <a
-                    href="#"
-                    class="nav-button active"
-                    title="Início"
-                >
-                    🏠
-                </a>
-
-
-                <a
-                    href="#"
-                    class="nav-button"
-                    title="Mensagens"
-                >
-                    💬
-                </a>
-
-
-                <a
-                    href="#"
-                    class="nav-button add-button"
-                    title="Adicionar"
-                >
-                    +
-                </a>
-
-            </nav>
-
+            <a href="#" class="nav-button add-button" title="Adicionar"> + </a>
+          </nav>
         </aside>
-
-
 
         <!-- =====================================
              SIDEBAR DE CONTEÚDO
         ====================================== -->
 
         <aside class="content-sidebar">
-
-
-            <!-- =================================
+          <!-- =================================
                  NOME DO APLICATIVO
             ================================== -->
 
-            <header class="sidebar-header">
+          <header class="sidebar-header">
+            <h1>nightcall</h1>
+          </header>
 
-                <h1>
-                    nightcall
-                </h1>
-
-            </header>
-
-
-
-            <!-- =================================
+          <!-- =================================
                  MENU
             ================================== -->
 
-            <nav class="sidebar-navigation">
+          <nav class="sidebar-navigation">
+            <a href="#" class="sidebar-link active">
+              <span class="icon"> ⌂ </span>
 
-                <a
-                    href="#"
-                    class="sidebar-link active"
-                >
+              <span> Início </span>
+            </a>
 
-                    <span class="icon">
-                        ⌂
-                    </span>
+            <a href="#" class="sidebar-link">
+              <span class="icon"> ♧ </span>
 
-                    <span>
-                        Início
-                    </span>
+              <span> Amigos </span>
+            </a>
+          </nav>
 
-                </a>
-
-
-                <a
-                    href="#"
-                    class="sidebar-link"
-                >
-
-                    <span class="icon">
-                        ♧
-                    </span>
-
-                    <span>
-                        Amigos
-                    </span>
-
-                </a>
-
-            </nav>
-
-
-
-            <!-- =================================
+          <!-- =================================
                  MENSAGENS DIRETAS
             ================================== -->
 
-            <section class="direct-messages">
+          <section class="direct-messages">
+            <div class="section-title">
+              <span> MENSAGENS DIRETAS </span>
 
-                <div class="section-title">
+              <button class="add-message" type="button" title="Nova conversa">
+                +
+              </button>
+            </div>
 
-                    <span>
-                        MENSAGENS DIRETAS
-                    </span>
+            <div class="direct-messages-empty" id="directMessagesEmpty">
+              <span> Nenhuma conversa </span>
+            </div>
+          </section>
 
-                    <button
-                        class="add-message"
-                        type="button"
-                        title="Nova conversa"
-                    >
-                        +
-                    </button>
-
-                </div>
-
-
-                <div
-                    class="direct-messages-empty"
-                    id="directMessagesEmpty"
-                >
-
-                    <span>
-                        Nenhuma conversa
-                    </span>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =================================
+          <!-- =================================
                  PERFIL DO USUÁRIO
             ================================== -->
 
-            <div class="user-profile">
-
-                <div class="avatar">
-
-                    <img
-                        src=""
-                        alt="Minha foto de perfil"
-                        id="myAvatar"
-                    >
-
-                </div>
-
-
-                <div class="user-info">
-
-                    <strong id="myName">
-                        Usuário
-                    </strong>
-
-                    <span id="myUsername">
-                        @usuario
-                    </span>
-
-                </div>
-
-
-                <div class="profile-actions">
-
-                    <button
-                        type="button"
-                        title="Microfone"
-                    >
-                        🎙
-                    </button>
-
-
-                    <button
-                        type="button"
-                        title="Fones"
-                    >
-                        🎧
-                    </button>
-
-
-                    <button
-                        type="button"
-                        title="Configurações"
-                        id="settingsButton"
-                    >
-                        ⚙
-                    </button>
-
-                </div>
-
+          <div class="user-profile">
+            <div class="avatar">
+              <img src="" alt="Minha foto de perfil" id="myAvatar" />
             </div>
 
+            <div class="user-info">
+              <strong id="myName"> Usuário </strong>
+
+              <span id="myUsername"> @usuario </span>
+            </div>
+
+            <div class="profile-actions">
+              <button type="button" title="Microfone">🎙</button>
+
+              <button type="button" title="Fones">🎧</button>
+
+              <button type="button" title="Configurações" id="settingsButton">
+                ⚙
+              </button>
+            </div>
+          </div>
         </aside>
-
-
 
         <!-- =====================================
              CONTEÚDO PRINCIPAL
         ====================================== -->
 
         <main class="main-content">
+          <!-- Decoração do fundo -->
 
+          <div class="background-decoration" aria-hidden="true"></div>
 
-            <!-- Decoração do fundo -->
-
-            <div
-                class="background-decoration"
-                aria-hidden="true"
-            ></div>
-
-
-
-            <!-- =================================
+          <!-- =================================
                  PÁGINA INÍCIO
             ================================== -->
 
-            <section
-                id="homePage"
-                class="page-section active-page"
-            >
-
-
-                <!-- =================================
+          <section id="homePage" class="page-section active-page">
+            <!-- =================================
                      CABEÇALHO
                 ================================== -->
 
-                <header class="content-header">
+            <header class="content-header">
+              <div>
+                <span class="page-label"> INÍCIO </span>
 
-                    <div>
+                <h2 id="welcomeMessage">Boa noite.</h2>
 
-                        <span class="page-label">
-                            INÍCIO
-                        </span>
+                <p>Quem está aqui com você?</p>
+              </div>
+            </header>
 
-
-                        <h2 id="welcomeMessage">
-                            Boa noite.
-                        </h2>
-
-
-                        <p>
-                            Quem está aqui com você?
-                        </p>
-
-                    </div>
-
-                </header>
-
-
-
-                <!-- =================================
+            <!-- =================================
                      USUÁRIOS ONLINE
                 ================================== -->
 
-                <section class="online-section">
+            <section class="online-section">
+              <div class="section-heading">
+                <div class="online-title">
+                  <span class="online-indicator" aria-hidden="true"></span>
 
-                    <div class="section-heading">
+                  <h3>Quem está online</h3>
+                </div>
 
-                        <div class="online-title">
+                <span class="online-count" id="onlineCount">
+                  0 pessoas online
+                </span>
+              </div>
 
-                            <span
-                                class="online-indicator"
-                                aria-hidden="true"
-                            ></span>
-
-
-                            <h3>
-                                Quem está online
-                            </h3>
-
-                        </div>
-
-
-                        <span
-                            class="online-count"
-                            id="onlineCount"
-                        >
-                            0 pessoas online
-                        </span>
-
-                    </div>
-
-
-
-                    <!-- =================================
+              <!-- =================================
                          ESTADO VAZIO
                     ================================== -->
 
-                    <div
-                        class="online-empty"
-                        id="onlineEmpty"
-                    >
+              <div class="online-empty" id="onlineEmpty">
+                <div class="empty-icon">◉</div>
 
-                        <div class="empty-icon">
-                            ◉
-                        </div>
+                <h3>Ninguém está online</h3>
 
-
-                        <h3>
-                            Ninguém está online
-                        </h3>
-
-
-                        <p>
-                            Quando seus amigos estiverem online,
-                            eles aparecerão aqui.
-                        </p>
-
-                    </div>
-
-                </section>
-
+                <p>
+                  Quando seus amigos estiverem online, eles aparecerão aqui.
+                </p>
+              </div>
             </section>
+          </section>
 
-
-
-            <!-- =================================
+          <!-- =================================
                  PÁGINA AMIGOS
             ================================== -->
 
-            <section
-                id="friendsPage"
-                class="page-section friends-page"
-            >
-
-
-                <!-- =================================
+          <section id="friendsPage" class="page-section friends-page">
+            <!-- =================================
                      CABEÇALHO DOS AMIGOS
                 ================================== -->
 
-                <header class="friends-header">
+            <header class="friends-header">
+              <div class="friends-title">
+                <span class="page-label"> SOCIAL </span>
 
-                    <div class="friends-title">
+                <h2>Amigos</h2>
 
-                        <span class="page-label">
-                            SOCIAL
-                        </span>
+                <p>Encontre e gerencie seus amigos.</p>
+              </div>
 
+              <button
+                type="button"
+                class="add-friend-button"
+                id="addFriendButton"
+              >
+                <span> + </span>
 
-                        <h2>
-                            Amigos
-                        </h2>
+                Adicionar amigo
+              </button>
+            </header>
 
-
-                        <p>
-                            Encontre e gerencie seus amigos.
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="add-friend-button"
-                        id="addFriendButton"
-                    >
-
-                        <span>
-                            +
-                        </span>
-
-                        Adicionar amigo
-
-                    </button>
-
-                </header>
-
-
-
-                <!-- =================================
+            <!-- =================================
                      PESQUISA
                 ================================== -->
 
-                <div class="friends-search">
+            <div class="friends-search">
+              <span class="search-icon"> 🔎 </span>
 
-                    <span class="search-icon">
-                        🔎
-                    </span>
+              <input
+                type="text"
+                id="friendSearch"
+                placeholder="Pesquisar amigos..."
+                autocomplete="off"
+              />
+            </div>
 
-
-                    <input
-                        type="text"
-                        id="friendSearch"
-                        placeholder="Pesquisar amigos..."
-                        autocomplete="off"
-                    >
-
-                </div>
-
-
-
-                <!-- =================================
+            <!-- =================================
                      ABAS
                 ================================== -->
 
-                <nav class="friends-tabs">
+            <nav class="friends-tabs">
+              <button type="button" class="friends-tab active" data-tab="all">
+                Todos
+              </button>
 
-                    <button
-                        type="button"
-                        class="friends-tab active"
-                        data-tab="all"
-                    >
-                        Todos
-                    </button>
+              <button type="button" class="friends-tab" data-tab="online">
+                Online
+              </button>
 
+              <button type="button" class="friends-tab" data-tab="pending">
+                Solicitações
 
-                    <button
-                        type="button"
-                        class="friends-tab"
-                        data-tab="online"
-                    >
-                        Online
-                    </button>
+                <span class="request-count"> 0 </span>
+              </button>
+            </nav>
 
-
-                    <button
-                        type="button"
-                        class="friends-tab"
-                        data-tab="pending"
-                    >
-                        Solicitações
-
-                        <span class="request-count">
-                            0
-                        </span>
-
-                    </button>
-
-                </nav>
-
-
-
-                <!-- =================================
+            <!-- =================================
                      LISTA DE AMIGOS
                 ================================== -->
 
-                <section class="friends-list-section">
+            <section class="friends-list-section">
+              <div class="friends-list-title">
+                <h3 id="friendsListTitle">Todos os amigos</h3>
 
-                    <div class="friends-list-title">
+                <span id="friendsTotal"> 0 amigos </span>
+              </div>
 
-                        <h3 id="friendsListTitle">
-                            Todos os amigos
-                        </h3>
+              <div class="friends-list" id="friendsList"></div>
 
-
-                        <span id="friendsTotal">
-                            0 amigos
-                        </span>
-
-                    </div>
-
-
-
-                    <div
-                        class="friends-list"
-                        id="friendsList"
-                    >
-
-                    </div>
-
-
-
-                    <!-- =================================
+              <!-- =================================
                          ESTADO VAZIO
                     ================================== -->
 
-                    <div
-                        class="friends-empty visible"
-                        id="friendsEmpty"
-                    >
+              <div class="friends-empty visible" id="friendsEmpty">
+                <div class="empty-icon">♡</div>
 
-                        <div class="empty-icon">
-                            ♡
-                        </div>
+                <h3>Você ainda não tem amigos</h3>
 
+                <p>Adicione alguém para começar a conversar.</p>
 
-                        <h3>
-                            Você ainda não tem amigos
-                        </h3>
-
-
-                        <p>
-                            Adicione alguém para começar a conversar.
-                        </p>
-
-
-                        <button
-                            type="button"
-                            id="emptyAddFriend"
-                        >
-                            Adicionar amigo
-                        </button>
-
-                    </div>
-
-                </section>
-
+                <button type="button" id="emptyAddFriend">
+                  Adicionar amigo
+                </button>
+              </div>
             </section>
+          </section>
 
-
-
-            <!-- =================================
+          <!-- =================================
                  PÁGINA MENSAGENS
             ================================== -->
 
-            <section
-                id="messagesPage"
-                class="page-section messages-page"
-            >
-
-
-                <!-- =================================
+          <section id="messagesPage" class="page-section messages-page">
+            <!-- =================================
                      CABEÇALHO
                 ================================== -->
 
-                <header class="messages-header">
+            <header class="messages-header">
+              <div>
+                <span class="page-label"> CONVERSAS </span>
 
-                    <div>
+                <h2>Mensagens</h2>
 
-                        <span class="page-label">
-                            CONVERSAS
-                        </span>
+                <p>Suas conversas aparecerão aqui.</p>
+              </div>
 
+              <button
+                type="button"
+                class="new-conversation-button"
+                id="newConversationButton"
+              >
+                <span> + </span>
 
-                        <h2>
-                            Mensagens
-                        </h2>
+                Nova conversa
+              </button>
+            </header>
 
-
-                        <p>
-                            Suas conversas aparecerão aqui.
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="new-conversation-button"
-                        id="newConversationButton"
-                    >
-
-                        <span>
-                            +
-                        </span>
-
-                        Nova conversa
-
-                    </button>
-
-                </header>
-
-
-
-                <!-- =================================
+            <!-- =================================
                      PESQUISA DE CONVERSAS
                 ================================== -->
 
-                <div class="messages-search">
+            <div class="messages-search">
+              <span> 🔎 </span>
 
-                    <span>
-                        🔎
-                    </span>
+              <input
+                type="text"
+                id="messageSearch"
+                placeholder="Pesquisar conversas..."
+                autocomplete="off"
+              />
+            </div>
 
-
-                    <input
-                        type="text"
-                        id="messageSearch"
-                        placeholder="Pesquisar conversas..."
-                        autocomplete="off"
-                    >
-
-                </div>
-
-
-
-                <!-- =================================
+            <!-- =================================
                      ÁREA DAS CONVERSAS
                 ================================== -->
 
-                <section class="conversations-section">
+            <section class="conversations-section">
+              <div class="conversations-title">
+                <h3>Conversas</h3>
+              </div>
 
-                    <div class="conversations-title">
+              <div class="conversations-list" id="conversationsList"></div>
 
-                        <h3>
-                            Conversas
-                        </h3>
-
-                    </div>
-
-
-
-                    <div
-                        class="conversations-list"
-                        id="conversationsList"
-                    >
-
-                    </div>
-
-
-
-                    <!-- =================================
+              <!-- =================================
                          ESTADO VAZIO
                     ================================== -->
 
-                    <div
-                        class="messages-empty visible"
-                        id="messagesEmpty"
-                    >
+              <div class="messages-empty visible" id="messagesEmpty">
+                <div class="empty-icon">💬</div>
 
-                        <div class="empty-icon">
-                            💬
-                        </div>
+                <h3>Nenhuma conversa ainda</h3>
 
+                <p>Quando você iniciar uma conversa, ela aparecerá aqui.</p>
 
-                        <h3>
-                            Nenhuma conversa ainda
-                        </h3>
-
-
-                        <p>
-                            Quando você iniciar uma conversa,
-                            ela aparecerá aqui.
-                        </p>
-
-
-                        <button
-                            type="button"
-                            id="emptyNewConversation"
-                        >
-                            Nova conversa
-                        </button>
-
-                    </div>
-
-                </section>
-
+                <button type="button" id="emptyNewConversation">
+                  Nova conversa
+                </button>
+              </div>
             </section>
-
+          </section>
         </main>
+      </div>
 
-    </div>
-
-
-
-    <!-- =========================================
+      <!-- =========================================
          MODAL - ADICIONAR AMIGO
     ========================================== -->
 
-    <div
-        class="modal-overlay"
-        id="addFriendModal"
-        aria-hidden="true"
-    >
-
+      <div class="modal-overlay" id="addFriendModal" aria-hidden="true">
         <div
-            class="add-friend-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="addFriendTitle"
+          class="add-friend-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="addFriendTitle"
         >
+          <!-- CABEÇALHO -->
 
-            <!-- CABEÇALHO -->
+          <div class="modal-header">
+            <div>
+              <span class="modal-label"> SOCIAL </span>
 
-            <div class="modal-header">
+              <h2 id="addFriendTitle">Adicionar amigo</h2>
 
-                <div>
-
-                    <span class="modal-label">
-                        SOCIAL
-                    </span>
-
-                    <h2 id="addFriendTitle">
-                        Adicionar amigo
-                    </h2>
-
-                    <p>
-                        Encontre alguém pelo nome de usuário.
-                    </p>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    class="modal-close"
-                    id="closeAddFriendModal"
-                    aria-label="Fechar"
-                >
-                    ×
-                </button>
-
+              <p>Encontre alguém pelo nome de usuário.</p>
             </div>
 
-
-            <!-- PESQUISA -->
-
-            <div class="add-friend-search">
-
-                <span>
-                    @
-                </span>
-
-                <input
-                    type="text"
-                    id="addFriendUsername"
-                    placeholder="usuario"
-                    autocomplete="off"
-                    maxlength="32"
-                >
-
-            </div>
-
-
-            <!-- MENSAGEM DE ERRO -->
-
-            <div
-                class="add-friend-error"
-                id="addFriendError"
-            ></div>
-
-
-            <!-- RESULTADO -->
-
-            <div
-                class="add-friend-result"
-                id="addFriendResult"
+            <button
+              type="button"
+              class="modal-close"
+              id="closeAddFriendModal"
+              aria-label="Fechar"
             >
+              ×
+            </button>
+          </div>
 
-                <div class="result-avatar">
-                    👤
-                </div>
+          <!-- PESQUISA -->
 
-                <div class="result-info">
+          <div class="add-friend-search">
+            <span> @ </span>
 
-                    <strong id="resultUserName">
-                        Usuário
-                    </strong>
+            <input
+              type="text"
+              id="addFriendUsername"
+              placeholder="usuario"
+              autocomplete="off"
+              maxlength="32"
+            />
+          </div>
 
-                    <span id="resultUserUsername">
-                        @usuario
-                    </span>
+          <!-- MENSAGEM DE ERRO -->
 
-                </div>
+          <div class="add-friend-error" id="addFriendError"></div>
 
+          <!-- RESULTADO -->
 
-                <button
-                    type="button"
-                    id="sendFriendRequest"
-                >
-                    Adicionar
-                </button>
+          <div class="add-friend-result" id="addFriendResult">
+            <div class="result-avatar">👤</div>
 
+            <div class="result-info">
+              <strong id="resultUserName"> Usuário </strong>
+
+              <span id="resultUserUsername"> @usuario </span>
             </div>
 
+            <button type="button" id="sendFriendRequest">Adicionar</button>
+          </div>
 
-            <!-- RODAPÉ -->
+          <!-- RODAPÉ -->
 
-            <div class="modal-footer">
+          <div class="modal-footer">
+            <button type="button" class="modal-cancel" id="cancelAddFriend">
+              Cancelar
+            </button>
 
-                <button
-                    type="button"
-                    class="modal-cancel"
-                    id="cancelAddFriend"
-                >
-                    Cancelar
-                </button>
-
-
-                <button
-                    type="button"
-                    class="modal-search-button"
-                    id="searchFriendButton"
-                >
-                    Pesquisar
-                </button>
-
-            </div>
-
+            <button
+              type="button"
+              class="modal-search-button"
+              id="searchFriendButton"
+            >
+              Pesquisar
+            </button>
+          </div>
         </div>
+      </div>
 
-    </div>
-
-
-
-    <!-- =========================================
+      <!-- =========================================
          CONFIGURAÇÕES - DENTRO DO NIGHTCALL
     ========================================== -->
 
-    <div
-        class="settings-overlay"
-        id="settingsOverlay"
-        aria-hidden="true"
-    >
-
+      <div class="settings-overlay" id="settingsOverlay" aria-hidden="true">
         <div class="settings-modal-wrapper">
-
-
-            <!-- =====================================
+          <!-- =====================================
                  BOTÃO VOLTAR
                  AGORA FICA NO LUGAR DO X
             ====================================== -->
 
-            <button
-                type="button"
-                class="back-button settings-top-back"
-                id="closeSettingsButton"
-            >
-                ← Voltar para o Nightcall
-            </button>
+          <button
+            type="button"
+            class="back-button settings-top-back"
+            id="closeSettingsButton"
+          >
+            ← Voltar para o Nightcall
+          </button>
 
-
-            <div class="settings-app">
-
-
-                <!-- =================================
+          <div class="settings-app">
+            <!-- =================================
                      SIDEBAR DAS CONFIGURAÇÕES
                 ================================== -->
 
-                <aside class="settings-sidebar">
+            <aside class="settings-sidebar">
+              <!-- MINI PERFIL -->
 
+              <div class="settings-account-mini">
+                <div class="settings-mini-avatar" id="settingsMiniAvatar">
+                  👤
+                </div>
 
-                    <!-- MINI PERFIL -->
+                <div>
+                  <strong id="settingsMiniName"> Usuário </strong>
 
-                    <div class="settings-account-mini">
+                  <span> Configurações </span>
+                </div>
+              </div>
 
-                        <div
-                            class="settings-mini-avatar"
-                            id="settingsMiniAvatar"
-                        >
-                            👤
-                        </div>
+              <!-- PESQUISA -->
 
-                        <div>
+              <div class="settings-search">
+                <span> ⌕ </span>
 
-                            <strong id="settingsMiniName">
-                                Usuário
-                            </strong>
+                <input
+                  type="text"
+                  placeholder="Pesquisar"
+                  aria-label="Pesquisar configurações"
+                />
+              </div>
 
-                            <span>
-                                Configurações
-                            </span>
+              <!-- MENU -->
 
-                        </div>
+              <nav class="settings-navigation">
+                <div class="settings-nav-heading">CONTA</div>
 
-                    </div>
+                <button
+                  type="button"
+                  class="settings-nav-item active"
+                  data-section="profile"
+                >
+                  <span> 👤 </span>
 
+                  <span> Perfil </span>
+                </button>
 
+                <div class="settings-nav-heading">APLICATIVO</div>
 
-                    <!-- PESQUISA -->
+                <button
+                  type="button"
+                  class="settings-nav-item"
+                  data-section="audio"
+                >
+                  <span> 🎙 </span>
 
-                    <div class="settings-search">
+                  <span> Áudio </span>
+                </button>
 
-                        <span>
-                            ⌕
-                        </span>
+                <button
+                  type="button"
+                  class="settings-nav-item"
+                  data-section="appearance"
+                >
+                  <span> 🎨 </span>
 
-                        <input
-                            type="text"
-                            placeholder="Pesquisar"
-                            aria-label="Pesquisar configurações"
-                        >
+                  <span> Aparência </span>
+                </button>
 
-                    </div>
+                <button
+                  type="button"
+                  class="settings-nav-item"
+                  data-section="notifications"
+                >
+                  <span> 🔔 </span>
 
+                  <span> Notificações </span>
+                </button>
 
+                <button
+                  type="button"
+                  class="settings-nav-item"
+                  data-section="privacy"
+                >
+                  <span> 🔒 </span>
 
-                    <!-- MENU -->
+                  <span> Privacidade </span>
+                </button>
+              </nav>
+            </aside>
 
-                    <nav class="settings-navigation">
-
-
-                        <div class="settings-nav-heading">
-                            CONTA
-                        </div>
-
-
-                        <button
-                            type="button"
-                            class="settings-nav-item active"
-                            data-section="profile"
-                        >
-
-                            <span>
-                                👤
-                            </span>
-
-                            <span>
-                                Perfil
-                            </span>
-
-                        </button>
-
-
-
-                        <div class="settings-nav-heading">
-                            APLICATIVO
-                        </div>
-
-
-                        <button
-                            type="button"
-                            class="settings-nav-item"
-                            data-section="audio"
-                        >
-
-                            <span>
-                                🎙
-                            </span>
-
-                            <span>
-                                Áudio
-                            </span>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="settings-nav-item"
-                            data-section="appearance"
-                        >
-
-                            <span>
-                                🎨
-                            </span>
-
-                            <span>
-                                Aparência
-                            </span>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="settings-nav-item"
-                            data-section="notifications"
-                        >
-
-                            <span>
-                                🔔
-                            </span>
-
-                            <span>
-                                Notificações
-                            </span>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="settings-nav-item"
-                            data-section="privacy"
-                        >
-
-                            <span>
-                                🔒
-                            </span>
-
-                            <span>
-                                Privacidade
-                            </span>
-
-                        </button>
-
-                    </nav>
-
-                </aside>
-
-
-
-                <!-- =================================
+            <!-- =================================
                      CONTEÚDO DAS CONFIGURAÇÕES
                 ================================== -->
 
-                <main class="settings-main">
+            <main class="settings-main">
+              <!-- CABEÇALHO -->
 
+              <header class="settings-header">
+                <div>
+                  <span class="eyebrow" id="sectionLabel"> PERFIL </span>
 
-                    <!-- CABEÇALHO -->
+                  <h1 id="sectionTitle">Perfil</h1>
 
-                    <header class="settings-header">
+                  <p id="sectionDescription">
+                    Personalize as informações que aparecem no seu perfil.
+                  </p>
+                </div>
+              </header>
 
-                        <div>
-
-                            <span
-                                class="eyebrow"
-                                id="sectionLabel"
-                            >
-                                PERFIL
-                            </span>
-
-
-                            <h1 id="sectionTitle">
-                                Perfil
-                            </h1>
-
-
-                            <p id="sectionDescription">
-                                Personalize as informações que aparecem no seu perfil.
-                            </p>
-
-                        </div>
-
-                    </header>
-
-
-
-                    <!-- =================================
+              <!-- =================================
                          PERFIL
                     ================================== -->
 
-                    <section
-                        class="settings-section active"
-                        id="profileSection"
+              <section class="settings-section active" id="profileSection">
+                <!-- PREVIEW -->
+
+                <div class="profile-preview card">
+                  <div class="avatar-preview">
+                    <img src="" alt="Foto de perfil" id="avatarPreview" />
+
+                    <span id="avatarPlaceholder"> 👤 </span>
+                  </div>
+
+                  <div class="profile-preview-info">
+                    <strong id="previewName"> Usuário </strong>
+
+                    <span id="previewUsername"> @usuario </span>
+
+                    <small id="previewBio"> Nenhuma bio adicionada. </small>
+                  </div>
+                </div>
+
+                <!-- INFORMAÇÕES -->
+
+                <div class="card">
+                  <div class="card-title">
+                    <h2>Informações do perfil</h2>
+
+                    <p>Essas informações podem ser alteradas por você.</p>
+                  </div>
+
+                  <!-- NOME -->
+
+                  <div class="field">
+                    <label for="profileName"> Nome </label>
+
+                    <input
+                      type="text"
+                      id="profileName"
+                      maxlength="32"
+                      placeholder="Seu nome"
+                    />
+                  </div>
+
+                  <!-- USUÁRIO -->
+
+                  <div class="field">
+                    <label for="profileUsername"> Nome de usuário </label>
+
+                    <div class="username-input">
+                      <span> @ </span>
+
+                      <input
+                        type="text"
+                        id="profileUsername"
+                        maxlength="32"
+                        placeholder="usuario"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- BIO -->
+
+                  <div class="field">
+                    <label for="profileBio"> Bio </label>
+
+                    <textarea
+                      id="profileBio"
+                      maxlength="120"
+                      rows="3"
+                      placeholder="Conte um pouco sobre você..."
+                    ></textarea>
+
+                    <div class="character-count">
+                      <span id="bioCount"> 0 </span>
+
+                      /120
+                    </div>
+                  </div>
+
+                  <!-- FOTO -->
+
+                  <div class="field">
+                    <label for="profileAvatar"> Foto de perfil </label>
+
+                    <input
+                      type="url"
+                      id="profileAvatar"
+                      placeholder="https://exemplo.com/minha-foto.jpg"
+                    />
+
+                    <small>
+                      Cole o endereço de uma imagem. O upload do computador pode
+                      ser adicionado depois.
+                    </small>
+                  </div>
+
+                  <!-- SALVAR -->
+
+                  <div class="actions">
+                    <button
+                      type="button"
+                      class="primary-button"
+                      id="saveProfile"
                     >
-
-
-                        <!-- PREVIEW -->
-
-                        <div class="profile-preview card">
-
-                            <div class="avatar-preview">
-
-                                <img
-                                    src=""
-                                    alt="Foto de perfil"
-                                    id="avatarPreview"
-                                >
-
-                                <span id="avatarPlaceholder">
-                                    👤
-                                </span>
-
-                            </div>
-
-
-                            <div class="profile-preview-info">
-
-                                <strong id="previewName">
-                                    Usuário
-                                </strong>
-
-
-                                <span id="previewUsername">
-                                    @usuario
-                                </span>
-
-
-                                <small id="previewBio">
-                                    Nenhuma bio adicionada.
-                                </small>
-
-                            </div>
-
-                        </div>
-
-
-
-                        <!-- INFORMAÇÕES -->
-
-                        <div class="card">
-
-                            <div class="card-title">
-
-                                <h2>
-                                    Informações do perfil
-                                </h2>
-
-                                <p>
-                                    Essas informações podem ser alteradas por você.
-                                </p>
-
-                            </div>
-
-
-
-                            <!-- NOME -->
-
-                            <div class="field">
-
-                                <label for="profileName">
-                                    Nome
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="profileName"
-                                    maxlength="32"
-                                    placeholder="Seu nome"
-                                >
-
-                            </div>
-
-
-
-                            <!-- USUÁRIO -->
-
-                            <div class="field">
-
-                                <label for="profileUsername">
-                                    Nome de usuário
-                                </label>
-
-                                <div class="username-input">
-
-                                    <span>
-                                        @
-                                    </span>
-
-                                    <input
-                                        type="text"
-                                        id="profileUsername"
-                                        maxlength="32"
-                                        placeholder="usuario"
-                                    >
-
-                                </div>
-
-                            </div>
-
-
-
-                            <!-- BIO -->
-
-                            <div class="field">
-
-                                <label for="profileBio">
-                                    Bio
-                                </label>
-
-                                <textarea
-                                    id="profileBio"
-                                    maxlength="120"
-                                    rows="3"
-                                    placeholder="Conte um pouco sobre você..."
-                                ></textarea>
-
-
-                                <div class="character-count">
-
-                                    <span id="bioCount">
-                                        0
-                                    </span>
-
-                                    /120
-
-                                </div>
-
-                            </div>
-
-
-
-                            <!-- FOTO -->
-
-                            <div class="field">
-
-                                <label for="profileAvatar">
-                                    Foto de perfil
-                                </label>
-
-                                <input
-                                    type="url"
-                                    id="profileAvatar"
-                                    placeholder="https://exemplo.com/minha-foto.jpg"
-                                >
-
-
-                                <small>
-                                    Cole o endereço de uma imagem.
-                                    O upload do computador pode ser adicionado depois.
-                                </small>
-
-                            </div>
-
-
-
-                            <!-- SALVAR -->
-
-                            <div class="actions">
-
-                                <button
-                                    type="button"
-                                    class="primary-button"
-                                    id="saveProfile"
-                                >
-                                    Salvar alterações
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-
-                    <!-- =================================
+                      Salvar alterações
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              <!-- =================================
                          ÁUDIO
                     ================================== -->
 
-                    <section
-                        class="settings-section"
-                        id="audioSection"
-                    >
+              <section class="settings-section" id="audioSection">
+                <div class="card">
+                  <div class="card-title">
+                    <h2>Microfone</h2>
 
+                    <p>Configure a entrada de áudio do Nightcall.</p>
+                  </div>
 
-                        <div class="card">
+                  <div class="setting-row">
+                    <div>
+                      <strong> Microfone ativado </strong>
 
-                            <div class="card-title">
+                      <span> Permitir o uso do microfone nas chamadas. </span>
+                    </div>
 
-                                <h2>
-                                    Microfone
-                                </h2>
+                    <label class="switch">
+                      <input type="checkbox" id="microphoneEnabled" />
 
-                                <p>
-                                    Configure a entrada de áudio do Nightcall.
-                                </p>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
 
-                            </div>
+                  <div class="range-setting">
+                    <div class="range-header">
+                      <label for="microphoneVolume">
+                        Volume do microfone
+                      </label>
 
+                      <strong id="microphoneVolumeValue"> 100% </strong>
+                    </div>
 
-                            <div class="setting-row">
+                    <input
+                      type="range"
+                      id="microphoneVolume"
+                      min="0"
+                      max="100"
+                      value="100"
+                    />
+                  </div>
 
-                                <div>
+                  <button
+                    type="button"
+                    class="secondary-button"
+                    id="testMicrophone"
+                  >
+                    🎙 Testar microfone
+                  </button>
 
-                                    <strong>
-                                        Microfone ativado
-                                    </strong>
+                  <p class="status-message" id="microphoneStatus"></p>
+                </div>
 
-                                    <span>
-                                        Permitir o uso do microfone nas chamadas.
-                                    </span>
+                <div class="card">
+                  <div class="card-title">
+                    <h2>Saída de áudio</h2>
 
-                                </div>
+                    <p>Controle o volume dos sons e chamadas.</p>
+                  </div>
 
+                  <div class="range-setting">
+                    <div class="range-header">
+                      <label for="outputVolume"> Volume dos fones </label>
 
-                                <label class="switch">
+                      <strong id="outputVolumeValue"> 100% </strong>
+                    </div>
 
-                                    <input
-                                        type="checkbox"
-                                        id="microphoneEnabled"
-                                    >
+                    <input
+                      type="range"
+                      id="outputVolume"
+                      min="0"
+                      max="100"
+                      value="100"
+                    />
+                  </div>
+                </div>
+              </section>
 
-                                    <span class="slider"></span>
-
-                                </label>
-
-                            </div>
-
-
-
-                            <div class="range-setting">
-
-                                <div class="range-header">
-
-                                    <label for="microphoneVolume">
-                                        Volume do microfone
-                                    </label>
-
-                                    <strong id="microphoneVolumeValue">
-                                        100%
-                                    </strong>
-
-                                </div>
-
-
-                                <input
-                                    type="range"
-                                    id="microphoneVolume"
-                                    min="0"
-                                    max="100"
-                                    value="100"
-                                >
-
-                            </div>
-
-
-
-                            <button
-                                type="button"
-                                class="secondary-button"
-                                id="testMicrophone"
-                            >
-                                🎙 Testar microfone
-                            </button>
-
-
-                            <p
-                                class="status-message"
-                                id="microphoneStatus"
-                            ></p>
-
-                        </div>
-
-
-
-                        <div class="card">
-
-                            <div class="card-title">
-
-                                <h2>
-                                    Saída de áudio
-                                </h2>
-
-                                <p>
-                                    Controle o volume dos sons e chamadas.
-                                </p>
-
-                            </div>
-
-
-                            <div class="range-setting">
-
-                                <div class="range-header">
-
-                                    <label for="outputVolume">
-                                        Volume dos fones
-                                    </label>
-
-                                    <strong id="outputVolumeValue">
-                                        100%
-                                    </strong>
-
-                                </div>
-
-
-                                <input
-                                    type="range"
-                                    id="outputVolume"
-                                    min="0"
-                                    max="100"
-                                    value="100"
-                                >
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-
-                    <!-- =================================
+              <!-- =================================
                          APARÊNCIA
                     ================================== -->
 
-                    <section
-                        class="settings-section"
-                        id="appearanceSection"
+              <section class="settings-section" id="appearanceSection">
+                <div class="card">
+                  <div class="card-title">
+                    <h2>Aparência</h2>
+
+                    <p>Escolha como o Nightcall deve aparecer.</p>
+                  </div>
+
+                  <div class="theme-options">
+                    <button
+                      type="button"
+                      class="theme-option active"
+                      data-theme="dark"
                     >
+                      <span class="theme-icon"> 🌙 </span>
 
-                        <div class="card">
+                      <span>
+                        <strong> Escuro </strong>
 
-                            <div class="card-title">
+                        <small> Tema atual do Nightcall </small>
+                      </span>
+                    </button>
 
-                                <h2>
-                                    Aparência
-                                </h2>
+                    <button
+                      type="button"
+                      class="theme-option disabled"
+                      disabled
+                    >
+                      <span class="theme-icon"> ☀️ </span>
 
-                                <p>
-                                    Escolha como o Nightcall deve aparecer.
-                                </p>
+                      <span>
+                        <strong> Claro </strong>
 
-                            </div>
+                        <small> Disponível futuramente </small>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </section>
 
-
-                            <div class="theme-options">
-
-
-                                <button
-                                    type="button"
-                                    class="theme-option active"
-                                    data-theme="dark"
-                                >
-
-                                    <span class="theme-icon">
-                                        🌙
-                                    </span>
-
-
-                                    <span>
-
-                                        <strong>
-                                            Escuro
-                                        </strong>
-
-                                        <small>
-                                            Tema atual do Nightcall
-                                        </small>
-
-                                    </span>
-
-                                </button>
-
-
-
-                                <button
-                                    type="button"
-                                    class="theme-option disabled"
-                                    disabled
-                                >
-
-                                    <span class="theme-icon">
-                                        ☀️
-                                    </span>
-
-
-                                    <span>
-
-                                        <strong>
-                                            Claro
-                                        </strong>
-
-                                        <small>
-                                            Disponível futuramente
-                                        </small>
-
-                                    </span>
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-
-                    <!-- =================================
+              <!-- =================================
                          NOTIFICAÇÕES
                     ================================== -->
 
-                    <section
-                        class="settings-section"
-                        id="notificationsSection"
-                    >
+              <section class="settings-section" id="notificationsSection">
+                <div class="card">
+                  <div class="card-title">
+                    <h2>Notificações</h2>
 
-                        <div class="card">
+                    <p>Controle quais avisos você deseja receber.</p>
+                  </div>
 
-                            <div class="card-title">
+                  <div class="setting-row">
+                    <div>
+                      <strong> Mensagens </strong>
 
-                                <h2>
-                                    Notificações
-                                </h2>
+                      <span> Avisar quando receber uma nova mensagem. </span>
+                    </div>
 
-                                <p>
-                                    Controle quais avisos você deseja receber.
-                                </p>
+                    <label class="switch">
+                      <input
+                        type="checkbox"
+                        id="messageNotifications"
+                        checked
+                      />
 
-                            </div>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
 
+                  <div class="setting-row">
+                    <div>
+                      <strong> Solicitações de amizade </strong>
 
+                      <span>
+                        Avisar quando alguém enviar uma solicitação.
+                      </span>
+                    </div>
 
-                            <div class="setting-row">
+                    <label class="switch">
+                      <input type="checkbox" id="friendNotifications" checked />
 
-                                <div>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
 
-                                    <strong>
-                                        Mensagens
-                                    </strong>
+                  <div class="setting-row">
+                    <div>
+                      <strong> Chamadas </strong>
 
-                                    <span>
-                                        Avisar quando receber uma nova mensagem.
-                                    </span>
+                      <span> Avisar quando alguém iniciar uma chamada. </span>
+                    </div>
 
-                                </div>
+                    <label class="switch">
+                      <input type="checkbox" id="callNotifications" checked />
 
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </section>
 
-                                <label class="switch">
-
-                                    <input
-                                        type="checkbox"
-                                        id="messageNotifications"
-                                        checked
-                                    >
-
-                                    <span class="slider"></span>
-
-                                </label>
-
-                            </div>
-
-
-
-                            <div class="setting-row">
-
-                                <div>
-
-                                    <strong>
-                                        Solicitações de amizade
-                                    </strong>
-
-                                    <span>
-                                        Avisar quando alguém enviar uma solicitação.
-                                    </span>
-
-                                </div>
-
-
-                                <label class="switch">
-
-                                    <input
-                                        type="checkbox"
-                                        id="friendNotifications"
-                                        checked
-                                    >
-
-                                    <span class="slider"></span>
-
-                                </label>
-
-                            </div>
-
-
-
-                            <div class="setting-row">
-
-                                <div>
-
-                                    <strong>
-                                        Chamadas
-                                    </strong>
-
-                                    <span>
-                                        Avisar quando alguém iniciar uma chamada.
-                                    </span>
-
-                                </div>
-
-
-                                <label class="switch">
-
-                                    <input
-                                        type="checkbox"
-                                        id="callNotifications"
-                                        checked
-                                    >
-
-                                    <span class="slider"></span>
-
-                                </label>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-
-                    <!-- =================================
+              <!-- =================================
                          PRIVACIDADE
                     ================================== -->
 
-                    <section
-                        class="settings-section"
-                        id="privacySection"
+              <section class="settings-section" id="privacySection">
+                <div class="card">
+                  <div class="card-title">
+                    <h2>Privacidade</h2>
+
+                    <p>Controle quem poderá interagir com você.</p>
+                  </div>
+
+                  <div class="select-field">
+                    <label for="messagePrivacy">
+                      Quem pode enviar mensagens?
+                    </label>
+
+                    <select id="messagePrivacy">
+                      <option value="friends">Apenas amigos</option>
+
+                      <option value="everyone">Todos</option>
+                    </select>
+                  </div>
+
+                  <div class="select-field">
+                    <label for="friendPrivacy">
+                      Quem pode enviar solicitações?
+                    </label>
+
+                    <select id="friendPrivacy">
+                      <option value="everyone">Todos</option>
+
+                      <option value="friends-of-friends">
+                        Amigos de amigos
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="setting-row">
+                    <div>
+                      <strong> Mostrar status online </strong>
+
+                      <span>
+                        Permitir que seus amigos vejam quando você está online.
+                      </span>
+                    </div>
+
+                    <label class="switch">
+                      <input type="checkbox" id="onlineStatus" checked />
+
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+
+                  <div class="actions">
+                    <button
+                      type="button"
+                      class="primary-button"
+                      id="savePrivacy"
                     >
+                      Salvar privacidade
+                    </button>
+                  </div>
+                </div>
+              </section>
 
-                        <div class="card">
+              <!-- TOAST -->
 
-                            <div class="card-title">
-
-                                <h2>
-                                    Privacidade
-                                </h2>
-
-                                <p>
-                                    Controle quem poderá interagir com você.
-                                </p>
-
-                            </div>
-
-
-
-                            <div class="select-field">
-
-                                <label for="messagePrivacy">
-                                    Quem pode enviar mensagens?
-                                </label>
-
-                                <select id="messagePrivacy">
-
-                                    <option value="friends">
-                                        Apenas amigos
-                                    </option>
-
-                                    <option value="everyone">
-                                        Todos
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-
-
-                            <div class="select-field">
-
-                                <label for="friendPrivacy">
-                                    Quem pode enviar solicitações?
-                                </label>
-
-                                <select id="friendPrivacy">
-
-                                    <option value="everyone">
-                                        Todos
-                                    </option>
-
-                                    <option value="friends-of-friends">
-                                        Amigos de amigos
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-
-
-                            <div class="setting-row">
-
-                                <div>
-
-                                    <strong>
-                                        Mostrar status online
-                                    </strong>
-
-                                    <span>
-                                        Permitir que seus amigos vejam quando você está online.
-                                    </span>
-
-                                </div>
-
-
-                                <label class="switch">
-
-                                    <input
-                                        type="checkbox"
-                                        id="onlineStatus"
-                                        checked
-                                    >
-
-                                    <span class="slider"></span>
-
-                                </label>
-
-                            </div>
-
-
-
-                            <div class="actions">
-
-                                <button
-                                    type="button"
-                                    class="primary-button"
-                                    id="savePrivacy"
-                                >
-                                    Salvar privacidade
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-
-                    <!-- TOAST -->
-
-                    <div
-                        class="toast"
-                        id="toast"
-                        role="status"
-                        aria-live="polite"
-                    ></div>
-
-
-                </main>
-
-            </div>
-
+              <div
+                class="toast"
+                id="toast"
+                role="status"
+                aria-live="polite"
+              ></div>
+            </main>
+          </div>
         </div>
+      </div>
 
-    </div>
-
-
-
-    <!-- =========================================
+      <!-- =========================================
          JAVASCRIPT
     ========================================== -->
-
-    <script src="script.js"></script>
-
-</body>
-
+    </div>
+    <script type="module" src="js/app.js"></script>
+  </body>
 </html>
