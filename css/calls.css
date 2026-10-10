@@ -1,0 +1,5 @@
+.voice-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #3a344b;background:#171521}.voice-controls button{border:1px solid #8265bd;background:#302341;color:#fff;border-radius:8px;padding:7px 12px;cursor:pointer}.voice-controls span{font-size:12px;color:#c8bfdc;flex:1;min-width:135px}
+.call-videos { display:flex; gap:8px; flex-wrap:wrap; width:100%; }
+.call-video { width:min(100%,480px); max-height:270px; object-fit:contain; background:#070911; border-radius:8px; }
+.call-preview { width:min(100%,200px); }
+.call-video:not([src]) { min-height:0; }

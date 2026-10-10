@@ -1,4 +1,4 @@
-# Nightcall 0.2.0 — contas e perfis no servidor
+# Nightcall 0.3.0 — amizades e mensagens persistentes
 
 Continuação exclusiva do Nightcall-main.zip organizado. Não mistura as antigas versões rc.
 
@@ -20,7 +20,7 @@ O servidor escuta somente no computador local. Esta entrega não foi publicada n
 | Requisições da interface ao servidor | js/api.js |
 | Navegação e estado local | js/navigation.js |
 | Listas, busca e modal de amigos | js/friends.js |
-| Diretório de conversas (comunicação ainda pendente) | js/messages.js |
+| Diretório de conversas, envio e histórico de DMs | js/messages.js |
 | Edição e salvamento do perfil | js/profile.js |
 | Seções das configurações | js/settings.js |
 | Teste de microfone e preferências locais de áudio | js/audio.js |
@@ -34,12 +34,12 @@ O servidor escuta somente no computador local. Esta entrega não foi publicada n
 
 O HTML permanece estático, sem fetch de fragmentos. app.js apenas autentica e inicia os módulos uma vez. Senhas são derivadas com scrypt e salt; sessões usam tokens aleatórios, guardados como hash no banco, com validade de sete dias. Cookies são HttpOnly e SameSite=Strict. Não altere contas, sessões ou esquema do banco sem executar os testes e entender os efeitos sobre os dados existentes.
 
-Perfil vem do servidor; localStorage é apenas um cache de compatibilidade. Preferências de áudio, notificações e privacidade ainda são locais ao navegador e compartilhadas pelas contas usadas nele. Não representam regras de privacidade aplicadas no servidor.
+Perfil vem do servidor; localStorage é apenas um cache de compatibilidade. Preferências de notificações e privacidade são armazenadas separadamente por conta neste navegador (não sincronizam entre dispositivos). Não representam regras de privacidade aplicadas no servidor.
 
 ## O que ainda falta
 
-- Busca de pessoas no servidor, pedidos e amizades reais.
-- Mensagens entre contas, histórico e atualização em tempo real.
+- Concluído: busca exata por @usuário, solicitação de amizade, aceite, recusa e remoção de amigos, salvos no SQLite.
+- Concluído: DMs entre amigos com histórico persistente de até 100 mensagens recentes e atualização por consulta a cada 4 segundos (polling, não WebSocket).
 - Voz/WebRTC, mute/deafen efetivos, câmera, tela e PiP. Botões atuais de chamada ainda são placeholders do ZIP original.
 - Comunidades, canais, membros e presença real.
 - Recuperação de senha, política de implantação e validação entre duas redes.
@@ -54,3 +54,7 @@ Perfil vem do servidor; localStorage é apenas um cache de compatibilidade. Pref
 Para os testes de navegador, instale Playwright no ambiente de desenvolvimento (`npm install --no-save playwright` e `npx playwright install chromium`), ou informe PLAYWRIGHT_MODULE apontando para o módulo instalado. CHROME_PATH permite usar Chrome instalado. Os testes criam bancos temporários; não alteram suas contas.
 
 Não edite dist/. O servidor estático antigo, scripts/serve.js, não executa a aplicação com contas: use npm start.
+
+## Limitações desta versão
+
+O chat exige que ambas as contas estejam registradas no **mesmo servidor** e sejam amigas. O servidor padrão é local (`127.0.0.1`), portanto **ainda não permite conversar entre computadores pela internet sem implantação e HTTPS**. Chamada de voz, transmissão, comunidades, presença, bloqueio e notificações push não estão implementados. Ajustes de privacidade na interface não são restrições de acesso aplicadas pelo backend; o backend só permite DM entre amigos. As mensagens são texto simples e não possuem criptografia de ponta a ponta. Não disponibilize este protótipo diretamente na internet sem revisão de segurança, limites antiabuso e implantação apropriada.

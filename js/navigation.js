@@ -15,7 +15,9 @@ export let conversations;
 export let appState;
 export function readStorage(key, fallback) {
   try {
-    const saved = localStorage.getItem(key);
+    const profile = JSON.parse(localStorage.getItem("nightcallProfile") || "null");
+    const scoped = ["nightcallNotifications", "nightcallPrivacy", "nightcallAudio"].includes(key) && profile?.id;
+    const saved = localStorage.getItem(scoped ? `${key}:${profile.id}` : key);
     if (!saved) {
       return fallback;
     }
@@ -34,7 +36,9 @@ export function readStorage(key, fallback) {
 }
 export function writeStorage(key, value) {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    const profile = JSON.parse(localStorage.getItem("nightcallProfile") || "null");
+    const scoped = ["nightcallNotifications", "nightcallPrivacy", "nightcallAudio"].includes(key) && profile?.id;
+    localStorage.setItem(scoped ? `${key}:${profile.id}` : key, JSON.stringify(value));
   } catch (error) {
     console.warn("Erro ao salvar localStorage:", error);
   }

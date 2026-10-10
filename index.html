@@ -7,6 +7,7 @@
     <title>Nightcall</title>
 
     <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/visual-6.css" />
     <link rel="stylesheet" href="css/friends.css" />
     <link rel="stylesheet" href="css/messages.css" />
     <link rel="stylesheet" href="css/responsive.css" />
@@ -14,7 +15,9 @@
     <link rel="stylesheet" href="css/settings-controls.css" />
     <link rel="stylesheet" href="css/settings-layout.css" />
     <link rel="stylesheet" href="css/auth.css" />
-  </head>
+  <link rel="stylesheet" href="css/chat.css" />
+<link rel="stylesheet" href="/css/calls.css">
+</head>
 
   <body>
     <main id="authPage" class="auth-page">
@@ -81,8 +84,9 @@
              BARRA LATERAL PRINCIPAL
         ====================================== -->
 
-        <aside class="main-sidebar">
-          <div class="logo">🌙</div>
+        <aside class="main-sidebar" aria-label="Navegação principal">
+          <div class="logo" aria-label="Nightcall">🌙</div>
+          <button id="communityToggle" type="button" title="Comunidades" aria-label="Abrir comunidades">🌐</button>
           <button id="logoutButton" type="button" title="Sair da conta">
             Sair
           </button>
@@ -100,7 +104,7 @@
              SIDEBAR DE CONTEÚDO
         ====================================== -->
 
-        <aside class="content-sidebar">
+        <aside class="content-sidebar" aria-label="Conversas e perfil">
           <!-- =================================
                  NOME DO APLICATIVO
             ================================== -->
@@ -398,6 +402,12 @@
                   Nova conversa
                 </button>
               </div>
+            </section>
+            <section id="chatPanel" class="chat-panel" hidden aria-label="Conversa privada">
+              <header class="chat-header"><strong id="chatName"></strong><button id="chatClose" type="button">Fechar</button></header>
+              <div id="chatHistory" class="chat-history" role="log" aria-live="polite"></div>
+              <form id="chatForm" class="chat-form"><input id="chatInput" maxlength="2000" required autocomplete="off" placeholder="Escreva uma mensagem..." aria-label="Mensagem"/><button type="submit">Enviar</button></form>
+              <p id="chatStatus" role="status"></p>
             </section>
           </section>
         </main>
@@ -995,6 +1005,12 @@
          JAVASCRIPT
     ========================================== -->
     </div>
-    <script type="module" src="js/app.js"></script>
+<section id="communityRoot" hidden aria-label="Comunidades" class="nc-community">
+  <header class="nc-community-header"><div><span class="nc-eyebrow">NIGHTCALL / COMUNIDADES</span><h2>Comunidades</h2></div><button type="button" id="communityClose" class="nc-secondary">Fechar ✕</button></header>
+  <div class="nc-community-actions"><form id="communityCreate"><label for="communityName">Nova comunidade</label><div><input id="communityName" placeholder="Nome da comunidade" maxlength="50" required><button>Criar</button></div></form><form id="communityJoin"><label for="communityCode">Entrar por convite</label><div><input id="communityCode" placeholder="Código de 12 caracteres" maxlength="12" required><button>Entrar</button></div></form></div>
+  <p id="communityStatus" role="status" aria-live="polite"></p>
+  <div class="nc-community-grid"><aside class="nc-community-sidebar"><h3>Servidores</h3><div id="communityList" class="nc-community-list"></div></aside><aside class="nc-community-sidebar"><h3 id="communityTitle">Canais</h3><div id="communityInvite" class="nc-invite"></div><div id="communityChannels" class="nc-community-list"></div><form id="communityChannelCreate" class="nc-admin-form" hidden><h4>Novo canal</h4><input id="communityChannelName" placeholder="nome-do-canal" maxlength="32" pattern="[a-zA-Z0-9_-]+" required><select id="communityChannelKind"><option value="text">Texto</option><option value="voice">Voz (estrutura)</option></select><button>Criar canal</button></form></aside><div class="nc-community-main"><div id="communityMessages" class="nc-community-messages" role="log"></div><form id="communitySend" class="nc-message-form"><input id="communityText" placeholder="Mensagem do canal" maxlength="2000" required><button>Enviar</button></form></div><aside class="nc-community-sidebar nc-members"><h3>Membros</h3><div id="communityMembers" class="nc-community-list"></div></aside></div>
+</section>
+    <link rel="stylesheet" href="css/communities.css"><script type="module" src="js/app.js"></script><script defer src="js/ux-6.js"></script>
   </body>
 </html>

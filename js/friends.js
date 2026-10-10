@@ -1,3 +1,4 @@
+import { api } from "./api.js";
 import { currentUser, friendRequests, friends } from "./navigation.js";
 import { openConversation } from "./messages.js";
 export let friendsList;
@@ -95,6 +96,14 @@ export function createFriendCard(friend) {
   more.addEventListener("click", function () {
     openFriendOptions(friend);
   });
+  if (currentFriendsTab === "pending") {
+    message.textContent = "✓";
+    message.title = "Aceitar";
+    message.onclick = async () => { try { await api(`/api/friends/requests/${friend.id}/accept`, { method:"POST" }); await refreshFriends(); } catch(e) { alert(e.message); } };
+    more.textContent = "✕";
+    more.title = "Recusar";
+    more.onclick = async () => { try { await api(`/api/friends/requests/${friend.id}/reject`, { method:"POST" }); await refreshFriends(); } catch(e) { alert(e.message); } };
+  }
   actions.appendChild(message);
   actions.appendChild(more);
   card.appendChild(avatar);
@@ -103,7 +112,8 @@ export function createFriendCard(friend) {
   return card;
 }
 export function openFriendOptions(friend) {
-  console.log("Opções de " + (friend.name || "usuário"));
+  if (!confirm(`Remover ${friend.name} dos amigos?`)) return;
+  api(`/api/friends/${friend.id}`, { method:"DELETE" }).then(refreshFriends).catch(e=>alert(e.message));
 }
 export function updateFriendRequestCount() {
   if (!requestCount) {
@@ -112,6 +122,15 @@ export function updateFriendRequestCount() {
   const total = friendRequests.length;
   requestCount.textContent = total;
   requestCount.style.display = total > 0 ? "inline-flex" : "none";
+}
+let selectedUser = null;
+export async function refreshFriends() {
+  try {
+    const { friends: list, incoming } = await api("/api/friends");
+    friends.splice(0, friends.length, ...list);
+    friendRequests.splice(0, friendRequests.length, ...incoming);
+    renderFriends(); updateFriendRequestCount();
+  } catch(e) { console.warn("Falha ao atualizar amigos",e); }
 }
 export let addFriendModal;
 export let addFriendUsername;
@@ -154,6 +173,7 @@ export function clearAddFriendModal() {
   if (addFriendResult) {
     addFriendResult.classList.remove("visible");
   }
+  selectedUser = null;
   if (sendFriendRequest) {
     sendFriendRequest.disabled = false;
     sendFriendRequest.textContent = "Adicionar";
@@ -166,7 +186,7 @@ export function normalizeUsername(username) {
   }
   return value.toLowerCase();
 }
-export function searchUser() {
+export async function searchUser() {
   const username = normalizeUsername(addFriendUsername?.value);
   if (!username) {
     showAddFriendError("Digite um nome de usuário.");
@@ -179,12 +199,15 @@ export function searchUser() {
     hideFriendResult();
     return;
   }
-  const foundUser = findUserByUsername(username);
+  let foundUser;
+  try { ({user:foundUser} = await api(`/api/users/search?username=${encodeURIComponent(username)}`)); }
+  catch(e) { showAddFriendError(e.message); hideFriendResult(); return; }
   if (!foundUser) {
     showAddFriendError("Usuário não encontrado.");
     hideFriendResult();
     return;
   }
+  selectedUser = foundUser;
   showFriendResult(foundUser);
 }
 export function findUserByUsername(username) {
@@ -291,6 +314,8 @@ export function initializeFriends() {
   if (searchFriendButton) {
     searchFriendButton.addEventListener("click", searchUser);
   }
+  refreshFriends();
+  setInterval(refreshFriends, 12000);
   if (addFriendUsername) {
     addFriendUsername.addEventListener("keydown", function (event) {
       if (event.key === "Enter") {
@@ -300,14 +325,14 @@ export function initializeFriends() {
     });
   }
   if (sendFriendRequest) {
-    sendFriendRequest.addEventListener("click", function () {
-      const username = resultUserUsername?.textContent;
-      if (!username) {
-        return;
-      }
-      console.log("Solicitação enviada para " + username);
-      sendFriendRequest.textContent = "Enviado";
+    sendFriendRequest.addEventListener("click", async function () {
+      if (!selectedUser) return;
       sendFriendRequest.disabled = true;
+      try {
+        await api("/api/friends/request", {method:"POST", body:JSON.stringify({userId:selectedUser.id})});
+        sendFriendRequest.textContent = "Enviado";
+        await refreshFriends();
+      } catch(e) { showAddFriendError(e.message); sendFriendRequest.disabled=false; }
     });
   }
 }

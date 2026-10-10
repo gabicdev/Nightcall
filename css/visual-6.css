@@ -1,0 +1,25 @@
+/* Nightcall 5.7-6.0: camada visual sem alterar contratos JS. */
+:root{--nc-bg:#090a12;--nc-surface:#111321;--nc-hover:#20213a;--nc-border:rgba(178,165,255,.13);--nc-accent:#a68bff;--nc-text:#eeebff}
+body{font-family:Inter,"Segoe UI",Arial,sans-serif;background:var(--nc-bg);color:var(--nc-text)}
+.app{background:radial-gradient(ellipse at 75% 0%,rgba(90,49,145,.13),transparent 48%),var(--nc-bg)}
+.main-sidebar{flex:0 0 76px;width:76px;min-width:76px;background:#0c0d18;border-right:1px solid var(--nc-border);gap:10px;min-height:0;overflow-y:auto;overflow-x:hidden}
+.main-sidebar .logo{color:var(--nc-accent);filter:none;margin-bottom:9px}
+.main-sidebar>button{max-width:56px;min-height:38px;border-radius:12px}
+.main-navigation{gap:10px}.nav-button{width:48px;height:48px;flex-shrink:0;border-radius:14px}
+.nav-button.active,.sidebar-link.active{background:rgba(150,112,255,.18)!important;color:#d5c7ff!important;box-shadow:inset 3px 0 var(--nc-accent)!important}
+.nav-button:hover,.sidebar-link:hover{background:var(--nc-hover)}
+.content-sidebar{flex:0 0 280px;width:280px;min-width:220px;min-height:0;background:rgba(15,16,29,.97);border-right:1px solid var(--nc-border)}
+.sidebar-header{flex-shrink:0}.sidebar-header h1{letter-spacing:.03em}
+.direct-messages{min-height:0;overflow-y:auto;overflow-x:hidden}
+.user-profile{flex-shrink:0;position:relative;margin-top:auto;min-height:68px;background:#17182b;border-top:1px solid var(--nc-border);z-index:2}
+.user-info{min-width:0}.user-info strong,.user-info span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.profile-actions{flex-shrink:0}.profile-actions button{transition:background .15s ease}.profile-actions button:hover{background:var(--nc-hover)}
+.main-content{min-width:0;min-height:0;overflow:auto}
+.page-section{min-width:0}.nc-community{background:var(--nc-bg)}
+.nc-community-grid{min-width:0}.nc-community-main{min-width:0}
+button,input,textarea,select{font-family:inherit}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--nc-accent);outline-offset:2px}
+button{transition:background-color .15s ease,color .15s ease,filter .15s ease}
+@media(max-width:1000px){.content-sidebar{flex-basis:240px;width:240px}.nc-community-grid{overflow-x:auto}}
+@media(max-width:700px){.main-sidebar{flex-basis:58px;width:58px;min-width:58px;padding-top:14px}.main-sidebar .logo{font-size:24px;width:42px;height:42px}.nav-button{width:42px;height:42px}.content-sidebar{flex:0 0 192px;width:192px;min-width:192px}.main-content{padding:24px 18px}.user-profile{flex-wrap:wrap;height:auto}.profile-actions{margin-left:auto}}
+@media(max-width:480px){.content-sidebar{flex-basis:160px;width:160px;min-width:160px}.main-content{padding:16px 12px}.sidebar-header{padding:0 12px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}

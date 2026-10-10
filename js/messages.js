@@ -1,3 +1,5 @@
+import { api } from "./api.js";
+import { refreshFriends } from "./friends.js";
 import {
   closeSettings,
   conversations,
@@ -10,10 +12,42 @@ import {
 } from "./navigation.js";
 import { closeAddFriend, openAddFriend, renderFriends } from "./friends.js";
 export let messageSearch;
+export const getActivePerson=()=>activePerson;
 export let conversationsList;
 export let messagesEmpty;
 export let newConversationButton;
 export let emptyNewConversation;
+let activePerson = null;
+let currentUserId = null;
+async function refreshConversations() {
+  try { const data = await api("/api/conversations"); conversations.splice(0,conversations.length,...data.conversations); renderConversations(); }
+  catch(e) { console.warn(e); }
+}
+async function refreshChat() {
+  if (!activePerson) return;
+  try {
+    const {messages} = await api(`/api/messages/${activePerson.id}`);
+    const history = document.getElementById("chatHistory");
+    const signature = JSON.stringify(messages.map(m=>m.id+":"+m.content));
+    if (history.dataset.signature === signature) return;
+    history.dataset.signature=signature;
+    history.replaceChildren();
+    for (const msg of messages) {
+      const el=document.createElement("div"); el.className="chat-message"+(msg.senderId===currentUserId?" mine":"");
+      el.textContent=msg.content;
+      if(msg.senderId===currentUserId){
+        const del=document.createElement("button"); del.type="button"; del.className="message-delete";
+        del.textContent="Excluir";del.title="Excluir minha mensagem";
+        del.addEventListener("click",async()=>{
+          try{await api(`/api/messages/own/${msg.id}`,{method:"DELETE"});await refreshChat();}
+          catch(e){document.getElementById("chatStatus").textContent=e.message;}
+        });el.appendChild(del);
+      }
+      history.appendChild(el);
+    }
+    history.scrollTop=history.scrollHeight;
+  } catch(e) { document.getElementById("chatStatus").textContent=e.message; }
+}
 export function renderConversations() {
   if (!conversationsList) {
     return;
@@ -49,7 +83,8 @@ export function renderConversations() {
   });
 }
 export function openNewConversation() {
-  showMessages();
+  showFriends();
+  document.getElementById("addFriendButton")?.click();
 }
 export function openConversation(person = null) {
   showMessages();
@@ -57,7 +92,12 @@ export function openConversation(person = null) {
     console.log("Abrindo nova conversa.");
     return;
   }
-  console.log("Abrindo conversa com " + (person.name || "Usuário"));
+  activePerson = person;
+  document.getElementById("chatPanel").hidden=false;
+  document.getElementById("chatName").textContent=`${person.name} (@${person.username.replace(/^@/,"")})`;
+  document.getElementById("chatStatus").textContent="";
+  document.getElementById("chatHistory").dataset.signature="";
+  refreshChat();
 }
 export function startCall(person = null) {
   if (person) {
@@ -72,6 +112,40 @@ export function initializeMessages() {
   messagesEmpty = document.getElementById("messagesEmpty");
   newConversationButton = document.getElementById("newConversationButton");
   emptyNewConversation = document.getElementById("emptyNewConversation");
+  api("/api/auth/me").then(({user}) => {currentUserId=user.id;}).catch(console.warn);
+  document.getElementById("chatClose").addEventListener("click",()=>{activePerson=null;document.getElementById("chatPanel").hidden=true;});
+  document.getElementById("chatForm").addEventListener("submit",async event=>{
+    event.preventDefault(); if(!activePerson)return;
+    const input=document.getElementById("chatInput"); const content=input.value.trim();if(!content)return;
+    try {await api(`/api/messages/${activePerson.id}`,{method:"POST",body:JSON.stringify({content})});input.value="";await refreshChat();await refreshConversations();}
+    catch(e){document.getElementById("chatStatus").textContent=e.message;}
+  });
+  refreshConversations();
+  // Eventos imediatos com reconexão automática; polling como fallback.
+  if (typeof EventSource !== "undefined") {
+    const stream = new EventSource("/api/events");
+    stream.addEventListener("open",()=>{
+      const el=document.getElementById("chatStatus");
+      if(el?.textContent?.includes("Reconectando"))el.textContent="Conexão restabelecida.";
+      refreshConversations();refreshChat();
+    });
+    stream.addEventListener("error",()=>{
+      const el=document.getElementById("chatStatus");
+      if(el)el.textContent="Reconectando aos eventos do Nightcall…";
+    });
+    window.addEventListener("beforeunload",()=>stream.close(),{once:true});
+    stream.addEventListener("message",async event=>{
+      refreshConversations();refreshChat();
+      try{
+        const payload=JSON.parse(event.data);
+        if(document.hidden && payload?.from && payload.from!==currentUserId){
+          await window.nightcallDesktop?.notify("Nightcall — nova mensagem","Você recebeu uma mensagem privada.");
+        }
+      }catch{}
+    });
+    stream.addEventListener("social",()=>{refreshFriends();refreshConversations();});
+  }
+  setInterval(()=>{refreshConversations();refreshChat();},15000);
   if (messageSearch) {
     messageSearch.addEventListener("input", renderConversations);
   }
@@ -81,6 +155,7 @@ export function initializeMessages() {
   if (emptyNewConversation) {
     emptyNewConversation.addEventListener("click", openNewConversation);
   }
+  window.NightcallActivePerson=getActivePerson;
   window.Nightcall = {
     showHome,
     showFriends,
