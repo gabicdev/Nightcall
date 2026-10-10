@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="css/settings-layout.css" />
     <link rel="stylesheet" href="css/auth.css" />
   <link rel="stylesheet" href="css/chat.css" />
-<link rel="stylesheet" href="/css/calls.css">
+<link rel="stylesheet" href="css/calls.css">
 </head>
 
   <body>
     <main id="authPage" class="auth-page">
       <section class="auth-card" aria-label="Conta Nightcall">
-        <h1>Nightcall</h1>
+        <img class="nc-auth-brand" src="assets/nightcall-official.png" alt="Nightcall" />
+        <h1>Bem-vindo ao Nightcall</h1>
         <p>Entre para conversar.</p>
         <form id="loginForm">
           <label
@@ -85,16 +86,16 @@
         ====================================== -->
 
         <aside class="main-sidebar" aria-label="Navegação principal">
-          <div class="logo" aria-label="Nightcall">🌙</div>
+          <div class="logo" aria-label="Nightcall"><img src="assets/nightcall-official.png" alt="" /></div>
           <button id="communityToggle" type="button" title="Comunidades" aria-label="Abrir comunidades">🌐</button>
-          <button id="logoutButton" type="button" title="Sair da conta">
+          <button id="logoutButton" type="button" title="Sair da conta" aria-label="Sair da conta">
             Sair
           </button>
 
           <nav class="main-navigation">
-            <a href="#" class="nav-button active" title="Início"> 🏠 </a>
+            <a href="#" class="nav-button active" title="Início" aria-label="Início"><span class="nc-icon nc-icon-home" aria-hidden="true"></span></a>
 
-            <a href="#" class="nav-button" title="Mensagens"> 💬 </a>
+            <a href="#" class="nav-button" title="Mensagens" aria-label="Mensagens"><span class="nc-icon nc-icon-message" aria-hidden="true"></span></a>
 
             <a href="#" class="nav-button add-button" title="Adicionar"> + </a>
           </nav>
@@ -110,7 +111,7 @@
             ================================== -->
 
           <header class="sidebar-header">
-            <h1>nightcall</h1>
+            <div class="nc-wordmark"><span class="nc-wordmark-symbol" aria-hidden="true"></span><h1>nightcall</h1></div><p class="nc-brand-caption">Seu universo, suas conexões.</p>
           </header>
 
           <!-- =================================
@@ -119,13 +120,13 @@
 
           <nav class="sidebar-navigation">
             <a href="#" class="sidebar-link active">
-              <span class="icon"> ⌂ </span>
+              <span class="icon" aria-hidden="true">⌂</span>
 
               <span> Início </span>
             </a>
 
             <a href="#" class="sidebar-link">
-              <span class="icon"> ♧ </span>
+              <span class="icon" aria-hidden="true">♧</span>
 
               <span> Amigos </span>
             </a>
@@ -165,9 +166,9 @@
             </div>
 
             <div class="profile-actions">
-              <button type="button" title="Microfone">🎙</button>
+              
 
-              <button type="button" title="Fones">🎧</button>
+              
 
               <button type="button" title="Configurações" id="settingsButton">
                 ⚙
@@ -196,7 +197,7 @@
 
             <header class="content-header">
               <div>
-                <span class="page-label"> INÍCIO </span>
+                <span class="page-label"> NIGHTCALL / INÍCIO </span>
 
                 <h2 id="welcomeMessage">Boa noite.</h2>
 
@@ -1009,8 +1010,8 @@
   <header class="nc-community-header"><div><span class="nc-eyebrow">NIGHTCALL / COMUNIDADES</span><h2>Comunidades</h2></div><button type="button" id="communityClose" class="nc-secondary">Fechar ✕</button></header>
   <div class="nc-community-actions"><form id="communityCreate"><label for="communityName">Nova comunidade</label><div><input id="communityName" placeholder="Nome da comunidade" maxlength="50" required><button>Criar</button></div></form><form id="communityJoin"><label for="communityCode">Entrar por convite</label><div><input id="communityCode" placeholder="Código de 12 caracteres" maxlength="12" required><button>Entrar</button></div></form></div>
   <p id="communityStatus" role="status" aria-live="polite"></p>
-  <div class="nc-community-grid"><aside class="nc-community-sidebar"><h3>Servidores</h3><div id="communityList" class="nc-community-list"></div></aside><aside class="nc-community-sidebar"><h3 id="communityTitle">Canais</h3><div id="communityInvite" class="nc-invite"></div><div id="communityChannels" class="nc-community-list"></div><form id="communityChannelCreate" class="nc-admin-form" hidden><h4>Novo canal</h4><input id="communityChannelName" placeholder="nome-do-canal" maxlength="32" pattern="[a-zA-Z0-9_-]+" required><select id="communityChannelKind"><option value="text">Texto</option><option value="voice">Voz (estrutura)</option></select><button>Criar canal</button></form></aside><div class="nc-community-main"><div id="communityMessages" class="nc-community-messages" role="log"></div><form id="communitySend" class="nc-message-form"><input id="communityText" placeholder="Mensagem do canal" maxlength="2000" required><button>Enviar</button></form></div><aside class="nc-community-sidebar nc-members"><h3>Membros</h3><div id="communityMembers" class="nc-community-list"></div></aside></div>
+  <div class="nc-community-grid"><aside class="nc-community-sidebar"><h3>Servidores</h3><div id="communityList" class="nc-community-list"></div></aside><aside class="nc-community-sidebar"><h3 id="communityTitle">Canais</h3><div id="communityInvite" class="nc-invite"></div><div id="communityChannels" class="nc-community-list"></div><form id="communityChannelCreate" class="nc-admin-form" hidden><h4>Novo canal</h4><input id="communityChannelName" placeholder="nome-do-canal" maxlength="32" pattern="[a-zA-Z0-9_-]+" required><select id="communityChannelKind"><option value="text">Texto</option><option value="voice">Voz</option></select><button>Criar canal</button></form></aside><div class="nc-community-main"><div id="communityMessages" class="nc-community-messages" role="log"></div><form id="communitySend" class="nc-message-form"><input id="communityText" placeholder="Mensagem do canal" maxlength="2000" required><button>Enviar</button></form></div><aside class="nc-community-sidebar nc-members"><h3>Membros</h3><div id="communityMembers" class="nc-community-list"></div></aside></div>
 </section>
-    <link rel="stylesheet" href="css/communities.css"><script type="module" src="js/app.js"></script><script defer src="js/ux-6.js"></script>
+    <link rel="stylesheet" href="css/communities.css"><link rel="stylesheet" href="css/nightcall-design.css"><link rel="stylesheet" href="css/nightcall-refinement.css"><link rel="stylesheet" href="css/nightcall-nocturne.css"><script type="module" src="js/app.js"></script><script defer src="js/ux-6.js"></script>
   </body>
 </html>

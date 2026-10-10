@@ -1,6 +1,6 @@
 {
   "name": "nightcall",
-  "version": "13.0.0",
+  "version": "13.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -34,6 +34,7 @@
       "index.html",
       "js/**/*",
       "css/**/*",
+      "assets/**/*",
       "backend/**/*",
       "desktop/**/*",
       "package.json",
@@ -46,12 +47,16 @@
       "target": [
         "nsis",
         "portable"
-      ]
+      ],
+      "signAndEditExecutable": false
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "Nightcall-Setup-${version}-${arch}.${ext}"
     },
-    "artifactName": "Nightcall-${version}-${arch}-${target}.${ext}"
+    "portable": {
+      "artifactName": "Nightcall-Portable-${version}-${arch}.${ext}"
+    }
   }
 }

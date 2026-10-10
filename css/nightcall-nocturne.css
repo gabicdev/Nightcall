@@ -1,0 +1,64 @@
+/* Nightcall 13.3 — Nocturne design system.
+   Calm surfaces, strict typography, purposeful violet accents.
+   Kept last to normalize legacy component layers without altering behavior. */
+:root { --night-void:#080811; --night-rail:#0c0b16; --night-side:#10101d; --night-stage:#0d0d19; --night-raised:#191827; --night-hover:#222036; --night-border:rgba(197,179,255,.105); --night-text:#f3f0fc; --night-sub:#a5a0bb; --night-purple:#a68cff; --night-focus:#c6b1ff; }
+html,body { font-family: 'Segoe UI Variable Text','Segoe UI',Inter,system-ui,sans-serif!important; background:var(--night-void)!important; color:var(--night-text); font-size:14px; }
+.app { background:var(--night-void)!important; }
+.main-sidebar { background:var(--night-rail)!important; border-right:1px solid var(--night-border)!important; padding-top:14px!important; gap:10px!important; }
+.main-sidebar .logo { border:1px solid rgba(180,154,251,.16)!important; box-shadow:none!important; background:#151126!important; }
+.main-sidebar>button,.main-navigation .nav-button { border-radius:13px!important; transition:background .13s ease,color .13s ease!important; }
+.main-sidebar .nav-button.active { background:#29213f!important; border:1px solid rgba(180,146,255,.2)!important; box-shadow:inset 3px 0 0 #a48afa!important; }
+.content-sidebar { background:var(--night-side)!important; border-right:1px solid var(--night-border)!important; width:264px!important; min-width:210px!important; flex-basis:264px!important; }
+.sidebar-header { padding:19px 19px 12px!important; min-height:83px!important; }
+.sidebar-header h1 { letter-spacing:-.045em!important; font-weight:690!important; font-size:24px!important; }
+.nc-brand-caption { color:#938ea9!important; margin-top:4px!important; }
+.nc-wordmark-symbol { width:30px;height:30px;border-radius:10px; background:#201936; position:relative; font-size:0!important; }
+.nc-wordmark-symbol::before { content:''; position:absolute; inset:5px; background:linear-gradient(140deg,#d8beff,#7c5af7); border-radius:50%; clip-path:path('M 10 0 A 10 10 0 1 0 20 16 A 9 9 0 0 1 10 0'); }
+.sidebar-navigation { border-bottom:1px solid var(--night-border)!important; padding:8px 10px 13px!important; }
+.sidebar-link { border-radius:10px!important; min-height:42px!important; padding:0 13px!important; color:#b5aecb!important; }
+.sidebar-link.active { background:#242035!important; box-shadow:inset 3px 0 var(--night-purple)!important; }
+.sidebar-link:hover:not(.active) { background:#1b1a2b!important; }
+.direct-messages { padding:17px 10px!important; }
+.section-title { letter-spacing:.105em!important; font-size:10px!important; color:#8f89a9!important; }
+.user-profile { background:#151322!important; border-top:1px solid var(--night-border)!important; box-shadow:none!important; }
+.profile-actions button { font-size:15px; min-width:28px; min-height:28px; }
+.main-content { background:var(--night-stage)!important; padding:clamp(16px,2vw,30px)!important; }
+.background-decoration { display:none!important; }
+.page-section { max-width:1480px; }
+.content-header { margin-bottom:22px!important; padding-bottom:18px!important; border-bottom:1px solid var(--night-border)!important; }
+.content-header h2 { font-size:clamp(25px,2.6vw,35px)!important; font-weight:680!important; letter-spacing:-.042em!important; }
+.page-label,.nc-eyebrow { color:#a995ee!important; letter-spacing:.13em!important; }
+.online-section,.friends-list,.conversations-list,.friends-empty,.messages-empty { border-color:var(--night-border)!important; }
+.chat-panel,.nc-community-sidebar,.nc-community-main,.nc-community-actions,.voice-controls { border:1px solid var(--night-border)!important; border-radius:12px!important; box-shadow:none!important; background:#141320!important; }
+.chat-header,.nc-community-header { background:#181624!important; border-bottom:1px solid var(--night-border)!important; }
+.chat-form { background:#151422!important; border-top:1px solid var(--night-border)!important; }
+input:not([type=checkbox]):not([type=range]), textarea, select { background:#11101e!important; border:1px solid rgba(195,180,244,.16)!important; color:#f2eefc!important; border-radius:9px!important; }
+input:focus-visible,textarea:focus-visible,select:focus-visible { border-color:#a68cff!important; box-shadow:0 0 0 3px rgba(166,140,255,.12)!important; }
+button:focus-visible,a:focus-visible { outline:2px solid var(--night-focus)!important; outline-offset:2px!important; }
+button:not(.nav-button):not(.sidebar-link):hover { filter:none!important; }
+.nc-community { background:var(--night-stage)!important; }
+.nc-community-grid { gap:9px!important; }
+.nc-community-header { border-radius:12px!important; }
+.nc-community-actions { gap:10px!important; }
+.nc-community-messages { scrollbar-gutter:stable; }
+.nc-message-form { background:#151320; }
+.voice-controls { background:#141321!important; padding:16px!important; }
+.nc-call-actions button { background:#252039!important; border:1px solid rgba(187,158,255,.2)!important; border-radius:10px!important; min-height:40px; font-weight:550; }
+.nc-call-actions button:hover { background:#302746!important; }
+.nc-call-preferences { background:#0e0d19!important; border-color:var(--night-border)!important; }
+.nc-stream-stage { background:#090913!important; border:1px solid var(--night-border)!important; }
+.call-videos { gap:10px!important; }
+.call-video { background:#080811!important; border:1px solid rgba(205,184,255,.12)!important; border-radius:10px!important; }
+.settings-overlay,.modal-overlay { background:rgba(4,3,11,.82)!important; backdrop-filter:blur(9px); }
+.settings-sidebar { background:#100f1c!important; }
+.settings-main { background:#171522!important; }
+.settings-nav-item.active { background:#27203c!important; }
+.auth-page { background:radial-gradient(circle at 50% 6%,rgba(115,73,194,.12),transparent 43%),#090811!important; }
+.auth-card { background:#151321!important; border:1px solid rgba(192,164,255,.14)!important; border-radius:18px!important; box-shadow:0 28px 80px rgba(0,0,0,.3)!important; }
+.auth-card h1 { font-size:24px; font-weight:680; }
+.auth-card>p { color:#aaa4bc; }
+/* Isolated premium surface: remove accidental decorative layer glare */
+.main-content * { text-shadow:none; }
+@media(max-width:1000px) { .content-sidebar { width:220px!important; min-width:190px!important; flex-basis:220px!important; } }
+@media(max-width:680px) { .main-sidebar { width:58px!important; min-width:58px!important; flex-basis:58px!important; } .content-sidebar { width:172px!important; min-width:150px!important; flex-basis:172px!important; } .main-content { padding:14px!important; } .nc-brand-caption { display:none!important; } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition-duration:.01ms!important; animation-duration:.01ms!important; scroll-behavior:auto!important; } }

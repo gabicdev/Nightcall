@@ -281,7 +281,12 @@ export function initializeCalls(){
   secondRemoteVideo=document.createElement("video");secondRemoteVideo.autoplay=true;secondRemoteVideo.playsInline=true;secondRemoteVideo.className="call-video";secondRemoteVideo.setAttribute("aria-label","Segunda tela recebida");
   secondLocalPreview=document.createElement("video");secondLocalPreview.autoplay=true;secondLocalPreview.muted=true;secondLocalPreview.playsInline=true;secondLocalPreview.className="call-video call-preview";secondLocalPreview.setAttribute("aria-label","Prévia da segunda tela");
   const videos=document.createElement("div");videos.className="call-videos";videos.append(remoteVideo,secondRemoteVideo,localPreview,secondLocalPreview);
-  bar.append(button,answerButton,rejectButton,muteButton,deafButton,volumeInput,microphoneSelect,qualitySelect,fpsSelect,systemAudioToggle,screenButton,secondScreenButton,pipButton,status,audio,videos);panel.prepend(bar);
+  const actions=document.createElement("div");actions.className="nc-call-actions";actions.setAttribute("aria-label","Ações da chamada");actions.append(button,answerButton,rejectButton,muteButton,deafButton,screenButton,secondScreenButton,pipButton);
+  const preferences=document.createElement("div");preferences.className="nc-call-preferences";preferences.setAttribute("aria-label","Qualidade e dispositivos");
+  const audioLabel=document.createElement("label");audioLabel.className="nc-inline-toggle";audioLabel.append(systemAudioToggle,document.createTextNode("Áudio da tela"));
+  preferences.append(microphoneSelect,volumeInput,qualitySelect,fpsSelect,audioLabel);
+  const streamStage=document.createElement("section");streamStage.className="nc-stream-stage";streamStage.setAttribute("aria-label","Transmissões e prévias");streamStage.append(videos);
+  bar.append(status,actions,preferences,audio,streamStage);panel.prepend(bar);
   button.addEventListener("click",()=>{
     if(current){hangup();return;}
     const selected=window.NightcallActivePerson?.();
