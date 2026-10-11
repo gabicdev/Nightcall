@@ -51,7 +51,7 @@ try {
   await page.locator("#closeAddFriendModal").click();
   await page.evaluate(() => Nightcall.showMessages());
   await page.evaluate(() => Nightcall.showHome());
-  await page.locator("#settingsButton").click();
+  await page.locator("#settingsButton").click(); await page.locator('[data-settings-open="profile"]').click();
   await page.locator("#profileName").fill("Victor salvo");
   await page.locator("#saveProfile").click();
   await page.waitForFunction(

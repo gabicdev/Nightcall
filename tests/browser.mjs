@@ -113,7 +113,7 @@ try {
     await page.locator('.friend-action[title="Enviar mensagem"]').click();
     assert.equal(await page.locator(".conversation-card").count(), 1);
     await snapshot("local-fixtures");
-    await page.locator("#settingsButton").click();
+    await page.locator("#settingsButton").click(); await page.locator('[data-settings-open="profile"]').click();
     await page.locator("#profileName").fill("Victor Teste");
     await page.locator("#profileUsername").fill("victor");
     await page.locator("#profileBio").fill("Perfil local preservado");
@@ -144,7 +144,7 @@ try {
     await page.locator("#savePrivacy").click();
     await page.reload();
     await page.waitForFunction(() => !!window.Nightcall);
-    await page.locator("#settingsButton").click();
+    await page.locator("#settingsButton").click(); await page.locator('[data-settings-open="profile"]').click();
     await page.locator('.settings-nav-item[data-section="profile"]').click();
     assert.equal(
       await page.locator("#profileName").inputValue(),

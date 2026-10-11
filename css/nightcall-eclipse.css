@@ -30,10 +30,6 @@
 .main-sidebar .logo{background:linear-gradient(180deg,#120f23,#100d1d)!important}
 .main-sidebar .logo img{display:none!important}
 .main-sidebar .logo::before{content:"";display:block;width:34px;height:34px;background:url('../assets/nightcall-mark.png') center/contain no-repeat;filter:drop-shadow(0 8px 18px rgba(91,72,168,.24))}
-.main-navigation .add-button{font-size:0!important;position:relative}
-.main-navigation .add-button::before{content:"+";font-size:28px;line-height:1;color:#d3c7f8;font-weight:400}
-#communityToggle{order:4!important;border:1px solid transparent!important;background:transparent!important;color:#c7bce0!important}
-#communityToggle:hover,#communityToggle.active{background:#211a34!important;border-color:#594477!important;color:#e2d7ff!important;box-shadow:inset 3px 0 #b38fff!important}
 
 .nc-wordmark{display:flex;align-items:center;gap:0}
 .nc-home-guide{display:grid;grid-template-columns:1.4fr 1fr;align-items:center;gap:26px;background:linear-gradient(135deg, rgba(23,18,42,1), rgba(15,14,28,.92));}

@@ -25,6 +25,7 @@ export const publicUser = (row) => ({
   name: row.name,
   bio: row.bio,
   avatar: row.avatar,
+  banner: row.banner || "",
 });
 export function createSessions(db, secure = false) {
   const age = 7 * 24 * 60 * 60;

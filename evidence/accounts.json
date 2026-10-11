@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "states": [
+    "logged out y=0",
+    "register",
+    "authenticated y=0",
+    "refresh authenticated",
+    "navigation",
+    "save profile",
+    "logout",
+    "refresh logged out",
+    "wrong password",
+    "login",
+    "mobile",
+    "separate browser session"
+  ],
+  "errors": [],
+  "templateRequests": []
+}

@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "packaged": true,
+  "screenshotCaptured": true,
+  "flows": [
+    "cadastro",
+    "perfil separado",
+    "modelo Jogos com 3 canais",
+    "mensagem",
+    "banner",
+    "recarregamento"
+  ],
+  "errors": []
+}

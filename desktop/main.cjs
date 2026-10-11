@@ -3,6 +3,9 @@ const path=require('node:path');
 const {pathToFileURL}=require('node:url');
 const fs=require('node:fs');
 const {readRemoteConfig}=require('./runtime-config.cjs');
+const {autoUpdater}=require('electron-updater');
+const {createUpdates}=require('./updates.cjs');
+let updates;
 let server;
 let mainWindow;
 let tray;
@@ -11,6 +14,9 @@ let unread=0;
 let activeUrl='';
 let startupError='';
 let lastNotifyAt=0;
+// Os testes usam uma pasta temporária e não acessam os dados do usuário.
+const testing=process.env.NIGHTCALL_TEST_MODE === '1' && !!process.env.NIGHTCALL_TEST_DATA;
+if(testing) app.setPath('userData',path.resolve(process.env.NIGHTCALL_TEST_DATA));
 // IPC só é permitido a partir da janela principal no endereço esperado.
 function trustedSender(event){
   if(!mainWindow || event.sender!==mainWindow.webContents || !activeUrl)return false;
@@ -54,7 +60,7 @@ const start=async()=>{
     url=`http://127.0.0.1:${server.address().port}`;
   }
   activeUrl=url;
-  const win=new BrowserWindow({width:1250,height:800,minWidth:850,minHeight:560,backgroundColor:'#101018',title:'Nightcall',autoHideMenuBar:true,webPreferences:{nodeIntegration:false,contextIsolation:true,sandbox:true,preload:path.join(__dirname,'preload.cjs')}});
+  const win=new BrowserWindow({show:!testing,icon:path.join(root,'assets/nightcall-mark.png'),width:1250,height:800,minWidth:850,minHeight:560,backgroundColor:'#101018',title:'Nightcall',autoHideMenuBar:true,webPreferences:{nodeIntegration:false,contextIsolation:true,sandbox:true,preload:path.join(__dirname,'preload.cjs')}});
   win.webContents.setWindowOpenHandler(({url:external})=>{
     try {const parsed=new URL(external);if(parsed.protocol==='https:' && !parsed.username && !parsed.password)shell.openExternal(parsed.toString()).catch(()=>{});} catch {}
     return {action:'deny'};
@@ -70,7 +76,7 @@ const start=async()=>{
   mainWindow=win;
   win.on('focus',()=>{unread=0;tray?.setToolTip('Nightcall');});
   win.on('close', event=>{if(!quitting){event.preventDefault();win.hide();}});
-  const icon=nativeImage.createFromDataURL('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=');
+  const icon=nativeImage.createFromPath(path.join(root,'assets/nightcall-mark.png'));
   try {
     tray=new Tray(icon);
     tray.setToolTip('Nightcall');
@@ -95,14 +101,19 @@ const start=async()=>{
   win.webContents.on('did-fail-load',(_event,code,desc,validatedUrl,isMainFrame)=>{
     if(isMainFrame && validatedUrl===url) console.warn('Falha de carregamento:',code,desc);
   });
+  updates=createUpdates({app,updater:autoUpdater,dialog,getWindow:()=>mainWindow,portable:!!process.env.PORTABLE_EXECUTABLE_FILE,enabled:!testing,onInstall:()=>{quitting=true;}});
+  autoUpdater.on('update-downloaded',()=>{if(Notification.isSupported()) {const notice=new Notification({title:'Nightcall — atualização pronta',body:'Use Atualizações no ícone da bandeja para reiniciar quando quiser.'});notice.on('click',()=>updates.show().catch(console.error));notice.show();}});
   const originalMenu=()=>Menu.buildFromTemplate([
     {label:'Abrir Nightcall',click:()=>{win.show();win.focus();}},
+    {label:`Nightcall ${app.getVersion()}`,enabled:false},
+    {label:'Atualizações — verificar / instalar',click:()=>updates.check(true).catch(console.error)},
     {label:'Tentar reconectar',click:()=>{loadApp().catch(console.error);win.show();}},
     {label:'Minimizar',click:()=>win.hide()},
     {label:'Sair',click:()=>{quitting=true;app.quit();}}
   ]);
   tray?.setContextMenu(originalMenu());
   await loadApp();
+  updates.start();
 };
 ipcMain.handle('nightcall:connection-info',(event)=>trustedSender(event)?({mode:activeUrl.startsWith('https:')?'remote':'local',origin:activeUrl||'',hasError:!!startupError}):null);
 if(singleInstance) app.whenReady().then(start).catch(error=>{
@@ -116,4 +127,4 @@ if(singleInstance) app.whenReady().then(start).catch(error=>{
   app.quit();
 });
 app.on('window-all-closed',()=>app.quit());
-app.on('before-quit',()=>{quitting=true;if(server)server.close();});
+app.on('before-quit',()=>{quitting=true;updates?.stop();if(server)server.close();});

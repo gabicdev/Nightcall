@@ -1,6 +1,6 @@
 {
   "name": "nightcall",
-  "version": "13.7.0",
+  "version": "13.10.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,7 +11,7 @@
     "test:accounts": "node tests/accounts-browser.mjs",
     "desktop": "electron .",
     "dist:win": "electron-builder --win nsis portable --x64",
-    "check:desktop": "node --check desktop/main.cjs && node --check desktop/preload.cjs && node --check desktop/remote-config.cjs && node --check desktop/runtime-config.cjs",
+    "check:desktop": "node --check desktop/main.cjs && node --check desktop/preload.cjs && node --check desktop/remote-config.cjs && node --check desktop/runtime-config.cjs && node --check desktop/updates.cjs",
     "diagnose:resources": "node scripts/resources.mjs",
     "check:release": "node scripts/validate-release.cjs",
     "diagnose:network": "node scripts/healthcheck.mjs",
@@ -44,19 +44,34 @@
       "output": "release"
     },
     "win": {
+      "icon": "assets/nightcall.ico",
       "target": [
         "nsis",
         "portable"
       ],
-      "signAndEditExecutable": false
+      "signAndEditExecutable": true
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "artifactName": "Nightcall-Setup-${version}-${arch}.${ext}"
+      "artifactName": "Nightcall-Setup-${version}-${arch}.${ext}",
+      "perMachine": false,
+      "deleteAppDataOnUninstall": false,
+      "allowElevation": true
     },
     "portable": {
       "artifactName": "Nightcall-Portable-${version}-${arch}.${ext}"
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "gabicdev",
+        "repo": "Nightcall",
+        "releaseType": "release"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2"
   }
 }

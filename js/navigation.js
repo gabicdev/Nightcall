@@ -62,6 +62,10 @@ export function loadCurrentUser() {
     myUsername.textContent = currentUser.username;
   }
   const fallbackAvatar = document.getElementById("myAvatarFallback");
+  const communityAccountName=document.getElementById('communityAccountName');
+  if(communityAccountName)communityAccountName.textContent=currentUser.name;
+  const communityAccountAvatar=document.getElementById('communityAccountAvatar');
+  if(communityAccountAvatar)communityAccountAvatar.textContent=(currentUser.name||'N').trim().slice(0,1).toUpperCase();
   if (fallbackAvatar) fallbackAvatar.textContent = (currentUser.name || "N").trim().charAt(0).toUpperCase();
   if (myAvatar) {
     if (currentUser.avatar) {
@@ -98,6 +102,7 @@ export function setCurrentPage(page) {
   appState.currentPage = page;
 }
 export function showPage(page) {
+  document.dispatchEvent(new CustomEvent("nightcallWorkspace", {detail: page}));
   const pages = [homePage, friendsPage, messagesPage];
   pages.forEach(function (pageElement) {
     if (pageElement) {
@@ -133,6 +138,7 @@ export function showFriends() {
 }
 export function showMessages() {
   showPage("messages");
+  activateSidebarItem('Mensagens');
   renderConversations();
 }
 export function updateActiveNavigation() {
@@ -151,7 +157,7 @@ export function updateActiveNavigation() {
   }
 }
 export function openAddMenu() {
-  document.getElementById("communityToggle")?.click();
+  document.dispatchEvent(new CustomEvent("nightcallCommunityAdd"));
 }
 export function toggleMicrophone() {
   appState.microphoneEnabled = !appState.microphoneEnabled;
@@ -165,12 +171,14 @@ export function toggleHeadphones() {
     appState.headphonesEnabled ? "Fones ativados." : "Fones desativados.",
   );
 }
-export function openSettings(section = "profile") {
+export function openSettings(section = "overview") {
   const overlay = document.getElementById("settingsOverlay");
   if (!overlay) {
     console.error("settingsOverlay não encontrado no HTML.");
     return;
   }
+  document.getElementById("ownProfile")?.close();
+  overlay.hidden = false;
   overlay.classList.add("open");
   updateSettingsMiniProfile();
   overlay.setAttribute("aria-hidden", "false");
@@ -185,6 +193,7 @@ export function closeSettings() {
     return;
   }
   overlay.classList.remove("open");
+  overlay.hidden = true;
   overlay.setAttribute("aria-hidden", "true");
   document.body.classList.remove("settings-open");
 }
@@ -272,8 +281,27 @@ export function initializeNavigation() {
       }
     });
   });
-  document.getElementById("settingsButton")?.addEventListener("click", () => openSettings("profile"));
-  document.querySelector(".user-profile")?.addEventListener("click", () => openSettings("profile"));
+  document.getElementById("settingsButton")?.addEventListener("click", (event) => { event.stopPropagation(); openSettings("overview"); });
+  const openOwnProfile = () => {
+    closeSettings();
+    const profile = readStorage('nightcallProfile', {});
+    for (const [id, value] of [['ownProfileName', profile.name], ['ownProfileUsername', '@' + profile.username], ['ownProfileBio', profile.bio || 'Nenhuma bio adicionada.']]) document.getElementById(id).textContent = value || '';
+    for (const [id, value] of [['ownProfileAvatar', profile.avatar], ['ownProfileBanner', profile.banner]]) {
+      const img = document.getElementById(id); img.hidden = !value;
+      if (value) img.src = value; else img.removeAttribute('src');
+      img.onerror = () => { img.hidden = true; };
+    }
+    document.getElementById('ownProfileFallback').textContent = (profile.name || 'N').trim().slice(0,1).toUpperCase();
+    document.getElementById('ownProfile').showModal();
+  };
+  document.getElementById('ownProfileButton')?.addEventListener('click', openOwnProfile);
+  document.querySelector('[data-mobile-open="profile"]')?.addEventListener('click',openOwnProfile);
+  document.getElementById('communityOwnProfile')?.addEventListener('click',openOwnProfile);
+  document.getElementById('communityAccountSettings')?.addEventListener('click',()=>openSettings('overview'));
+  document.querySelector('[data-mobile-open="settings"]')?.addEventListener('click',()=>openSettings('overview'));
+  document.querySelector('[data-mobile-open="friends"]')?.addEventListener('click',showFriends);
+  document.getElementById('ownProfileClose').addEventListener('click', () => document.getElementById('ownProfile').close());
+  document.getElementById('ownProfileEdit').addEventListener('click', () => openSettings('profile'));
   document.querySelectorAll('[data-quick-open="friends"]').forEach((button) => button.addEventListener('click', () => showFriends()));
   document.querySelectorAll('[data-quick-open="messages"]').forEach((button) => button.addEventListener('click', () => showMessages()));
   document.querySelector(".add-message")?.addEventListener("click", () => showFriends());
@@ -282,6 +310,7 @@ export function initializeNavigation() {
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
+      if (document.querySelector('dialog[open]')) return;
       closeSettings();
       const community = document.getElementById("communityRoot");
       if (community && !community.hidden) document.getElementById("communityClose")?.click();

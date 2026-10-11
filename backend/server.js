@@ -74,7 +74,7 @@ export function createServer({
     }
   }
   function validateProfile(input) {
-    const { username, name, bio = "", avatar = "" } = input;
+    const { username, name, bio = "", avatar = "", banner = "" } = input;
     if (
       typeof username !== "string" ||
       !/^[a-zA-Z0-9_]{3,24}$/.test(username) ||
@@ -84,7 +84,7 @@ export function createServer({
       typeof bio !== "string" ||
       bio.length > 200 ||
       typeof avatar !== "string" ||
-      avatar.length > 2048
+      avatar.length > 2048 || typeof banner !== "string" || banner.length > 2048
     )
       throw Object.assign(
         Error(
@@ -102,7 +102,12 @@ export function createServer({
           status: 400,
         });
     }
-    return { username: username.toLowerCase(), name: name.trim(), bio, avatar };
+    if (banner) {
+      let url;
+      try { url = new URL(banner); } catch {}
+      if (!url || !['http:', 'https:'].includes(url.protocol)) throw Object.assign(Error('Banner deve ser um link HTTP ou HTTPS.'), {status:400});
+    }
+    return { username: username.toLowerCase(), name: name.trim(), bio, avatar, banner };
   }
   const server = http.createServer(async (req, res) => {
     res.setHeader("Cache-Control", "no-store");
@@ -227,14 +232,15 @@ export function createServer({
         if (path === "/api/auth/me" && req.method === "GET")
           return reply(res, 200, { user: publicUser(user) });
         if (path === "/api/profile" && req.method === "PUT") {
-          const profile = validateProfile(await body(req));
+          const profile = validateProfile({ banner: user.banner || "", ...await body(req) });
           db.prepare(
-            "UPDATE users SET username=?, name=?, bio=?, avatar=? WHERE id=?",
+            "UPDATE users SET username=?, name=?, bio=?, avatar=?, banner=? WHERE id=?",
           ).run(
             profile.username,
             profile.name,
             profile.bio,
             profile.avatar,
+            profile.banner,
             user.id,
           );
           return reply(res, 200, {
@@ -354,16 +360,17 @@ export function createServer({
           return reply(res,200,{communities});
         }
         if (path === '/api/communities' && req.method === 'POST') {
-          const {name} = await body(req);
+          const {name,template="friends"} = await body(req);
           const normalizedName = typeof name === 'string' ? name.trim().replace(/\s+/g,' ') : '';
           if(!normalizedName || normalizedName.length < 3 || normalizedName.length > 40) return reply(res,400,{error:'Nome inválido (3–40 caracteres).'});
+          const templates = {custom:['geral','voz-geral'],friends:['geral','voz-geral'],community:['boas-vindas','novidades','geral','voz-geral'],games:['geral','clipes','equipe'],study:['geral','materiais','estudo'],school:['geral','avisos','encontro'],local:['geral','eventos','encontro'],creators:['geral','portfolio','feedback','estudio']};
+          if (!Object.hasOwn(templates,template)) return reply(res,400,{error:'Modelo inválido.'});
           const id=randomUUID(), code=randomUUID().replaceAll('-','').slice(0,12), now=Date.now();
           db.exec('BEGIN');
           try {
             db.prepare('INSERT INTO communities VALUES (?,?,?,?,?)').run(id,normalizedName,user.id,code,now);
             db.prepare('INSERT INTO community_members VALUES (?,?,?,?)').run(id,user.id,'owner',now);
-            db.prepare('INSERT INTO community_channels VALUES (?,?,?,?,?)').run(randomUUID(),id,'geral','text',now);
-            db.prepare('INSERT INTO community_channels VALUES (?,?,?,?,?)').run(randomUUID(),id,'voz-geral','voice',now);
+            templates[template].forEach((channelName,index,all) => db.prepare('INSERT INTO community_channels (id,community_id,name,kind,created_at) VALUES (?,?,?,?,?)').run(randomUUID(),id,channelName,index === all.length - 1 ? 'voice' : 'text',now + index));
             db.exec('COMMIT');
           } catch(e){db.exec('ROLLBACK');throw e;}
           return reply(res,201,{community:{id,name:normalizedName,ownerId:user.id,inviteCode:code,role:'owner'}});
@@ -378,22 +385,63 @@ export function createServer({
           return reply(res,200,{communityId:c.id});
         }
         const cm=path.match(/^\/api\/communities\/([a-f0-9-]+)$/);
+        if(cm && ['PATCH','DELETE'].includes(req.method)) {
+          const cid=cm[1], access=member(cid), c=community(cid);
+          if(!c||!access)return reply(res,404,{error:'Comunidade não encontrada.'});
+          const recipients=db.prepare('SELECT user_id FROM community_members WHERE community_id=?').all(cid).map(x=>x.user_id);
+          if(req.method==='PATCH') {
+            if(!roleCanManage(access.role))return reply(res,403,{error:'Sem permissão para editar a comunidade.'});
+            const data=await body(req), name=typeof data.name==='string'?data.name.trim().replace(/\s+/g,' '):'';
+            if(name.length<3||name.length>40)return reply(res,400,{error:'Nome inválido (3–40 caracteres).'});
+            db.prepare('UPDATE communities SET name=? WHERE id=?').run(name,cid);
+            broadcast(recipients,'community',{communityId:cid});
+            return reply(res,200,{ok:true,name});
+          }
+          if(access.role!=='owner'||c.owner_id!==user.id)return reply(res,403,{error:'Somente o dono pode excluir a comunidade.'});
+          const data=await body(req);
+          if(typeof data.confirmName!=='string'||data.confirmName.trim()!==c.name)return reply(res,400,{error:'Digite o nome atual da comunidade para confirmar.'});
+          const channelIds=new Set(db.prepare('SELECT id FROM community_channels WHERE community_id=?').all(cid).map(x=>x.id));
+          // A exclusão única utiliza as cascatas do banco: não afeta contas ou mensagens privadas.
+          db.prepare('DELETE FROM communities WHERE id=?').run(cid);
+          for(const [uid,presence] of voicePresence)if(channelIds.has(presence.channelId))voicePresence.delete(uid);
+          broadcast(recipients,'community',{communityId:cid,deleted:true});
+          return reply(res,200,{ok:true});
+        }
         if(cm && req.method === 'GET') {
           const cid=cm[1], access=member(cid), c=community(cid);
           if(!c||!access)return reply(res,404,{error:'Comunidade não encontrada.'});
-          const channels=db.prepare('SELECT id,name,kind FROM community_channels WHERE community_id=? ORDER BY created_at,id').all(cid);
+          const channels=db.prepare('SELECT id,name,kind,category_id categoryId FROM community_channels WHERE community_id=? ORDER BY created_at,id').all(cid);
+          const categories=db.prepare('SELECT id,name FROM community_categories WHERE community_id=? ORDER BY created_at,id').all(cid);
           const members=db.prepare('SELECT u.id,u.username,u.name,m.role FROM community_members m JOIN users u ON u.id=m.user_id WHERE m.community_id=? ORDER BY m.joined_at').all(cid);
-          return reply(res,200,{community:{id:c.id,name:c.name,ownerId:c.owner_id,inviteCode:roleCanManage(access.role)?c.invite_code:null,role:access.role},channels,members});
+          return reply(res,200,{community:{id:c.id,name:c.name,ownerId:c.owner_id,inviteCode:roleCanManage(access.role)?c.invite_code:null,role:access.role},channels,categories,members});
+        }
+        const categoryCreate=path.match(/^\/api\/communities\/([a-f0-9-]+)\/categories$/);
+        if(categoryCreate && req.method==='POST') {
+          const cid=categoryCreate[1];if(!roleCanManage(member(cid)?.role))return reply(res,403,{error:'Sem permissão para criar categorias.'});
+          const data=await body(req), name=typeof data.name==='string'?data.name.trim().replace(/\s+/g,' '):'';
+          if(!name || name.length>40)return reply(res,400,{error:'Use 1–40 caracteres para a categoria.'});
+          const id=randomUUID();db.prepare('INSERT INTO community_categories VALUES (?,?,?,?)').run(id,cid,name,Date.now());broadcast(db.prepare('SELECT user_id FROM community_members WHERE community_id=?').all(cid).map(x=>x.user_id),'community',{communityId:cid});return reply(res,201,{category:{id,name}});
         }
         const chCreate=path.match(/^\/api\/communities\/([a-f0-9-]+)\/channels$/);
         if(chCreate && req.method === 'POST') {
           const cid=chCreate[1], access=member(cid);
           if(!roleCanManage(access?.role))return reply(res,403,{error:'Sem permissão para criar canais.'});
-          const {name,kind='text'}=await body(req);
+          const {name,kind='text',categoryId=null}=await body(req);
+          if(categoryId!==null && (typeof categoryId!=='string'||!db.prepare('SELECT 1 FROM community_categories WHERE id=? AND community_id=?').get(categoryId,cid)))return reply(res,400,{error:'Categoria inválida para esta comunidade.'});
           if(typeof name!=='string'|| !/^[a-zA-Z0-9_-]{1,32}$/.test(name)||!['text','voice'].includes(kind)) return reply(res,400,{error:'Canal inválido.'});
-          const id=randomUUID(); db.prepare('INSERT INTO community_channels VALUES (?,?,?,?,?)').run(id,cid,name,kind,Date.now());
+          const id=randomUUID(); db.prepare('INSERT INTO community_channels (id,community_id,name,kind,created_at,category_id) VALUES (?,?,?,?,?,?)').run(id,cid,name,kind,Date.now(),categoryId);
           broadcast(db.prepare('SELECT user_id FROM community_members WHERE community_id=?').all(cid).map(x=>x.user_id),'community');
           return reply(res,201,{channel:{id,name,kind}});
+        }
+        const channelEdit=path.match(/^\/api\/channels\/([a-f0-9-]+)$/);
+        if(channelEdit && req.method === 'PATCH') {
+          const ch=db.prepare('SELECT * FROM community_channels WHERE id=?').get(channelEdit[1]);
+          if(!ch || !roleCanManage(member(ch.community_id)?.role)) return reply(res,403,{error:'Sem permissão para editar canais.'});
+          const {name}=await body(req);
+          if(typeof name !== 'string' || !/^[a-zA-Z0-9_-]{1,32}$/.test(name)) return reply(res,400,{error:'Use 1–32 letras, números, _ ou -.'});
+          db.prepare('UPDATE community_channels SET name=? WHERE id=?').run(name,ch.id);
+          broadcast(db.prepare('SELECT user_id FROM community_members WHERE community_id=?').all(ch.community_id).map(x=>x.user_id),'community');
+          return reply(res,200,{ok:true});
         }
         const memberEdit=path.match(/^\/api\/communities\/([a-f0-9-]+)\/members\/([a-f0-9-]+)$/);
         if(memberEdit && req.method==='PATCH') {
@@ -463,7 +511,7 @@ export function createServer({
             if(typeof content!=='string'||!content.trim()||content.length>2000)return reply(res,400,{error:'Mensagem inválida.'});
             const msg={id:randomUUID(),senderId:user.id,content:content.trim(),createdAt:Date.now()};
             db.prepare('INSERT INTO channel_messages VALUES (?,?,?,?,?)').run(msg.id,channel.id,user.id,msg.content,msg.createdAt);
-            broadcast(db.prepare('SELECT user_id FROM community_members WHERE community_id=?').all(channel.community_id).map(x=>x.user_id),'community');
+            broadcast(db.prepare('SELECT user_id FROM community_members WHERE community_id=?').all(channel.community_id).map(x=>x.user_id),'community',{communityId:channel.community_id,from:user.id,hasMessage:true});
             return reply(res,201,{message:msg});
           }
         }
@@ -500,7 +548,8 @@ export function createServer({
       if (
         !(
           /^\/(?:index\.html)?$/.test(path) ||
-          /^\/(js|css)\/[a-zA-Z0-9_-]+\.(js|css)$/.test(path)
+          /^\/(js|css)\/[a-zA-Z0-9_-]+\.(js|css)$/.test(path) ||
+          /^\/assets\/[a-zA-Z0-9_-]+\.(png|jpg|jpeg|webp|svg|ico)$/.test(path)
         )
       )
         return reply(res, 404, { error: "Não encontrado." });

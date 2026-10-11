@@ -39,6 +39,7 @@ export function renderFriends() {
   }
   if (filteredFriends.length === 0) {
     friendsEmpty?.classList.add("visible");
+    if(friendsEmpty){const heading=search?'Nenhum resultado':currentFriendsTab==='pending'?'Nenhuma solicitação':currentFriendsTab==='online'?'Nenhum amigo online':'Você ainda não tem amigos';const detail=search?'Tente outro nome ou nome de usuário.':currentFriendsTab==='pending'?'Novos pedidos de amizade aparecerão aqui.':currentFriendsTab==='online'?'Seus amigos aparecerão aqui quando se conectarem.':'Adicione alguém para começar a conversar.';friendsEmpty.querySelector('h3').textContent=heading;friendsEmpty.querySelector('p').textContent=detail;emptyAddFriend.hidden=!!search || currentFriendsTab!=='all';}
     return;
   }
   friendsEmpty?.classList.remove("visible");
@@ -85,17 +86,13 @@ export function createFriendCard(friend) {
   message.className = "friend-action";
   message.title = "Enviar mensagem";
   message.textContent = "Mensagem";
-  message.addEventListener("click", function () {
-    openConversation(friend);
-  });
+  if(currentFriendsTab!=="pending") message.addEventListener("click",()=>openConversation(friend));
   const more = document.createElement("button");
   more.type = "button";
   more.className = "friend-action";
   more.title = "Mais opções";
   more.textContent = "•••";
-  more.addEventListener("click", function () {
-    openFriendOptions(friend);
-  });
+  if(currentFriendsTab!=="pending") more.addEventListener("click",()=>openFriendOptions(friend));
   if (currentFriendsTab === "pending") {
     message.textContent = "✓";
     message.title = "Aceitar";
@@ -104,6 +101,8 @@ export function createFriendCard(friend) {
     more.title = "Recusar";
     more.onclick = async () => { try { await api(`/api/friends/requests/${friend.id}/reject`, { method:"POST" }); await refreshFriends(); } catch(e) { alert(e.message); } };
   }
+  message.setAttribute('aria-label',message.title);
+  more.setAttribute('aria-label',more.title);
   actions.appendChild(message);
   actions.appendChild(more);
   card.appendChild(avatar);

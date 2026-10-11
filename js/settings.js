@@ -57,6 +57,7 @@ export function initializeSettings() {
   };
   settingsNavItems = document.querySelectorAll(".settings-nav-item");
   settingsSections = {
+    overview: document.getElementById("overviewSection"),
     profile: document.getElementById("profileSection"),
     audio: document.getElementById("audioSection"),
     appearance: document.getElementById("appearanceSection"),
@@ -64,6 +65,7 @@ export function initializeSettings() {
     privacy: document.getElementById("privacySection"),
   };
   sectionInformation = {
+    overview: {label:"APLICATIVO",title:"Configurações",description:"Preferências, privacidade e sua conta."},
     profile: {
       label: "PERFIL",
       title: "Perfil",
@@ -90,6 +92,8 @@ export function initializeSettings() {
       description: "Controle quem poderá interagir com você.",
     },
   };
+  document.querySelectorAll('[data-settings-open]').forEach(button=>button.addEventListener('click',()=>openSection(button.dataset.settingsOpen)));
+  document.querySelector('.settings-search input')?.addEventListener('input',event=>{const query=event.target.value.trim().toLocaleLowerCase('pt-BR');settingsNavItems.forEach(item=>{item.hidden=!item.textContent.toLocaleLowerCase('pt-BR').includes(query);});});
   sectionLabel = document.getElementById("sectionLabel");
   sectionTitle = document.getElementById("sectionTitle");
   sectionDescription = document.getElementById("sectionDescription");

@@ -2,8 +2,6 @@
 .main-sidebar{width:72px!important;min-width:72px!important;flex-basis:72px!important;display:flex!important;flex-direction:column!important;align-items:center!important;padding:14px 8px!important;gap:14px!important;background:#0d0b16!important;border-right:1px solid #272135!important}
 .main-sidebar .logo{position:relative!important;display:grid!important;place-items:center!important;width:48px!important;height:48px!important;min-height:48px!important;padding:0!important;overflow:hidden!important;border:1px solid #5b4385!important;border-radius:16px!important;background:#120f22!important}
 .main-sidebar .logo img{width:100%!important;height:100%!important;object-fit:contain!important;display:block!important}
-#communityToggle{display:grid!important;place-items:center!important;position:relative!important;order:2!important;inset:auto!important;width:44px!important;height:44px!important;padding:10px!important;margin:0!important}
-#communityToggle svg{width:23px;height:23px}
 .main-navigation{display:flex!important;flex-direction:column!important;align-items:center!important;gap:10px!important;width:100%!important;order:1!important}
 .main-navigation .nav-button{display:grid!important;place-items:center!important;width:44px!important;height:44px!important;padding:0!important;flex:none!important}
 #logoutButton{order:5!important;margin-top:auto!important;position:static!important;display:grid!important;place-items:center!important;width:44px!important;height:44px!important;color:#aea1c9!important;background:transparent!important}

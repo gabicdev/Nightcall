@@ -3,6 +3,8 @@ import { refreshFriends } from "./friends.js";
 import {
   closeSettings,
   conversations,
+  currentUser,
+  friends,
   openSettings,
   setCurrentPage,
   showFriends,
@@ -34,14 +36,18 @@ async function refreshChat() {
     history.replaceChildren();
     for (const msg of messages) {
       const el=document.createElement("div"); el.className="chat-message"+(msg.senderId===currentUserId?" mine":"");
-      el.textContent=msg.content;
+      const sender=msg.senderId===currentUserId?currentUser.name:activePerson.name;
+      const avatar=document.createElement('span');avatar.className='nc-message-avatar';avatar.textContent=String(sender||'N').trim().slice(0,1).toUpperCase();
+      const copy=document.createElement('div');copy.className='nc-private-message-copy';
+      const header=document.createElement('header'),name=document.createElement('strong'),time=document.createElement('time'),content=document.createElement('p');
+      name.textContent=sender || 'Usuário';time.dateTime=new Date(msg.createdAt).toISOString();time.textContent=new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit'}).format(msg.createdAt);time.title=new Date(msg.createdAt).toLocaleString('pt-BR');content.textContent=msg.content;header.append(name,time);copy.append(header,content);el.append(avatar,copy);
       if(msg.senderId===currentUserId){
         const del=document.createElement("button"); del.type="button"; del.className="message-delete";
         del.textContent="Excluir";del.title="Excluir minha mensagem";
         del.addEventListener("click",async()=>{
           try{await api(`/api/messages/own/${msg.id}`,{method:"DELETE"});await refreshChat();}
           catch(e){document.getElementById("chatStatus").textContent=e.message;}
-        });el.appendChild(del);
+        });header.appendChild(del);
       }
       history.appendChild(el);
     }
@@ -53,6 +59,9 @@ export function renderConversations() {
     return;
   }
   conversationsList.innerHTML = "";
+  const sidebar=document.getElementById('directMessagesList');
+  if(sidebar){sidebar.replaceChildren();for(const person of conversations){const button=document.createElement('button');button.type='button';button.className='nc-direct-conversation';const avatar=document.createElement('span');avatar.textContent=String(person.name||person.username||'N').trim().slice(0,1).toUpperCase();const name=document.createElement('strong');name.textContent=person.name||person.username;button.append(avatar,name);button.addEventListener('click',()=>openConversation(person));sidebar.append(button);}}
+  const noDirect=document.getElementById('directMessagesEmpty');if(noDirect)noDirect.hidden=conversations.length>0;
   let filtered = [...conversations];
   const search = messageSearch?.value.trim().toLowerCase();
   if (search) {
@@ -64,6 +73,7 @@ export function renderConversations() {
   }
   if (filtered.length === 0) {
     messagesEmpty?.classList.add("visible");
+    if(messagesEmpty) {messagesEmpty.querySelector('h3').textContent=search?'Nenhuma conversa encontrada':'Nenhuma conversa ainda';messagesEmpty.querySelector('p').textContent=search?'Tente outro nome ou nome de usuário.':'Escolha um amigo para começar a conversar.';messagesEmpty.querySelector('button').hidden=!!search;}
     return;
   }
   messagesEmpty?.classList.remove("visible");
@@ -94,8 +104,9 @@ export function renderConversations() {
   });
 }
 export function openNewConversation() {
+  document.querySelector('[data-tab="all"]')?.click();
   showFriends();
-  document.getElementById("addFriendButton")?.click();
+  if(!friends.length) document.getElementById("addFriendButton")?.click();
 }
 export function openConversation(person = null) {
   showMessages();
@@ -104,6 +115,8 @@ export function openConversation(person = null) {
     return;
   }
   activePerson = person;
+  renderConversations();
+  document.getElementById("messagesPage").classList.add("nc-chat-open");
   document.getElementById("chatPanel").hidden=false;
   document.getElementById("chatName").textContent=`${person.name} (@${person.username.replace(/^@/,"")})`;
   document.getElementById("chatStatus").textContent="";
@@ -124,7 +137,7 @@ export function initializeMessages() {
   newConversationButton = document.getElementById("newConversationButton");
   emptyNewConversation = document.getElementById("emptyNewConversation");
   api("/api/auth/me").then(({user}) => {currentUserId=user.id;}).catch(console.warn);
-  document.getElementById("chatClose").addEventListener("click",()=>{activePerson=null;document.getElementById("chatPanel").hidden=true;});
+  document.getElementById("chatClose").addEventListener("click",()=>{activePerson=null;document.getElementById("chatPanel").hidden=true;document.getElementById("messagesPage").classList.remove("nc-chat-open");});
   document.getElementById("chatForm").addEventListener("submit",async event=>{
     event.preventDefault(); if(!activePerson)return;
     const input=document.getElementById("chatInput"); const content=input.value.trim();if(!content)return;

@@ -3,6 +3,7 @@ import { cacheProfile } from "./auth.js";
 import { readStorage } from "./navigation.js";
 import { DEFAULT_PROFILE } from "./settings.js";
 import { showToast } from "./preferences.js";
+export let profileBanner;
 export let profileName;
 export let profileUsername;
 export let profileBio;
@@ -25,6 +26,8 @@ export function updateProfilePreview() {
   const username = profileUsername.value.trim().replace(/^@/, "") || "usuario";
   const bio = profileBio.value.trim();
   const avatar = profileAvatar.value.trim();
+  const banner = document.getElementById("bannerPreview");
+  if (banner) { banner.hidden = !profileBanner?.value.trim(); if (!banner.hidden) banner.src = profileBanner.value.trim(); banner.onerror = () => { banner.hidden = true; }; }
   if (previewName) {
     previewName.textContent = name;
   }
@@ -61,6 +64,7 @@ export function loadProfile() {
   profileUsername.value = profile.username;
   profileBio.value = profile.bio;
   profileAvatar.value = profile.avatar;
+  profileBanner.value = profile.banner || "";
   updateBioCount();
   updateProfilePreview();
 }
@@ -73,6 +77,7 @@ export async function saveProfileData() {
     username: profileUsername.value.trim().replace(/^@/, "") || "usuario",
     bio: profileBio.value.trim(),
     avatar: profileAvatar.value.trim(),
+    banner: profileBanner.value.trim(),
   };
   saveProfile.disabled = true;
   try {
@@ -98,6 +103,8 @@ export function updateBioCount() {
   bioCount.textContent = profileBio.value.length;
 }
 export function initializeProfile() {
+  profileBanner = document.getElementById("profileBanner");
+  profileBanner?.addEventListener("input", updateProfilePreview);
   profileName = document.getElementById("profileName");
   profileUsername = document.getElementById("profileUsername");
   profileBio = document.getElementById("profileBio");

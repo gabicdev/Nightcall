@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "flows": [
+    "perfil separado",
+    "banner persistente por URL",
+    "botão +",
+    "criação",
+    "convite com segunda conta",
+    "permissões",
+    "canal de texto",
+    "renomeação preserva mensagens",
+    "navegação",
+    "entrada e saída de voz com mídia simulada"
+  ],
+  "errors": []
+}

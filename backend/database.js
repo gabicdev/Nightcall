@@ -63,5 +63,15 @@ export function openDatabase(filename) {
   CREATE INDEX IF NOT EXISTS channel_messages_idx ON channel_messages(channel_id,created_at);
   CREATE INDEX IF NOT EXISTS member_user_idx ON community_members(user_id);
   `);
+  if (!db.prepare('PRAGMA table_info(users)').all().some(column => column.name === 'banner')) {
+    db.exec("ALTER TABLE users ADD COLUMN banner TEXT NOT NULL DEFAULT ''");
+  }
+  db.exec(`CREATE TABLE IF NOT EXISTS community_categories (
+    id TEXT PRIMARY KEY, community_id TEXT NOT NULL REFERENCES communities(id) ON DELETE CASCADE,
+    name TEXT NOT NULL, created_at INTEGER NOT NULL
+  );`);
+  if(!db.prepare('PRAGMA table_info(community_channels)').all().some(column=>column.name==='category_id')){
+    db.exec('ALTER TABLE community_channels ADD COLUMN category_id TEXT');
+  }
   return db;
 }

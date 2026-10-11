@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "media": "microfones simulados no mesmo computador",
+  "flows": [
+    "ligar",
+    "receber",
+    "aceitar",
+    "conectar WebRTC",
+    "silenciar",
+    "desligar",
+    "sem vídeos vazios",
+    "restaurar layout"
+  ],
+  "errors": []
+}

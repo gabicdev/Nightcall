@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "comparedWithBaseline": false,
+  "states": [
+    "home",
+    "friends",
+    "messages",
+    "local-fixtures",
+    "audio",
+    "appearance",
+    "notifications",
+    "privacy",
+    "profile",
+    "home-final",
+    "mobile"
+  ]
+}

@@ -93,7 +93,6 @@
 
         <aside class="main-sidebar" aria-label="Navegação principal">
           <div class="logo" aria-label="Nightcall"><img src="assets/nightcall-mark.png" alt="Nightcall" /></div>
-          <button id="communityToggle" class="nc-rail-action" type="button" title="Comunidades" aria-label="Abrir comunidades"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></button>
           <button id="logoutButton" class="nc-logout" type="button" title="Sair da conta" aria-label="Sair da conta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
 
           <nav class="main-navigation">
@@ -101,7 +100,7 @@
 
             <a href="#" class="nav-button" title="Mensagens" aria-label="Mensagens"><span class="nc-icon nc-icon-message" aria-hidden="true"></span></a>
 
-            <a href="#" class="nav-button add-button" title="Nova conversa" aria-label="Nova conversa"><span class="nc-icon nc-icon-plus" aria-hidden="true"></span></a>
+            <div id="communityRail" class="nc-spaces-rail" aria-label="Suas comunidades"></div><button type="button" class="nav-button add-button" title="Criar ou entrar em comunidade" aria-label="Criar ou entrar em comunidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
           </nav>
         </aside>
 
@@ -149,7 +148,7 @@
               </button>
             </div>
 
-            <div class="direct-messages-empty" id="directMessagesEmpty">
+            <div id="directMessagesList" class="nc-direct-messages-list"></div><div class="direct-messages-empty" id="directMessagesEmpty">
               <span> Nenhuma conversa </span>
             </div>
           </section>
@@ -159,6 +158,7 @@
             ================================== -->
 
           <div class="user-profile">
+            <button type="button" id="ownProfileButton" aria-label="Abrir meu perfil">
             <div class="avatar nc-avatar" aria-label="Avatar da conta"><span id="myAvatarFallback" class="nc-avatar-fallback" aria-hidden="true">N</span><img alt="Foto de perfil" id="myAvatar" hidden /></div>
 
             <div class="user-info">
@@ -167,6 +167,7 @@
               <span id="myUsername"> @usuario </span>
             </div>
 
+            </button>
             <div class="profile-actions">
               
 
@@ -181,7 +182,7 @@
              CONTEÚDO PRINCIPAL
         ====================================== -->
 
-        <main class="main-content">
+        <main class="main-content"><nav class="mobile-workspace-bar" aria-label="Sua conta e navegação"><button type="button" data-mobile-open="friends">Amigos</button><button type="button" data-mobile-open="profile">Meu perfil</button><button type="button" data-mobile-open="settings">Configurações</button></nav>
           <!-- Decoração do fundo -->
 
           <div class="background-decoration" aria-hidden="true"></div>
@@ -236,17 +237,9 @@
                 </p>
               </div>
             </section>
-            <section class="nc-home-guide" aria-label="Acesso rápido">
-              <div class="nc-home-guide-copy">
-                <span class="nc-eyebrow">SEU ESPAÇO</span>
-                <h3>Conexões que importam.</h3>
-                <p>Converse, entre em comunidades e compartilhe a noite — tudo em um só lugar.</p>
-              </div>
-              <div class="nc-home-guide-actions">
-                <button type="button" class="nc-quick-action" data-quick-open="friends">Adicionar amigos</button>
-                <button type="button" class="nc-quick-action" data-quick-open="communities">Abrir comunidades</button>
-                <button type="button" class="nc-quick-action" data-quick-open="messages">Ver mensagens</button>
-              </div>
+            <section class="nc-quick-access" aria-labelledby="quickAccessTitle">
+              <header><h3 id="quickAccessTitle">Acesso rápido</h3><p>Escolha onde continuar.</p></header>
+              <div class="nc-access-grid"><button type="button" class="nc-access-card" data-quick-open="friends"><span class="nc-access-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20v-2a6 6 0 0 1 12 0v2M17 15a5 5 0 0 1 5 5"/></svg></span><span class="nc-access-copy"><strong>Amigos</strong><small>Adicionar e conversar</small></span></button><button type="button" class="nc-access-card" data-quick-open="messages"><span class="nc-access-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11a8 8 0 0 1-8 8H7l-5 3 1-6a9 9 0 1 1 18-5Z"/><path d="M8 10h8M8 14h5"/></svg></span><span class="nc-access-copy"><strong>Mensagens</strong><small>Ver suas conversas</small></span></button></div>
             </section>
           </section>
 
@@ -284,11 +277,11 @@
                 ================================== -->
 
             <div class="friends-search">
-              <span class="search-icon" aria-hidden="true">⌕</span>
+              <span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span>
 
               <input
                 type="text"
-                id="friendSearch"
+                id="friendSearch" aria-label="Pesquisar amigos"
                 placeholder="Pesquisar amigos..."
                 autocomplete="off"
               />
@@ -298,7 +291,7 @@
                      ABAS
                 ================================== -->
 
-            <nav class="friends-tabs">
+            <nav class="friends-tabs" aria-label="Filtrar amigos">
               <button type="button" class="friends-tab active" data-tab="all">
                 Todos
               </button>
@@ -332,7 +325,7 @@
                     ================================== -->
 
               <div class="friends-empty visible" id="friendsEmpty">
-                <div class="empty-icon" aria-hidden="true">✧</div>
+                <div class="empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 6a3 3 0 0 1 0 6M17 15a5 5 0 0 1 4 5"/></svg></div>
 
                 <h3>Você ainda não tem amigos</h3>
 
@@ -379,11 +372,11 @@
                 ================================== -->
 
             <div class="messages-search">
-              <span aria-hidden="true">⌕</span>
+              <span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span>
 
               <input
                 type="text"
-                id="messageSearch"
+                id="messageSearch" aria-label="Pesquisar conversas"
                 placeholder="Pesquisar conversas..."
                 autocomplete="off"
               />
@@ -405,7 +398,7 @@
                     ================================== -->
 
               <div class="messages-empty visible" id="messagesEmpty">
-                <div class="empty-icon" aria-hidden="true">✉</div>
+                <div class="empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11a8 8 0 0 1-8 8H7l-5 3 1-6a9 9 0 1 1 18-5Z"/><path d="M8 10h8M8 14h5"/></svg></div>
 
                 <h3>Nenhuma conversa ainda</h3>
 
@@ -512,7 +505,7 @@
          CONFIGURAÇÕES - DENTRO DO NIGHTCALL
     ========================================== -->
 
-      <div class="settings-overlay" id="settingsOverlay" aria-hidden="true">
+      <div class="settings-overlay" id="settingsOverlay" aria-hidden="true" hidden>
         <div class="settings-modal-wrapper">
           <!-- =====================================
                  BOTÃO VOLTAR
@@ -559,7 +552,7 @@
 
               <!-- MENU -->
 
-              <nav class="settings-navigation">
+              <nav class="settings-navigation"><button type="button" class="settings-nav-item" data-section="overview"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h6v6H4ZM14 4h6v6h-6ZM4 14h6v6H4ZM14 14h6v6h-6Z"/></svg></span><span>Geral</span></button>
                 <div class="settings-nav-heading">CONTA</div>
 
                 <button
@@ -567,7 +560,7 @@
                   class="settings-nav-item active"
                   data-section="profile"
                 >
-                  <span> 👤 </span>
+                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 6a3 3 0 0 1 0 6M17 15a5 5 0 0 1 4 5"/></svg></span>
 
                   <span> Perfil </span>
                 </button>
@@ -579,7 +572,7 @@
                   class="settings-nav-item"
                   data-section="audio"
                 >
-                  <span> 🎙 </span>
+                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg></span>
 
                   <span> Áudio </span>
                 </button>
@@ -589,7 +582,7 @@
                   class="settings-nav-item"
                   data-section="appearance"
                 >
-                  <span> 🎨 </span>
+                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg></span>
 
                   <span> Aparência </span>
                 </button>
@@ -599,7 +592,7 @@
                   class="settings-nav-item"
                   data-section="notifications"
                 >
-                  <span> 🔔 </span>
+                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0v6l2 3H4l2-3ZM10 21h4"/></svg></span>
 
                   <span> Notificações </span>
                 </button>
@@ -609,7 +602,7 @@
                   class="settings-nav-item"
                   data-section="privacy"
                 >
-                  <span> 🔒 </span>
+                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4"/></svg></span>
 
                   <span> Privacidade </span>
                 </button>
@@ -639,10 +632,11 @@
                          PERFIL
                     ================================== -->
 
-              <section class="settings-section active" id="profileSection">
+              <section class="settings-section" id="overviewSection"><div class="nc-settings-summary"><h2>Seu aplicativo, do seu jeito</h2><p>Escolha o que você quer ajustar.</p></div><div class="nc-settings-grid"><button type="button" data-settings-open="audio"><strong>Voz e vídeo</strong><span>Microfone, volume e dispositivos</span><b aria-hidden="true">›</b></button><button type="button" data-settings-open="appearance"><strong>Aparência</strong><span>Tema e preferências visuais</span><b aria-hidden="true">›</b></button><button type="button" data-settings-open="notifications"><strong>Notificações</strong><span>Mensagens, amigos e chamadas</span><b aria-hidden="true">›</b></button><button type="button" data-settings-open="privacy"><strong>Privacidade</strong><span>Quem pode conversar com você</span><b aria-hidden="true">›</b></button></div><div class="nc-settings-account"><div><strong>Seu perfil</strong><p>Nome, foto, bio e banner.</p></div><button type="button" data-settings-open="profile">Editar perfil</button></div></section><section class="settings-section" id="profileSection">
                 <!-- PREVIEW -->
 
                 <div class="profile-preview card">
+                  <img id="bannerPreview" class="nc-profile-banner" alt="Banner do perfil" hidden>
                   <div class="avatar-preview">
                     <img src="" alt="Foto de perfil" id="avatarPreview" />
 
@@ -733,6 +727,11 @@
                     </small>
                   </div>
 
+                  <div class="field">
+                    <label for="profileBanner">Banner do perfil</label>
+                    <input type="url" id="profileBanner" placeholder="https://exemplo.com/banner.jpg" maxlength="2048">
+                    <small>Use o endereço de uma imagem. Apague o campo para remover o banner.</small>
+                  </div>
                   <!-- SALVAR -->
 
                   <div class="actions">
@@ -1016,52 +1015,65 @@
          JAVASCRIPT
     ========================================== -->
     </div>
-<section id="communityRoot" hidden aria-label="Comunidades" class="nc-community">
-  <header class="nc-community-header">
-    <div>
-      <span class="nc-eyebrow">NIGHTCALL / COMUNIDADES</span>
-      <h2>Comunidades</h2>
-      <p>Servidores, canais e membros em um só lugar.</p>
-    </div>
-    <button type="button" id="communityClose" class="nc-secondary" aria-label="Fechar comunidades">Fechar</button>
-  </header>
-  <div class="nc-community-actions">
-    <form id="communityCreate">
-      <label for="communityName">Nova comunidade</label>
-      <div>
-        <input id="communityName" placeholder="Nome da comunidade" maxlength="40" minlength="3" required>
-        <button>Criar</button>
+<dialog id="ownProfile" class="nc-own-profile" aria-labelledby="ownProfileName"><div class="nc-own-profile-cover"><img id="ownProfileBanner" class="nc-profile-banner" alt="Banner do perfil" hidden></div><button id="ownProfileClose" type="button" aria-label="Fechar perfil">×</button><div class="nc-own-profile-body"><div class="nc-own-profile-avatar"><span id="ownProfileFallback" aria-hidden="true">N</span><img id="ownProfileAvatar" alt="Foto do perfil" hidden></div><h2 id="ownProfileName"></h2><p id="ownProfileUsername"></p><div class="nc-own-profile-about"><span>Sobre mim</span><p id="ownProfileBio"></p></div><button id="ownProfileEdit" type="button">Editar meu perfil</button></div></dialog>
+  <dialog class="nc-community-actions" id="ncCommunityActions" aria-label="Criar ou entrar em comunidade"><button type="button" id="communityActionCancel" class="nc-wizard-close" aria-label="Fechar criação de comunidade">×</button>
+    <section id="communityChooser">
+      <h2>Criar sua comunidade</h2><p>Um lugar para reunir suas pessoas. Comece do seu jeito ou escolha um modelo.</p>
+      <button type="button" data-community-template="custom" class="nc-template-choice"><span class="nc-template-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><strong>Criar o meu</strong><span>›</span></button>
+      <h3>COMEÇAR COM UM MODELO</h3>
+      <div class="nc-template-options">
+        <button type="button" data-community-template="games" class="nc-template-choice"><span class="nc-template-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10a4 4 0 0 1 4 4l1 6a2 2 0 0 1-3 2l-4-3H9l-4 3a2 2 0 0 1-3-2l1-6a4 4 0 0 1 4-4Z"/><path d="M6 12h4M8 10v4M16 11h.01M19 13h.01"/></svg></span><strong>Jogos</strong><span>›</span></button>
+        <button type="button" data-community-template="friends" class="nc-template-choice"><span class="nc-template-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20v-2a6 6 0 0 1 12 0v2M17 15a5 5 0 0 1 5 5"/></svg></span><strong>Amigos</strong><span>›</span></button>
+        <button type="button" data-community-template="study" class="nc-template-choice"><span class="nc-template-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6v15M3 4c4-1 6 0 9 2 3-2 5-3 9-2v15c-4-1-6 0-9 2-3-2-5-3-9-2Z"/></svg></span><strong>Grupo de estudos</strong><span>›</span></button>
+        <button type="button" data-community-template="school" class="nc-template-choice"><span class="nc-template-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 9 10-5 10 5-10 5Zm4 3v6c4 3 8 3 12 0v-6M22 9v8"/></svg></span><strong>Clube escolar</strong><span>›</span></button>
+        <button type="button" data-community-template="local" class="nc-template-choice"><span class="nc-template-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><strong>Comunidade local</strong><span>›</span></button>
+        <button type="button" data-community-template="creators" class="nc-template-choice"><span class="nc-template-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 3 6 6-10 10-7 1 1-7ZM13 5l6 6M4 20l-1 1"/></svg></span><strong>Artistas e criadores</strong><span>›</span></button>
       </div>
+      <button type="button" id="communityBrowse" class="nc-secondary nc-browse">Minhas comunidades</button><footer><strong>Já tem um convite?</strong><button type="button" id="communityChooserJoin" class="nc-secondary">Entrar em uma comunidade</button></footer>
+    </section>
+    <form id="communityCreate" hidden>
+      <p id="communityStepLabel" class="nc-eyebrow" aria-live="polite">ETAPA 1 DE 3</p>
+      <section data-create-step="2" hidden>
+        <h2>Dê um nome ao seu espaço</h2>
+        <p>Use um nome que seus amigos reconheçam.</p>
+        <label for="communityName">Nome da comunidade</label>
+        <input id="communityName" placeholder="Ex.: Clube da madrugada" maxlength="40" minlength="3" required>
+      </section>
+      <section data-create-step="3" hidden>
+        <h2>Seu espaço está pronto para começar</h2>
+        <strong id="communityReviewName"></strong>
+        <p>Estes canais serão criados automaticamente:</p>
+        <ul id="communityReviewChannels"></ul>
+        <small>Depois de criar, copie o convite para chamar as pessoas.</small>
+      </section>
+      <div class="nc-wizard-controls"><button type="button" id="communityStepBack" class="nc-secondary" hidden>Voltar</button><button type="button" id="communityStepNext">Continuar</button><button type="submit" id="communityCreateSubmit" hidden>Criar comunidade</button></div>
     </form>
-    <form id="communityJoin">
+    <form id="communityJoin" hidden>
       <label for="communityCode">Entrar por convite</label>
       <div>
         <input id="communityCode" placeholder="Código de 12 caracteres" maxlength="12" required>
         <button>Entrar</button>
       </div>
     </form>
-  </div>
-  <p id="communityStatus" role="status" aria-live="polite"></p>
+    <p id="communityWizardStatus" role="status" aria-live="polite"></p>
+  </dialog>
+<dialog id="communitySettings" class="nc-management-dialog" aria-labelledby="communitySettingsTitle"><header><h2 id="communitySettingsTitle">Gerenciar comunidade</h2><button type="button" id="communitySettingsClose" aria-label="Fechar gerenciamento">×</button></header><form id="communityEditForm"><label for="communityEditName">Nome da comunidade</label><input id="communityEditName" minlength="3" maxlength="40" required><button type="submit">Salvar nome</button></form><section id="communityRolesSection"><h3>Membros e cargos</h3><div id="communityRoles"></div></section><section class="nc-danger-zone" id="communityDeleteZone"><h3>Excluir comunidade</h3><p>Esta ação apaga os canais e as mensagens desta comunidade para todos os membros. Não pode ser desfeita.</p><label for="communityDeleteName">Digite o nome atual para confirmar</label><input id="communityDeleteName" autocomplete="off"><button type="button" id="communityDelete" disabled>Excluir comunidade</button></section><p id="communitySettingsStatus" role="status" aria-live="polite"></p></dialog><dialog id="communityCategoryDialog" class="nc-management-dialog" aria-labelledby="communityCategoryTitle"><header><h2 id="communityCategoryTitle">Criar categoria</h2><button type="button" id="communityCategoryClose" aria-label="Fechar criação de categoria">×</button></header><form id="communityCategoryForm"><label for="communityCategoryName">Nome da categoria</label><input id="communityCategoryName" maxlength="40" required placeholder="Ex.: Jogos e conversas"><button type="submit">Criar categoria</button></form><p id="communityCategoryStatus" role="status"></p></dialog><dialog id="communityNotificationDialog" class="nc-management-dialog" aria-labelledby="communityNotificationTitle"><header><h2 id="communityNotificationTitle">Notificações da comunidade</h2><button type="button" id="communityNotificationClose" aria-label="Fechar notificações">×</button></header><form id="communityNotificationForm"><label for="communityNotificationMode">Mensagens nesta comunidade</label><select id="communityNotificationMode"><option value="all">Avisar sobre novas mensagens</option><option value="muted">Silenciar esta comunidade</option></select><p>Esta preferência vale para sua conta neste dispositivo. Os avisos do aplicativo instalado respeitam também as configurações gerais de notificações.</p><button type="submit">Salvar preferência</button></form></dialog><section id="communityRoot" hidden aria-label="Comunidades" class="nc-community nc-conversation-workspace">
   <div class="nc-community-grid">
-    <aside class="nc-community-sidebar nc-community-servers">
-      <h3>Servidores</h3>
-      <div id="communityList" class="nc-community-list"></div>
-    </aside>
+
     <aside class="nc-community-sidebar nc-community-channels">
-      <div class="nc-channel-panel-header">
-        <h3 id="communityTitle">Selecione uma comunidade</h3>
-        <div id="communityInvite" class="nc-invite"></div>
-      </div>
+      <div class="nc-channel-panel-header"><button type="button" id="communitySwitch" aria-expanded="false" aria-controls="communityDirectory"><span id="communityTitle">Selecione uma comunidade</span><span aria-hidden="true">⌄</span></button><div id="communityDirectory" hidden class="nc-server-menu"><div class="nc-server-menu-group"><button type="button" id="communityCopyInvite" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M2 20v-2a6 6 0 0 1 12 0v2M19 8v8M15 12h8"/></svg><span>Convidar pessoas</span></button><button type="button" id="communityManage" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 3 6 0 1 3 3 1 2 5-2 3-3 1-1 5H9l-1-5-3-1-2-3 2-5 3-1Z"/><circle cx="12" cy="12" r="3"/></svg><span>Configurações da comunidade</span></button><button type="button" id="communityMenuChannel" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M7 12h10M12 7v10"/></svg><span>Criar canal</span></button><button type="button" id="communityMenuCategory" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h7l2 3h9v12H3Z"/></svg><span>Criar categoria</span></button></div><div class="nc-server-menu-group"><button type="button" id="communityMenuNotifications" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0v6l2 3H4l2-3ZM10 21h4"/></svg><span>Notificações</span></button><button type="button" id="communityCopyId" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M9 8v8M13 8h3v8h-3Z"/></svg><span>Copiar ID da comunidade</span></button></div></div></div><div id="communityInvite" class="nc-invite" hidden></div><p id="communityStatus" role="status" aria-live="polite"></p><p class="nc-channel-section-label">CANAIS DE CONVERSA</p>
       <div id="communityChannels" class="nc-community-list"></div>
+      <button type="button" id="communityChannelManage" hidden>+ Novo canal</button>
       <form id="communityChannelCreate" class="nc-admin-form" hidden>
         <h4>Novo canal</h4>
         <input id="communityChannelName" placeholder="nome-do-canal" maxlength="32" pattern="[a-zA-Z0-9_-]+" required>
-        <select id="communityChannelKind"><option value="text">Texto</option><option value="voice">Voz</option></select>
-        <button>Criar canal</button>
+        <label for="communityChannelCategory">Categoria</label><select id="communityChannelCategory"><option value="">Sem categoria</option></select><label for="communityChannelKind">Tipo</label><select id="communityChannelKind"><option value="text">Texto</option><option value="voice">Voz</option></select>
+        <button>Criar canal</button><button type="button" id="communityChannelCancel" class="nc-secondary">Cancelar</button>
       </form>
+      <footer class="nc-community-account"><button type="button" id="communityOwnProfile" aria-label="Abrir meu perfil"><span id="communityAccountAvatar">N</span><span><strong id="communityAccountName">Usuário</strong><small>Meu perfil</small></span></button><button type="button" id="communityAccountSettings" aria-label="Abrir configurações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 3 6 0 1 3 3 1 2 5-2 3-3 1-1 5H9l-1-5-3-1-2-3 2-5 3-1Z"/><circle cx="12" cy="12" r="3"/></svg></button></footer>
     </aside>
     <div class="nc-community-main">
-      <div id="communityMessages" class="nc-community-messages" role="log"></div>
+      <div class="nc-channel-heading"><h3 id="communityChannelTitle">Conversa</h3><button type="button" id="communityClose" aria-label="Voltar ao Nightcall">Voltar</button><button id="channelRename" type="button" hidden>Renomear canal</button></div><form id="channelRenameForm" hidden><label for="channelRenameName">Nome do canal</label><input id="channelRenameName" maxlength="32" pattern="[a-zA-Z0-9_-]+" required><button>Salvar</button><button type="button" id="channelRenameCancel">Cancelar</button></form><div id="communityMessages" class="nc-community-messages" role="log"></div>
       <form id="communitySend" class="nc-message-form">
         <input id="communityText" placeholder="Mensagem do canal" maxlength="2000" required>
         <button>Enviar</button>
@@ -1073,6 +1085,6 @@
     </aside>
   </div>
 </section>
-    <link rel="stylesheet" href="css/communities.css"><link rel="stylesheet" href="css/nightcall-design.css"><link rel="stylesheet" href="css/nightcall-refinement.css"><link rel="stylesheet" href="css/nightcall-nocturne.css"><link rel="stylesheet" href="css/nightcall-identity.css"><link rel="stylesheet" href="css/nightcall-repair.css"><link rel="stylesheet" href="css/nightcall-eclipse.css"><link rel="stylesheet" href="css/nightcall-atelier.css"><script type="module" src="js/app.js"></script><script defer src="js/ux-6.js"></script>
+    <link rel="stylesheet" href="css/communities.css"><link rel="stylesheet" href="css/nightcall-design.css"><link rel="stylesheet" href="css/nightcall-refinement.css"><link rel="stylesheet" href="css/nightcall-nocturne.css"><link rel="stylesheet" href="css/nightcall-identity.css"><link rel="stylesheet" href="css/nightcall-repair.css"><link rel="stylesheet" href="css/nightcall-eclipse.css"><link rel="stylesheet" href="css/nightcall-atelier.css"><link rel="stylesheet" href="css/nightcall-13-8.css"><link rel="stylesheet" href="css/workflows.css"><link rel="stylesheet" href="css/social-workspace.css"><script type="module" src="js/app.js"></script><script defer src="js/ux-6.js"></script>
   </body>
 </html>

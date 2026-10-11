@@ -1,0 +1,100 @@
+/* Layout do workspace e dos fluxos de perfil/comunidade. */
+#settingsOverlay[hidden] {display:none!important}
+.nc-quick-access {margin-top:22px;padding:22px;border:1px solid #30263f;border-radius:18px;background:#151121}
+.nc-quick-access header {display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:18px}
+.nc-quick-access h3 {margin:0;font-size:16px;color:#f1ebff}
+.nc-quick-access header p {margin:0;font-size:12px;color:#a99ebd}
+.nc-access-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.nc-access-card {display:flex;align-items:center;gap:12px;min-width:0;padding:16px;border:1px solid #3a2e4b;border-radius:12px;background:#1d172a;color:#eee8fa;text-align:left;font:inherit;cursor:pointer;transition:background .15s,border-color .15s}
+.nc-access-card:hover {background:#2b203d;border-color:#8967b8}
+.nc-access-card:focus-visible {outline:2px solid #ccb2ff;outline-offset:3px}
+.nc-access-icon {display:grid;place-items:center;width:34px;height:34px;flex:none;color:#cbb1ff}
+.nc-access-icon svg {width:24px;height:24px}
+.nc-access-copy {display:grid;gap:6px;min-width:0}
+.nc-access-copy strong {font-size:14px;font-weight:600}
+.nc-access-copy small {font-size:11px;line-height:1.4;color:#b1a5c3}
+@media(max-width:1050px){.nc-access-grid{grid-template-columns:1fr}.nc-access-card{padding:14px}.nc-quick-access header{display:block}.nc-quick-access header p{margin-top:7px}}
+@media(max-width:600px){.nc-quick-access{padding:14px}.nc-access-icon{display:none}.nc-access-card{padding:12px}}
+.main-navigation .add-button {font-size:28px!important;color:#d3c7f8;background:transparent;border:0;cursor:pointer}
+#ownProfileButton {display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left;background:transparent;color:inherit;border:0;padding:0;font:inherit;cursor:pointer}
+#ownProfileButton:focus-visible {outline:2px solid #c3a0ff;outline-offset:5px;border-radius:8px}
+.main-navigation .add-button svg {width:23px;height:23px}
+.community-menu-link {font:inherit;text-align:left;border:0;background:transparent;color:inherit;cursor:pointer;order:3}
+.sidebar-navigation {display:flex;flex-direction:column}
+.sidebar-navigation>a {order:1}
+.sidebar-navigation>a:nth-of-type(2) {order:2}
+.nc-template-icon {display:grid;place-items:center;width:34px;height:34px;flex:none;border-radius:10px;background:#38294d;color:#ccb2ff}
+.nc-template-icon svg {width:22px;height:22px}
+.main-sidebar .logo img {transform:none;object-position:center!important}
+.main-sidebar .logo {padding:3px!important}
+
+.nc-community {inset:0 0 0 72px!important;display:flex;flex-direction:column;gap:8px;padding:20px!important}
+body.nc-community-open .content-sidebar,body.nc-community-open .main-content {display:none!important}
+.nc-community-header {flex-shrink:0}
+.nc-community-header h2 {font-size:25px!important;margin:6px 0!important}
+.nc-community-header p {margin:0;font-size:13px}
+.nc-community-toolbar {padding:14px 18px;margin:0;flex-shrink:0}
+.nc-community-grid {flex:1;min-height:0!important;margin-top:0!important;grid-template-columns:170px 205px minmax(240px,1fr) 170px!important;overflow:hidden}
+.nc-community-main {min-height:0!important;overflow:hidden}
+.nc-community-main h3 {font-size:15px;margin:0;padding:8px 0 14px;border-bottom:1px solid #302d42}
+.nc-community-messages {height:auto;min-height:0!important;overflow:auto}
+.nc-community-sidebar {overflow:auto}
+.nc-community-list {max-height:none}
+.nc-community-setup .nc-community-grid,.nc-community-setup .nc-community-toolbar {display:none!important}
+.nc-community-actions {display:block!important;max-width:680px;width:100%;margin:24px auto!important}
+.nc-community-actions:not([open]) {display:none!important}
+.nc-community-actions[open] {position:fixed;inset:0;margin:auto!important;width:min(490px,calc(100vw - 32px));max-height:calc(100dvh - 40px);overflow:auto;padding:24px!important;color:#eee8fa;border:1px solid #453652;box-shadow:0 20px 80px #0009}
+.nc-community-actions::backdrop {background:#080510b8}
+.nc-community-actions button {font:inherit;color:#f1ebff;background:#7650c5;border:0;border-radius:10px;padding:12px 16px;min-height:44px;cursor:pointer}
+.nc-community-actions button:hover {background:#926ae3}
+.nc-community-actions .nc-secondary {background:#292237;border:1px solid #443653}
+.nc-community-actions input {font:inherit;color:#f1ebff;background:#100d1b;border:1px solid #443653;border-radius:10px;padding:12px;width:100%}
+.nc-community-actions button:focus-visible,.nc-community-actions input:focus-visible {outline:2px solid #d9bcff;outline-offset:3px}
+#communityActionCancel {position:absolute;top:12px;right:12px;padding:2px 9px;font-size:24px;background:transparent;width:auto!important;min-height:32px}
+#communityChooser h2 {text-align:center;font-size:24px;margin:6px 25px 12px}
+#communityChooser>p {text-align:center;line-height:1.6;color:#b5accb;margin-bottom:24px}
+#communityChooser h3 {font-size:10px;letter-spacing:1.2px;margin:24px 0 10px}
+.nc-template-options {display:grid;gap:8px;max-height:min(310px,36dvh);overflow-y:auto;scrollbar-width:thin;padding-right:5px}
+.nc-template-choice {display:flex!important;align-items:center;gap:14px;width:100%;background:#211b30!important;border:1px solid #403052!important;border-radius:12px;text-align:left;padding:16px!important}
+.nc-template-choice:hover {background:#312644!important;border-color:#9675ce!important}
+.nc-template-choice strong {flex:1;font-size:14px;font-weight:500}
+.nc-template-choice>span {font-size:22px}
+#communityChooser footer {display:grid;gap:12px;text-align:center;margin-top:28px}
+#communityChooser[hidden] {display:none!important}
+.nc-community-actions form {padding:0!important;background:none!important;border:none!important;box-shadow:none!important}
+#communityWizardStatus {color:#ffb3b3;line-height:1.5;font-size:13px}
+.nc-community-actions[hidden] {display:none!important}
+.nc-community-actions>p {color:#b5accb;line-height:1.6}
+.nc-admin-form {padding:14px 0;border-top:1px solid #302d42}
+#channelRenameForm[hidden],#channelRename[hidden],#communityCopyInvite[hidden],#communityChannelManage[hidden] {display:none!important}
+.nc-channel-heading {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+#channelRenameForm {display:flex;gap:8px;flex-wrap:wrap;padding:12px 0}
+#channelRenameForm label {flex-basis:100%}
+#communityChannelManage {margin-top:18px;width:100%}
+.nc-own-profile {position:fixed;inset:0;margin:auto;padding:0;width:min(470px,90vw);border:1px solid #504164;border-radius:18px;background:#171222;color:#f1ebff;overflow:hidden}
+.nc-own-profile::backdrop {background:#090611b8}
+#ownProfileClose {position:absolute;right:12px;top:10px;background:#151020cc;border:0;border-radius:8px;color:white;padding:6px 12px;font-size:22px;cursor:pointer}
+.nc-profile-banner {width:100%;height:145px;object-fit:cover;background:#29213c;flex-basis:100%}
+.nc-profile-banner[hidden],#ownProfileAvatar[hidden] {display:none!important}
+.nc-own-profile-body {padding:24px}
+#ownProfileAvatar {width:72px;height:72px;object-fit:cover;border-radius:20px}
+.nc-own-profile h2 {margin:12px 0 4px}
+.nc-own-profile p {white-space:pre-wrap;overflow-wrap:anywhere;color:#bdb3ce}
+#ownProfileEdit {background:#7650c5;border:0;border-radius:10px;padding:12px 18px;color:white;cursor:pointer}
+.profile-preview {flex-wrap:wrap;padding:0!important;overflow:hidden;gap:16px!important}
+.profile-preview .avatar-preview {margin:16px}
+.profile-preview-info {padding:16px}
+.nc-community-grid .nc-members {grid-column:auto!important;grid-row:auto!important;max-height:none!important}
+[data-create-step][hidden],.nc-wizard-controls button[hidden] {display:none!important}
+.nc-community-actions .nc-template {display:flex!important;align-items:center;gap:16px;border:1px solid #403052;padding:20px;border-radius:14px;cursor:pointer}
+.nc-template:has(input:checked) {background:#29203f;border-color:#a88ae7}
+.nc-template input {width:18px!important;min-height:18px!important;flex:none;accent-color:#a88ae7}
+.nc-template span {display:grid;gap:6px}
+.nc-template small {font-size:13px;color:#b5accb}
+[data-create-step] h2 {font-size:24px;line-height:1.3;margin:14px 0}
+[data-create-step]>p {color:#b5accb;line-height:1.7;margin:12px 0 20px}
+.nc-wizard-controls {justify-content:flex-end;margin-top:24px}
+#communityReviewName {font-size:22px}
+#communityReviewChannels {list-style:none;padding:18px;border:1px solid #403052;border-radius:12px;line-height:2;color:#d5c9f0;margin-bottom:20px}
+@media(max-width:1150px){.nc-community-grid{grid-template-columns:145px 180px minmax(240px,1fr)!important;overflow:auto}.nc-community-grid .nc-members{grid-column:1/-1!important;max-height:130px!important}.nc-community-main{min-height:300px!important}}
+@media(max-width:760px){.nc-community{inset:0 0 0 56px!important;overflow:auto!important}.nc-community-grid{overflow:visible;display:flex!important;flex-direction:column;flex:none}.nc-community-main{min-height:360px!important}.nc-community-messages{min-height:200px!important}.nc-community-actions{max-width:100%}}

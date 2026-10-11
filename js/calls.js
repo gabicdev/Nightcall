@@ -3,6 +3,18 @@ let peer=null, stream=null, screenStream=null, secondScreenStream=null, videoSen
 let screenButton, secondScreenButton, secondRemoteVideo, secondLocalPreview, muteButton, deafButton, volumeInput, microphoneSelect, pipButton, remoteVideo, localPreview;
 let qualitySelect, fpsSelect, systemAudioToggle, screenAudioContext=null, mixedAudioTrack=null, microphoneSender=null;
 let status, button, answerButton, rejectButton, audio;
+let streamStage, preferences, audioLabel;
+function syncCallLayout(){
+  let showing=false;
+  for(const video of [remoteVideo,secondRemoteVideo,localPreview,secondLocalPreview]){
+    if(!video)continue;
+    const live=video.srcObject?.getVideoTracks().some(track=>track.readyState==='live' && !track.muted);
+    video.hidden=!live;showing ||= !!live;
+  }
+  if(streamStage)streamStage.hidden=!showing;
+  if(preferences)preferences.hidden=!peer;
+  if(audioLabel)audioLabel.hidden=!peer;
+}
 let captureSequence=0, replacingMicrophone=false;
 const settingsKey="nightcall-capture-v1";
 function readCaptureSettings(){
@@ -45,6 +57,7 @@ function cleanup(message="Chamada encerrada"){
   if(answerButton)answerButton.hidden=true;
   if(rejectButton)rejectButton.hidden=true;
   display(message);
+  syncCallLayout();
 }
 async function hangup(){try{await signal("hangup");}catch{}cleanup();}
 async function prepare(){
@@ -60,7 +73,7 @@ async function prepare(){
   peer.ontrack=event=>{
     if(event.track.kind==="video"){
       const destination=event.transceiver===secondVideoTransceiver?secondRemoteVideo:remoteVideo;
-      destination.srcObject=new MediaStream([event.track]);destination.play().catch(()=>{});return;
+      destination.srcObject=new MediaStream([event.track]);for(const kind of ['ended','mute','unmute'])event.track.addEventListener(kind,syncCallLayout);syncCallLayout();destination.play().catch(()=>{});return;
     }
     audio.srcObject=new MediaStream([event.track]);audio.play().catch(()=>display("Clique para liberar a reprodução de áudio."));
   };
@@ -75,6 +88,7 @@ async function prepare(){
     if(["failed","closed"].includes(peer?.connectionState))cleanup("Conexão encerrada");
   };
   muteButton.hidden=false;deafButton.hidden=false;volumeInput.hidden=false;microphoneSelect.hidden=false;screenButton.hidden=false;secondScreenButton.hidden=false;pipButton.hidden=false;qualitySelect.hidden=false;fpsSelect.hidden=false;systemAudioToggle.hidden=false;
+  syncCallLayout();
 }
 function releaseMixedAudio(){
   if(mixedAudioTrack){mixedAudioTrack.stop();mixedAudioTrack=null;}
@@ -85,6 +99,7 @@ function stopSecondScreen(){
   if(secondScreenStream){secondScreenStream.getTracks().forEach(track=>track.stop());secondScreenStream=null;}
   if(secondLocalPreview)secondLocalPreview.srcObject=null;
   if(secondScreenButton)secondScreenButton.textContent="Compartilhar segunda tela";
+  syncCallLayout();
 }
 function stopPrimaryScreen(){
   captureSequence++;
@@ -95,6 +110,7 @@ function stopPrimaryScreen(){
     microphoneSender.replaceTrack(stream.getAudioTracks()[0]).catch(()=>{});
   }
   releaseMixedAudio();
+  syncCallLayout();
 }
 function stopScreen(){stopSecondScreen();stopPrimaryScreen();}
 function selectedCaptureConstraints(){
@@ -147,6 +163,7 @@ async function toggleScreen(){
     if(attempt!==captureSequence){capture.getTracks().forEach(t=>t.stop());return;}
     await applyVideoQuality(videoSender);
     screenStream=capture;localPreview.srcObject=new MediaStream([track]);
+    syncCallLayout();
     localPreview.muted=true;
     screenButton.textContent="Parar transmissão";
     track.addEventListener("ended",()=>{if(screenStream===capture){videoSender?.replaceTrack(null).catch(()=>{});stopPrimaryScreen();}},{once:true});
@@ -177,6 +194,7 @@ async function toggleSecondScreen(){
     await applyVideoQuality(secondVideoSender);
     secondScreenStream=capture;
     secondLocalPreview.srcObject=new MediaStream([track]);
+    syncCallLayout();
     secondScreenButton.textContent="Parar segunda tela";
     track.addEventListener("ended",()=>{if(secondScreenStream===capture){secondVideoSender?.replaceTrack(null).catch(()=>{});stopSecondScreen();}},{once:true});
     display("Segunda transmissão ativa. Áudio compartilhado apenas pela primeira tela.");
@@ -282,11 +300,11 @@ export function initializeCalls(){
   secondLocalPreview=document.createElement("video");secondLocalPreview.autoplay=true;secondLocalPreview.muted=true;secondLocalPreview.playsInline=true;secondLocalPreview.className="call-video call-preview";secondLocalPreview.setAttribute("aria-label","Prévia da segunda tela");
   const videos=document.createElement("div");videos.className="call-videos";videos.append(remoteVideo,secondRemoteVideo,localPreview,secondLocalPreview);
   const actions=document.createElement("div");actions.className="nc-call-actions";actions.setAttribute("aria-label","Ações da chamada");actions.append(button,answerButton,rejectButton,muteButton,deafButton,screenButton,secondScreenButton,pipButton);
-  const preferences=document.createElement("div");preferences.className="nc-call-preferences";preferences.setAttribute("aria-label","Qualidade e dispositivos");
-  const audioLabel=document.createElement("label");audioLabel.className="nc-inline-toggle";audioLabel.append(systemAudioToggle,document.createTextNode("Áudio da tela"));
+  preferences=document.createElement("div");preferences.className="nc-call-preferences";preferences.setAttribute("aria-label","Qualidade e dispositivos");
+  audioLabel=document.createElement("label");audioLabel.className="nc-inline-toggle";audioLabel.append(systemAudioToggle,document.createTextNode("Áudio da tela"));
   preferences.append(microphoneSelect,volumeInput,qualitySelect,fpsSelect,audioLabel);
-  const streamStage=document.createElement("section");streamStage.className="nc-stream-stage";streamStage.setAttribute("aria-label","Transmissões e prévias");streamStage.append(videos);
-  bar.append(status,actions,preferences,audio,streamStage);panel.prepend(bar);
+  streamStage=document.createElement("section");streamStage.className="nc-stream-stage";streamStage.setAttribute("aria-label","Transmissões e prévias");streamStage.append(videos);
+  bar.append(status,actions,preferences,audio,streamStage);panel.querySelector('.chat-header').after(bar);syncCallLayout();
   button.addEventListener("click",()=>{
     if(current){hangup();return;}
     const selected=window.NightcallActivePerson?.();
