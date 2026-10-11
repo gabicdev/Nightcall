@@ -264,6 +264,8 @@ export function initializeNavigation() {
       if (section === "Amigos") {
         showFriends();
       }
+      if (section === "Mensagens") showMessages();
+      if (section === "Comunidades") document.dispatchEvent(new CustomEvent('nightcallShowCommunities'));
     });
   });
   navButtons.forEach(function (button) {

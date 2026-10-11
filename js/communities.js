@@ -86,6 +86,61 @@ export function initializeCommunities() {
   let voice = null,voiceView=false;
   let selectedRole = null;
   let channelEntries = [];
+  let callChatChannel=null,callChatBusy=false,callChatVersion=0,callChatSignature='';
+  let callChatOpen=window.matchMedia('(min-width:1281px)').matches;
+  const callChat=document.createElement('aside');callChat.className='nc-call-chat';callChat.hidden=true;
+  callChat.setAttribute('aria-label','Conversa durante a chamada');
+  callChat.innerHTML='<header class="nc-call-chat-heading"><strong>Conversa</strong><button type="button" aria-label="Fechar conversa da chamada">×</button></header><select aria-label="Canal da conversa durante a chamada"></select><div class="nc-call-chat-history" role="log" aria-label="Mensagens durante a chamada"></div><form class="nc-call-chat-form"><input aria-label="Mensagem durante a chamada" placeholder="Converse sem sair da call…" maxlength="2000"><button type="submit" aria-label="Enviar mensagem durante a chamada"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 19 9-19 9 4-9-4-9ZM7 12h15"/></svg></button></form><p class="nc-call-chat-status" role="status"></p>';
+  root.querySelector('.nc-community-grid').append(callChat);
+  const callChatSelect=callChat.querySelector('select'),callChatHistory=callChat.querySelector('[role=log]'),callChatForm=callChat.querySelector('form'),callChatInput=callChatForm.querySelector('input'),callChatStatus=callChat.querySelector('[role=status]');
+  const callChatComposer=attachComposer(callChatForm,{onError:message=>callChatStatus.textContent=message});
+  function updateCallChatVisibility(){
+    const show=Boolean(voice&&voiceView&&callChatOpen&&callChatChannel);
+    callChat.hidden=!show;root.classList.toggle('nc-call-chat-open',show);
+    root.querySelectorAll('.nc-call-chat-toggle').forEach(button=>button.setAttribute('aria-pressed',String(show)));
+  }
+  function selectCallChatChannel(id){
+    if(callChatChannel!==id){callChatChannel=id;callChatVersion++;callChatSignature='';callChatInput.value='';callChatComposer.reset();callChatHistory.replaceChildren();callChatStatus.textContent='';}
+    callChatSelect.value=id||'';updateCallChatVisibility();
+    if(id)void loadCallChat().catch(error=>callChatStatus.textContent=error.message);
+  }
+  function prepareCallChat(){
+    const entries=channelEntries.filter(entry=>entry.kind==='text');
+    callChatSelect.replaceChildren(...entries.map(entry=>Object.assign(document.createElement('option'),{value:entry.id,textContent:'# '+entry.name})));
+    const id=entries.some(entry=>entry.id===callChatChannel)?callChatChannel:entries[0]?.id||null;
+    selectCallChatChannel(id);
+  }
+  callChatSelect.onchange=()=>selectCallChatChannel(callChatSelect.value);
+  window.matchMedia('(min-width:1281px)').addEventListener('change',event=>{callChatOpen=event.matches;updateCallChatVisibility();});
+  callChat.querySelector('header button').onclick=()=>{callChatOpen=false;updateCallChatVisibility();};
+  callChatForm.onsubmit=async event=>{
+    event.preventDefault();const id=callChatChannel,version=callChatVersion,content=callChatInput.value.trim();
+    if(callChatBusy||!voice||!id||callChatComposer.busy||(!content&&!callChatComposer.ids.length))return;
+    callChatBusy=true;callChatStatus.textContent='';const submit=callChatForm.querySelector('[type=submit]');submit.disabled=true;
+    try{
+      await api('/api/channels/'+id+'/messages',{method:'POST',body:JSON.stringify({content,attachments:callChatComposer.ids})});
+      if(version===callChatVersion){callChatInput.value='';callChatComposer.reset();callChatSignature='';await loadCallChat(true);}
+    }catch(error){callChatStatus.textContent=error.message;}finally{callChatBusy=false;submit.disabled=false;}
+  };
+  async function loadCallChat(forceScroll=false){
+    const id=callChatChannel,version=callChatVersion;if(!voice||!id||root.hidden||!voiceView)return;
+    const data=await api('/api/channels/'+id+'/messages');
+    if(version!==callChatVersion||!voice)return;
+    const signature=JSON.stringify(data.messages);if(signature===callChatSignature)return;
+    const bottom=callChatHistory.scrollHeight-callChatHistory.scrollTop-callChatHistory.clientHeight<80;
+    callChatSignature=signature;
+    if(data.messages.length)callChatHistory.replaceChildren(...data.messages.map(createMessageRow));
+    else {const empty=document.createElement('p');empty.className='nc-call-chat-empty';empty.textContent='A conversa continua aqui. Envie uma mensagem sem sair da chamada.';callChatHistory.replaceChildren(empty);}
+    if(forceScroll||bottom)callChatHistory.scrollTop=callChatHistory.scrollHeight;
+  }
+  function createMessageRow(message){
+    const line=document.createElement('article');line.className='nc-channel-message';
+    const avatar=document.createElement('span');avatar.className='nc-message-avatar';renderAvatar(avatar,message.senderAvatar,message.senderName);
+    const copy=document.createElement('div'),meta=document.createElement('header'),content=document.createElement('p');
+    const name=document.createElement('strong');name.textContent=message.senderName;
+    const time=document.createElement('time');time.dateTime=new Date(message.createdAt).toISOString();time.textContent=new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit'}).format(message.createdAt);time.title=new Date(message.createdAt).toLocaleString('pt-BR');
+    meta.append(name,time);content.textContent=message.content;copy.append(meta,content);renderAttachments(copy,message.attachments);line.append(avatar,copy);return line;
+  }
   let inviteCode = '';
   let renamingChannel = null;
   let activeName = '';
@@ -222,9 +277,12 @@ export function initializeCommunities() {
     console.error('Comunidades:', error);
   };
 
+  let infoTimer;
   const info = (text = '') => {
+    clearTimeout(infoTimer);
     status.textContent = text;
     status.dataset.state = text ? 'success' : '';
+    if(text)infoTimer=setTimeout(()=>{if(status.dataset.state==='success'&&status.textContent===text){status.textContent='';status.dataset.state='';}},3500);
   };
 
   const initials = (value) => {
@@ -294,6 +352,7 @@ export function initializeCommunities() {
     const remaining=voiceParticipants.filter(p=>p.id!==group.self);
     if(document.fullscreenElement===messages)await document.exitFullscreen().catch(()=>{});
     voice = null;voiceView=false;voiceDock.hidden=true;voiceParticipants=[];voiceSignature='';messages.classList.remove('nc-voice-view');root.classList.remove('nc-call-stage');
+    callChatVersion++;callChat.hidden=true;root.classList.remove('nc-call-chat-open');callChatComposer.reset();callChatInput.value='';callChatSignature='';
     await group.leave();
     if(old)renderRoomParticipants(old,remaining);
   }
@@ -302,6 +361,7 @@ export function initializeCommunities() {
   const iconMarkup=name=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+voiceIcons[name]+'</svg>';
   async function renderVoice(participants) {
     if(!voice||!voiceView)return;voiceParticipants=participants;renderRoomParticipants(voice,participants);updateVoiceDock();root.classList.add('nc-call-stage');
+    updateCallChatVisibility();
     const profile=readStorage('nightcallProfile',{}),all=[...participants];
     if(!all.some(p=>p.id===profile.id))all.unshift(profile);
     const signature=JSON.stringify([all,group.muted,group.deaf,group.cameraActive,group.screenActive,all.map(p=>[group.connectionState(p.id),...Object.values(group.participantMedia(p.id)).map(stream=>stream?.getVideoTracks().map(t=>[t.id,t.readyState,t.muted]))])]);
@@ -312,7 +372,8 @@ export function initializeCommunities() {
     const summary=document.createElement('span');summary.textContent=all.length+' '+(all.length===1?'pessoa na chamada':'pessoas na chamada');identity.append(label,summary);
     const utilities=document.createElement('div');utilities.className='nc-call-utilities';const clock=document.createElement('span');clock.className='nc-call-clock';
     const fullscreen=document.createElement('button');fullscreen.type='button';fullscreen.setAttribute('aria-label','Alternar tela cheia da chamada');fullscreen.title='Tela cheia';fullscreen.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>';fullscreen.onclick=async()=>{try{if(document.fullscreenElement===messages)await document.exitFullscreen();else await messages.requestFullscreen();}catch{info('A tela cheia não está disponível neste dispositivo.');}};
-    utilities.append(clock,fullscreen);heading.append(identity,utilities);messages.append(heading);updateCallClock();
+    const chatToggle=document.createElement('button');chatToggle.type='button';chatToggle.className='nc-call-chat-toggle';chatToggle.title='Conversa durante a chamada';chatToggle.setAttribute('aria-label','Alternar conversa durante a chamada');chatToggle.setAttribute('aria-pressed',String(!callChat.hidden));chatToggle.disabled=!callChatChannel;chatToggle.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11a8 8 0 0 1-8 8H7l-5 3 1-6a9 9 0 1 1 18-5Z"/><path d="M8 10h8M8 14h5"/></svg>';chatToggle.onclick=()=>{callChatOpen=!callChatOpen;updateCallChatVisibility();if(callChatOpen)void loadCallChat().catch(error=>callChatStatus.textContent=error.message);};
+    utilities.append(clock,chatToggle,fullscreen);heading.append(identity,utilities);messages.append(heading);updateCallClock();
     const stage=document.createElement('div');stage.className='nc-voice-stage';
     stage.dataset.count=String(all.length);
     for(const participant of all){
@@ -347,7 +408,7 @@ export function initializeCommunities() {
     document.dispatchEvent(new CustomEvent('nightcallGroupCallStarted'));
     renderEmpty('Entrando na chamada…','Permita o acesso ao microfone para continuar.');
     const participants = await group.join(channelId);
-    voice = channelId;channel=null;sendForm.hidden=true;voiceView=true;voiceStarted=Date.now();info('');
+    voice = channelId;channel=null;sendForm.hidden=true;voiceView=true;voiceStarted=Date.now();info('');prepareCallChat();
     highlightChannelButtons(channelEntries);
     await renderVoice(participants);
   }
@@ -355,7 +416,7 @@ export function initializeCommunities() {
   async function loadVoice() {
     if (!voice) return;
     const participants = await group.refresh();
-    voiceParticipants=participants;renderRoomParticipants(voice,participants);if(voiceView)await renderVoice(participants);else updateVoiceDock();
+    voiceParticipants=participants;renderRoomParticipants(voice,participants);if(voiceView){await renderVoice(participants);await loadCallChat();}else updateVoiceDock();
   }
 
   async function refresh() {
@@ -419,6 +480,7 @@ export function initializeCommunities() {
     await refreshRoomPresence();
 
     members.replaceChildren();
+    root.querySelector('.nc-members h3').textContent='Membros · '+data.members.length;
     get('communityRoles').replaceChildren();get('communityRolesSection').hidden=selectedRole!=='owner';
     for (const member of data.members) {
       const row = document.createElement('div');
@@ -482,6 +544,7 @@ export function initializeCommunities() {
 
   async function load() {
     root.classList.remove('nc-call-stage');
+    callChat.hidden=true;root.classList.remove('nc-call-chat-open');
     messages.classList.remove('nc-voice-view');
     sendForm.hidden = !channel;
     if (!channel) {
@@ -615,6 +678,7 @@ export function initializeCommunities() {
   });
 
   const events = new EventSource('/api/events');
+  document.addEventListener('nightcallShowCommunities',()=>{setPanelOpen(true);refresh().catch(fail);});
   events.addEventListener('profile',()=>{if(!root.hidden){refresh().then(()=>voice?loadVoice():load()).catch(fail);}});
   document.addEventListener('nightcallProfileSaved',()=>{if(voice)loadVoice().catch(fail);});
   events.addEventListener('community', async event => {

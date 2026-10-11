@@ -9,6 +9,7 @@ import { initializeCalls } from "./calls.js";
 import { initializeAudio } from "./audio.js";
 import { initializePreferences } from "./preferences.js";
 import {initializeReleaseSettings} from './release-settings.js';
+import {initializeWorkspaceLayout} from './workspace-layout.js';
 
 await authenticate();
 
@@ -23,5 +24,6 @@ initializeProfile();
 initializeAudio();
 initializePreferences();
 initializeReleaseSettings();
+initializeWorkspaceLayout();
 
 document.dispatchEvent(new CustomEvent("nightcallProfileSaved"));

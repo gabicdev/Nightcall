@@ -29,7 +29,7 @@ try {
   await page.locator('.add-button').click();await page.locator('#communityBrowse').click();await page.getByText('Mensagem no aplicativo',{exact:false}).waitFor();
   assert.deepEqual(errors,[]);await mkdir('test-results',{recursive:true});
   let screenshotCaptured=false;
-  try {await page.screenshot({path:'test-results/electron-13.13.png',timeout:5000}); screenshotCaptured=true;} catch {}
+  try {await page.screenshot({path:'test-results/electron-13.14.png',timeout:5000}); screenshotCaptured=true;} catch {}
   await writeFile('test-results/electron.json',JSON.stringify({passed:true,packaged:!!process.env.NIGHTCALL_TEST_EXE,screenshotCaptured,version:JSON.parse(await readFile('package.json','utf8')).version,flows:['upload de avatar','cadastro','perfil separado','modelo Jogos com 3 canais','mensagem','banner','recarregamento'],errors},null,2));
   console.log('PASS: Electron com dados isolados; cadastro, modelo, mensagem, perfil e banner.');
 } catch(error) {

@@ -22,7 +22,7 @@
 
 Uma partida com os amigos. Uma conversa que atravessa a madrugada. Uma comunidade onde você conhece gente que curte as mesmas coisas.
 
-O **Nightcall** está sendo construído para esses momentos: um aplicativo de comunicação que reúne mensagens, comunidades e chamadas em uma experiência com identidade própria. Visual escuro, tons de roxo e espaço para o que mais importa — as pessoas e as conversas.
+O **Nightcall** está sendo construído para esses momentos: um aplicativo de comunicação que reúne mensagens, comunidades e chamadas em uma experiência com identidade própria. Visual grafite, detalhes em violeta e espaço para o que mais importa — as pessoas e as conversas.
 
 ## Da primeira mensagem à última chamada
 
@@ -36,7 +36,7 @@ Crie um espaço do zero ou comece com um modelo. Organize os assuntos em canais 
 
 ### Entre e fique à vontade
 
-Salas de voz e chamadas com áudio, vídeo e compartilhamento de tela aproximam quem está do outro lado. Para jogar junto, mostrar algo ou fazer companhia.
+Salas de voz e chamadas com áudio, vídeo e compartilhamento de tela aproximam quem está do outro lado. Converse também pelo painel de chat ao lado da sala, sem sair da chamada. Para jogar junto, mostrar algo ou fazer companhia.
 
 ### Seu perfil, seu jeito
 

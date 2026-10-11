@@ -250,7 +250,7 @@ async function accept(){
     for(const ice of current.candidates)await peer.addIceCandidate(ice);
     current.candidates=[];
     answerButton.hidden=true;rejectButton.hidden=true;button.textContent="Desligar";
-    display("Conectando áudio…");
+    display(peer?.connectionState==="connected"?"Chamada conectada":"Conectando áudio…");
   }catch(e){try{await signal("reject");}catch{}cleanup(e.message);}
 }
 function onSignal(data){privateSignalQueue=privateSignalQueue.catch(()=>{}).then(()=>processPrivateSignal(data));return privateSignalQueue;}
@@ -277,7 +277,7 @@ async function processPrivateSignal(data){
   try{
     if(data.type==='reconnect'){await recoverPrivate();return;}
     if(data.type==="media-state"){remoteMediaState=data.payload||{};syncCallLayout();return;}
-    if(data.type=="answer" && peer && data.payload?.sdp){await peer.setRemoteDescription(data.payload.sdp);for(const ice of current.candidates||[])await peer.addIceCandidate(ice);current.candidates=[];if(timer)clearTimeout(timer);timer=null;display("Conectando áudio…");}
+    if(data.type=="answer" && peer && data.payload?.sdp){await peer.setRemoteDescription(data.payload.sdp);for(const ice of current.candidates||[])await peer.addIceCandidate(ice);current.candidates=[];if(timer)clearTimeout(timer);timer=null;display(peer?.connectionState==="connected"?"Chamada conectada":"Conectando áudio…");}
     if(data.type==="ice" && data.payload){if(peer?.remoteDescription)await peer.addIceCandidate(data.payload);else (current.candidates??=[]).push(data.payload);}
     if(["hangup","reject","busy"].includes(data.type))cleanup(data.type==="busy"?"Usuário em outra chamada.":"Chamada encerrada.");
   }catch(e){cleanup("Falha na conexão: "+e.message);}
