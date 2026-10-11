@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "media": "Câmeras/microfones simulados; captura de tela substituída por pista de vídeo real de teste",
+  "flows": [
+    "avatar PNG e banner GIF por upload",
+    "salvar e recarregar",
+    "solicitar e aceitar amizade pelo modal",
+    "imagens, vídeo e áudio nos chats",
+    "ícone da comunidade por upload",
+    "anexos privados e comunitários",
+    "figurinhas salvas e reutilizadas",
+    "dois participantes de voz",
+    "microfone trocado durante chamadas de grupo e privadas",
+    "qualidade com estatísticas WebRTC",
+    "destaque de fala",
+    "renegociação ICE mantendo chamada",
+    "ampliar transmissão",
+    "participantes abaixo do canal",
+    "tempo na chamada",
+    "tela cheia",
+    "chamada em largura de celular",
+    "presença por mais de 45 segundos",
+    "chat durante chamada",
+    "silenciar",
+    "câmera transmitida",
+    "tela transmitida",
+    "sair e liberar mídia",
+    "chamada recebida fora da conversa",
+    "câmeras privadas nos dois sentidos",
+    "duas telas privadas simultâneas com encerramento independente"
+  ],
+  "errors": []
+}

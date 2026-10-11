@@ -34,6 +34,9 @@ test('sinalização de voz é autenticada, privada e encaminhada só a amigos co
   const event=await reader.read();
   assert.match(new TextDecoder().decode(event.value),/event: call/);
   assert.match(new TextDecoder().decode(event.value),/call-test-12345/);
+  for(const type of ['hangup','reject','busy'])assert.equal((await post('/api/calls/signal',{...msg,type,payload:null},a.cookie)).status,200);
+  assert.equal((await post('/api/calls/signal',{...msg,payload:{sdp:{type:'offer',sdp:'x'.repeat(16000)}}},a.cookie)).status,200);
+  assert.equal((await post('/api/calls/signal',{...msg,payload:null},a.cookie)).status,400);
   controller.abort();
  }finally{
   try{await reader?.cancel();}catch{}

@@ -27,5 +27,6 @@ test('interface informa reconexão e chamada tolera perda breve',async()=>{
  assert.match(messages,/stream\.addEventListener\("open"/);
  assert.match(messages,/stream\.addEventListener\("error"/);
  assert.match(calls,/connectionState==="disconnected"/);
- assert.match(calls,/12000/);
+ assert.match(calls,/35000/);
+ assert.match(calls,/createOffer\(\{iceRestart:true\}\)/);
 });

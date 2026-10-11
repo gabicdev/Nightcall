@@ -38,11 +38,11 @@ try {
   assert.equal(await page.locator('.content-sidebar').isVisible(),false);
   const info=await (await context.request.get(url+'/api/communities')).json();
   const community=info.communities[0];
-  await page.locator('#communityText').fill('Mensagem preservada'); await page.locator('#communitySend button').click(); await page.getByText('Mensagem preservada',{exact:false}).waitFor();
+  await page.locator('#communityText').fill('Mensagem preservada'); await page.locator('#communitySend button:not([type=button])').click(); await page.getByText('Mensagem preservada',{exact:false}).waitFor();
   await page.locator('#channelRename').click(); await page.locator('#channelRenameName').fill('conversa'); await page.locator('#channelRenameForm button').first().click(); await page.waitForFunction(()=>document.getElementById('communityChannelTitle').textContent==='# conversa');
   await page.getByText('Mensagem preservada',{exact:false}).waitFor();
   await page.locator('#communityChannelManage').click(); await page.locator('#communityChannelName').fill('novidades'); await page.locator('#communityChannelCreate button').first().click(); await page.locator('.nc-channel-item strong').filter({hasText:'novidades'}).waitFor();
-  await page.locator('.nc-channel-item').filter({hasText:'novidades'}).click(); await page.locator('#communityText').fill('Novo canal funcionando'); await page.locator('#communitySend button').click(); await page.getByText('Novo canal funcionando',{exact:false}).waitFor();
+  await page.locator('.nc-channel-item').filter({hasText:'novidades'}).click(); await page.locator('#communityText').fill('Novo canal funcionando'); await page.locator('#communitySend button:not([type=button])').click(); await page.getByText('Novo canal funcionando',{exact:false}).waitFor();
   await page.screenshot({path:'test-results/communities-13.9.png'});
   const second=await browser.newContext();
   await second.request.post(url+'/api/auth/register',{data:{name:'Membro',username:'member',password:'strong password 123'}});
@@ -59,7 +59,7 @@ try {
   assert.equal(await page.locator('[data-quick-open=communities]').count(),0);
   await page.screenshot({path:'test-results/home-13.9.png'});
   await page.locator('.add-button').click();await page.locator('#communityBrowse').click(); await page.locator('.nc-channel-item').filter({hasText:'voz-geral'}).click();
-  await page.getByText('Canal de voz · WebRTC',{exact:false}).waitFor();
+  await page.locator('.nc-voice-stage').waitFor();
   assert.equal(await page.locator('#communitySend').isVisible(),false);
   await page.getByRole('button',{name:'Sair do canal',exact:true}).click();
   await page.locator('#communityClose').click();

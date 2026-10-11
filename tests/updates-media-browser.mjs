@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {mkdtemp,rm,mkdir,writeFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join,resolve} from 'node:path';
+import {createServer} from '../backend/server.js';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
+const dir=await mkdtemp(join(tmpdir(),'nc-updates-media-')),server=createServer({database:join(dir,'db.sqlite'),root:resolve('.')});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+server.address().port;
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH});
+try{
+ const context=await browser.newContext({viewport:{width:1366,height:900}});
+ await context.addInitScript(()=>{let state={supported:true,state:'idle',currentVersion:'13.12.0',message:'Verifique uma versão nova.'};window.__setUpdateStatus=value=>state={...state,...value};window.__updateChecked=0;window.__installRequested=0;window.nightcallDesktop={updateStatus:async()=>state,checkUpdates:async()=>{window.__updateChecked++;return state={...state,state:'current',message:'Você está usando a versão mais recente publicada.'};},installUpdate:async()=>{window.__installRequested++;return true;},connectionInfo:async()=>({mode:'local'}),notify:async()=>false};});
+ const other=await browser.newContext(),users=[];for(const [session,username] of [[context,'mediaretry'],[other,'mediafriend']]){const response=await session.request.post(origin+'/api/auth/register',{data:{username,name:username,password:'strong password 123'}});assert.equal(response.status(),201);users.push((await response.json()).user);}
+ assert.equal((await context.request.post(origin+'/api/friends/request',{data:{userId:users[1].id}})).status(),200);assert.equal((await other.request.post(origin+'/api/friends/requests/'+users[0].id+'/accept')).status(),200);
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin);await page.waitForFunction(()=>!!window.Nightcall);
+ await page.locator('#settingsButton').click();await page.getByText('Nightcall sempre atualizado',{exact:true}).waitFor();await page.locator('#ncCheckUpdates').click();assert.equal(await page.evaluate(()=>__updateChecked),1);await page.getByText('Você está usando a versão mais recente publicada.',{exact:true}).waitFor();
+ await page.evaluate(()=>__setUpdateStatus({state:'downloading',progress:46,message:'Baixando Nightcall 13.13.0 (46%).'}));await page.waitForFunction(()=>document.getElementById('ncUpdateProgress').value===46);assert.equal(await page.locator('#ncInstallUpdate').isVisible(),false);
+ await page.evaluate(()=>__setUpdateStatus({state:'ready',message:'Nightcall 13.13.0 está pronto.'}));await page.locator('#ncInstallUpdate').waitFor();await page.locator('#ncInstallUpdate').click();assert.equal(await page.evaluate(()=>__installRequested),1);await page.locator('#ncCheckConnection').click();await page.getByText('Servidor acessível',{exact:false}).waitFor();
+ await mkdir('test-results',{recursive:true});await page.screenshot({path:'test-results/updates-13.13.png'});await page.locator('#closeSettingsButton').click();await page.evaluate(person=>Nightcall.openConversation(person),users[1]);
+ let attempts=0;await page.route('**/api/media',async route=>{if(route.request().method()==='POST'&&attempts++===0)return route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Envio interrompido para teste.'})});return route.continue();});
+ await page.locator('#chatForm input[type=file]').setInputFiles('assets/nightcall-mark.png');await page.getByRole('button',{name:'Tentar novamente',exact:true}).waitFor();assert.equal(await page.locator('#chatHistory .nc-attachments').count(),0);await page.getByRole('button',{name:'Tentar novamente',exact:true}).click();await page.locator('.nc-upload-chip img').waitFor();await page.locator('#chatForm button[type=submit]').click();await page.locator('#chatHistory .nc-attachments img').waitFor();assert.equal(attempts,2);
+ assert.deepEqual(errors,[]);await writeFile('test-results/updates-media-13.13.json',JSON.stringify({passed:true,errors,flows:['painel de atualização e versão','progresso de atualização','instalação solicitada explicitamente','diagnóstico de conexão','upload falha e tenta novamente sem duplicar mensagem'],updater:'ponte simulada neste teste de interface; download real validado separadamente'},null,2));console.log('PASS: atualização nas configurações, diagnóstico e repetição de upload.');
+}finally{await browser.close();await new Promise(r=>server.close(r));await rm(dir,{recursive:true,force:true});}

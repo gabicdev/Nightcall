@@ -10,6 +10,11 @@ function setup(extra={}) {
   const manager=createUpdates({app:{isPackaged:true},updater,dialog:{showMessageBox:async options=>{prompts.push(options);return {response};}},getWindow:()=>null,onInstall:()=>quitting++,...extra});
   return {manager,updater,prompts,counts:()=>({checks,installed,quitting}),answer:value=>response=value};
 }
+test('canal sem publicação informa ausência de atualização e mantém instalador já baixado',async()=>{
+ const t=setup({app:{isPackaged:true,getVersion:()=> '13.12.0'}});if(process.platform!=='win32')return;
+ t.updater.emit('error',Error('404 latest.yml'));assert.equal(t.manager.status().errorKind,'unpublished');assert.match(t.manager.status().message,/Ainda não há/);assert.equal(t.manager.status().currentVersion,'13.12.0');
+ t.updater.emit('update-downloaded',{version:'13.13.0'});t.updater.emit('error',Error('offline'));assert.equal(t.manager.status().state,'ready');
+});
 test('portátil e desenvolvimento não procuram nem instalam atualizações',async()=>{
   for(const extra of [{portable:true},{app:{isPackaged:false}},{enabled:false}]) {const t=setup(extra);await t.manager.check(true);assert.equal(t.counts().checks,0);assert.equal(t.manager.status().supported,false);assert.equal(t.counts().installed,0);}
 });

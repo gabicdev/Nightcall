@@ -1,3 +1,4 @@
+import {uploadFile} from './media.js';
 import { api } from "./api.js";
 import { cacheProfile } from "./auth.js";
 import { readStorage } from "./navigation.js";
@@ -26,8 +27,9 @@ export function updateProfilePreview() {
   const username = profileUsername.value.trim().replace(/^@/, "") || "usuario";
   const bio = profileBio.value.trim();
   const avatar = profileAvatar.value.trim();
+  if(avatarPlaceholder)avatarPlaceholder.textContent=name.slice(0,1).toUpperCase();
   const banner = document.getElementById("bannerPreview");
-  if (banner) { banner.hidden = !profileBanner?.value.trim(); if (!banner.hidden) banner.src = profileBanner.value.trim(); banner.onerror = () => { banner.hidden = true; }; }
+  if (banner) { banner.hidden = !profileBanner?.value.trim(); if (!banner.hidden) banner.src = profileBanner.value.trim(); banner.onerror = () => { banner.hidden = true;const feedback=document.getElementById("profileSaveStatus");if(feedback)feedback.textContent="Não foi possível carregar o banner deste endereço. Escolha uma imagem ou GIF salvo no computador."; }; }
   if (previewName) {
     previewName.textContent = name;
   }
@@ -38,16 +40,17 @@ export function updateProfilePreview() {
     previewBio.textContent = bio || "Nenhuma bio adicionada.";
   }
   if (avatar && avatarPreview) {
+    avatarPreview.style.display = "block";
     avatarPreview.src = avatar;
     avatarPreview.classList.add("visible");
-    avatarPreview.onerror = () => { avatarPreview.classList.remove("visible"); avatarPreview.style.display = "none"; if (avatarPlaceholder) avatarPlaceholder.style.display = "inline"; };
+    avatarPreview.onerror = () => {const feedback=document.getElementById("profileSaveStatus");if(feedback)feedback.textContent="Não foi possível carregar a foto deste endereço. Escolha uma imagem ou GIF salvo no computador."; avatarPreview.classList.remove("visible"); avatarPreview.style.display = "none"; if (avatarPlaceholder) avatarPlaceholder.style.display = "inline"; };
     avatarPreview.onload = () => { avatarPreview.style.display = "block"; };
     if (avatarPlaceholder) {
       avatarPlaceholder.style.display = "none";
     }
   } else {
     if (avatarPreview) {
-      avatarPreview.removeAttribute("src");
+      avatarPreview.style.display="none";avatarPreview.removeAttribute("src");
       avatarPreview.classList.remove("visible");
     }
     if (avatarPlaceholder) {
@@ -80,6 +83,7 @@ export async function saveProfileData() {
     banner: profileBanner.value.trim(),
   };
   saveProfile.disabled = true;
+  document.getElementById("profileSaveStatus").textContent="Salvando perfil…";
   try {
     const { user } = await api("/api/profile", {
       method: "PUT",
@@ -87,6 +91,7 @@ export async function saveProfileData() {
     });
     cacheProfile(user);
   } catch (error) {
+    document.getElementById("profileSaveStatus").textContent=error.message;
     showToast(error.message);
     return;
   } finally {
@@ -94,6 +99,7 @@ export async function saveProfileData() {
   }
   document.dispatchEvent(new CustomEvent("nightcallProfileSaved"));
   updateProfilePreview();
+  document.getElementById("profileSaveStatus").textContent="Perfil salvo. Sua foto e banner foram atualizados.";
   showToast("Perfil salvo com sucesso ✓");
 }
 export function updateBioCount() {
@@ -116,6 +122,12 @@ export function initializeProfile() {
   avatarPlaceholder = document.getElementById("avatarPlaceholder");
   bioCount = document.getElementById("bioCount");
   saveProfile = document.getElementById("saveProfile");
+  for(const kind of ['Avatar','Banner']){
+    const field=document.getElementById('profile'+kind),file=document.getElementById('profile'+kind+'File'),choose=document.getElementById('profile'+kind+'Choose');
+    choose.onclick=()=>file.click();
+    document.getElementById('profile'+kind+'Remove').onclick=()=>{field.value='';updateProfilePreview();document.getElementById('profileSaveStatus').textContent='Salve para aplicar a remoção.';};
+    file.onchange=async()=>{const selected=file.files[0];if(!selected)return;choose.disabled=true;saveProfile.disabled=true;const feedback=document.getElementById('profileSaveStatus');feedback.textContent='Enviando imagem…';try{const media=await uploadFile(selected,'profile');field.value=media.url;updateProfilePreview();feedback.textContent='Imagem pronta. Salve para aplicar ao perfil.';}catch(error){feedback.textContent=error.message;}finally{choose.disabled=false;saveProfile.disabled=false;file.value='';}};
+  }
   if (saveProfile) {
     saveProfile.addEventListener("click", saveProfileData);
   }

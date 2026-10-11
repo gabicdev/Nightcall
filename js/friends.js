@@ -1,3 +1,4 @@
+import {renderAvatar} from './media.js';
 import { api } from "./api.js";
 import { currentUser, friendRequests, friends } from "./navigation.js";
 import { openConversation } from "./messages.js";
@@ -122,10 +123,11 @@ export function updateFriendRequestCount() {
   requestCount.textContent = total;
   requestCount.style.display = total > 0 ? "inline-flex" : "none";
 }
-let selectedUser = null;
+let selectedUser = null,requestAction='send',returnFocus=null;let outgoingRequests=[];
 export async function refreshFriends() {
   try {
-    const { friends: list, incoming } = await api("/api/friends");
+    const { friends: list, incoming, outgoing } = await api("/api/friends");
+    outgoingRequests=outgoing||[];
     friends.splice(0, friends.length, ...list);
     friendRequests.splice(0, friendRequests.length, ...incoming);
     renderFriends(); updateFriendRequestCount();
@@ -145,6 +147,7 @@ export function openAddFriend() {
   if (!addFriendModal) {
     return;
   }
+  returnFocus=document.activeElement;
   addFriendModal.classList.add("open");
   addFriendModal.setAttribute("aria-hidden", "false");
   clearAddFriendModal();
@@ -158,7 +161,7 @@ export function closeAddFriend() {
   if (!addFriendModal) {
     return;
   }
-  addFriendModal.classList.remove("open");
+  addFriendModal.classList.remove("open");returnFocus?.focus();
   addFriendModal.setAttribute("aria-hidden", "true");
   clearAddFriendModal();
 }
@@ -172,7 +175,7 @@ export function clearAddFriendModal() {
   if (addFriendResult) {
     addFriendResult.classList.remove("visible");
   }
-  selectedUser = null;
+  selectedUser = null;requestAction='send';
   if (sendFriendRequest) {
     sendFriendRequest.disabled = false;
     sendFriendRequest.textContent = "Adicionar";
@@ -198,14 +201,16 @@ export async function searchUser() {
     hideFriendResult();
     return;
   }
-  let foundUser;
+  let foundUser;searchFriendButton.disabled=true;searchFriendButton.textContent="Buscando…";
   try { ({user:foundUser} = await api(`/api/users/search?username=${encodeURIComponent(username)}`)); }
   catch(e) { showAddFriendError(e.message); hideFriendResult(); return; }
+  finally{searchFriendButton.disabled=false;searchFriendButton.textContent="Pesquisar";}
   if (!foundUser) {
     showAddFriendError("Usuário não encontrado.");
     hideFriendResult();
     return;
   }
+  await refreshFriends();
   selectedUser = foundUser;
   showFriendResult(foundUser);
 }
@@ -228,6 +233,11 @@ export function showFriendResult(user) {
   if (resultUserUsername) {
     resultUserUsername.textContent = user.username || "@usuario";
   }
+  renderAvatar(document.getElementById("resultUserAvatar"),user.avatar,user.name);
+  sendFriendRequest.disabled=false;sendFriendRequest.textContent='Enviar solicitação';requestAction='send';
+  if(outgoingRequests.some(f=>f.id===user.id)){sendFriendRequest.disabled=true;sendFriendRequest.textContent='Solicitação enviada';}
+  if(friendRequests.some(f=>f.id===user.id)){requestAction='accept';sendFriendRequest.textContent='Aceitar solicitação';}
+  if(friends.some(f=>f.id===user.id)){sendFriendRequest.disabled=true;sendFriendRequest.textContent="Já são amigos";}
   addFriendResult.classList.add("visible");
   clearAddFriendError();
 }
@@ -303,7 +313,9 @@ export function initializeFriends() {
   if (cancelAddFriend) {
     cancelAddFriend.addEventListener("click", closeAddFriend);
   }
+  document.addEventListener("keydown",event=>{if(event.key==="Escape"&&addFriendModal?.classList.contains("open"))closeAddFriend();});
   if (addFriendModal) {
+    addFriendModal.addEventListener('keydown',event=>{if(event.key!=='Tab')return;const nodes=[...addFriendModal.querySelectorAll('button:not(:disabled),input')].filter(el=>el.getClientRects().length);if(!nodes.length)return;const first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}});
     addFriendModal.addEventListener("click", function (event) {
       if (event.target === addFriendModal) {
         closeAddFriend();
@@ -328,8 +340,10 @@ export function initializeFriends() {
       if (!selectedUser) return;
       sendFriendRequest.disabled = true;
       try {
+        if(requestAction==='accept'){await api('/api/friends/requests/'+selectedUser.id+'/accept',{method:'POST'});sendFriendRequest.textContent='Amizade aceita';addFriendError.textContent='Agora vocês podem conversar.';await refreshFriends();return;}
         await api("/api/friends/request", {method:"POST", body:JSON.stringify({userId:selectedUser.id})});
-        sendFriendRequest.textContent = "Enviado";
+        sendFriendRequest.textContent = "Solicitação enviada";
+        addFriendError.textContent="Pronto! A pessoa receberá seu pedido de amizade.";
         await refreshFriends();
       } catch(e) { showAddFriendError(e.message); sendFriendRequest.disabled=false; }
     });

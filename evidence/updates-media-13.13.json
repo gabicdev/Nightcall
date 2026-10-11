@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "errors": [],
+  "flows": [
+    "painel de atualização e versão",
+    "progresso de atualização",
+    "instalação solicitada explicitamente",
+    "diagnóstico de conexão",
+    "upload falha e tenta novamente sem duplicar mensagem"
+  ],
+  "updater": "ponte simulada neste teste de interface; download real validado separadamente"
+}

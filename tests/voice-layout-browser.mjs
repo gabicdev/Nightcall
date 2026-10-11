@@ -12,7 +12,7 @@ try{
  const p=await a.newPage(),q=await b.newPage();const errors=[];for(const page of [p,q]){page.on('pageerror',e=>errors.push(e.message));await page.goto(url);await page.waitForFunction(()=>!!window.Nightcall);}
  await p.evaluate(person=>Nightcall.openConversation(person),users[1]);await q.evaluate(person=>Nightcall.openConversation(person),users[0]);
  assert.equal(await p.locator('.nc-stream-stage').isVisible(),false);
- await p.getByRole('button',{name:'Ligar',exact:true}).click();await q.getByRole('button',{name:'Aceitar chamada',exact:true}).click();
+ await p.getByRole('button',{name:'Ligar',exact:true}).click();try{await q.getByRole('button',{name:'Atender',exact:true}).click();}catch(e){console.log('CALL FAILURE',await p.locator('.voice-controls').innerText(),await q.locator('.voice-controls').innerText(),errors);throw e;}
  await p.getByText('Chamada conectada',{exact:true}).waitFor();await q.getByText('Chamada conectada',{exact:true}).waitFor();
  assert.equal(await p.locator('.nc-call-preferences').isVisible(),true);assert.equal(await p.locator('.nc-stream-stage').isVisible(),false);assert.equal(await q.locator('.call-video:visible').count(),0);
  await p.getByRole('button',{name:'Silenciar',exact:true}).click();await p.getByRole('button',{name:'Ativar microfone',exact:true}).waitFor();

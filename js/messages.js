@@ -1,3 +1,4 @@
+import {renderAvatar,renderAttachments,attachComposer} from './media.js';
 import { api } from "./api.js";
 import { refreshFriends } from "./friends.js";
 import {
@@ -19,6 +20,7 @@ export let conversationsList;
 export let messagesEmpty;
 export let newConversationButton;
 export let emptyNewConversation;
+let composer;
 let activePerson = null;
 let currentUserId = null;
 async function refreshConversations() {
@@ -30,17 +32,17 @@ async function refreshChat() {
   try {
     const {messages} = await api(`/api/messages/${activePerson.id}`);
     const history = document.getElementById("chatHistory");
-    const signature = JSON.stringify(messages.map(m=>m.id+":"+m.content));
+    const signature = JSON.stringify([currentUser.avatar,activePerson.avatar,messages]);
     if (history.dataset.signature === signature) return;
     history.dataset.signature=signature;
     history.replaceChildren();
     for (const msg of messages) {
       const el=document.createElement("div"); el.className="chat-message"+(msg.senderId===currentUserId?" mine":"");
       const sender=msg.senderId===currentUserId?currentUser.name:activePerson.name;
-      const avatar=document.createElement('span');avatar.className='nc-message-avatar';avatar.textContent=String(sender||'N').trim().slice(0,1).toUpperCase();
+      const avatar=document.createElement('span');avatar.className='nc-message-avatar';renderAvatar(avatar,msg.senderId===currentUserId?currentUser.avatar:activePerson.avatar,sender);
       const copy=document.createElement('div');copy.className='nc-private-message-copy';
       const header=document.createElement('header'),name=document.createElement('strong'),time=document.createElement('time'),content=document.createElement('p');
-      name.textContent=sender || 'Usuário';time.dateTime=new Date(msg.createdAt).toISOString();time.textContent=new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit'}).format(msg.createdAt);time.title=new Date(msg.createdAt).toLocaleString('pt-BR');content.textContent=msg.content;header.append(name,time);copy.append(header,content);el.append(avatar,copy);
+      name.textContent=sender || 'Usuário';time.dateTime=new Date(msg.createdAt).toISOString();time.textContent=new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit'}).format(msg.createdAt);time.title=new Date(msg.createdAt).toLocaleString('pt-BR');content.textContent=msg.content;header.append(name,time);copy.append(header,content);renderAttachments(copy,msg.attachments);el.append(avatar,copy);
       if(msg.senderId===currentUserId){
         const del=document.createElement("button"); del.type="button"; del.className="message-delete";
         del.textContent="Excluir";del.title="Excluir minha mensagem";
@@ -60,7 +62,7 @@ export function renderConversations() {
   }
   conversationsList.innerHTML = "";
   const sidebar=document.getElementById('directMessagesList');
-  if(sidebar){sidebar.replaceChildren();for(const person of conversations){const button=document.createElement('button');button.type='button';button.className='nc-direct-conversation';const avatar=document.createElement('span');avatar.textContent=String(person.name||person.username||'N').trim().slice(0,1).toUpperCase();const name=document.createElement('strong');name.textContent=person.name||person.username;button.append(avatar,name);button.addEventListener('click',()=>openConversation(person));sidebar.append(button);}}
+  if(sidebar){sidebar.replaceChildren();for(const person of conversations){const button=document.createElement('button');button.type='button';button.className='nc-direct-conversation';const avatar=document.createElement('span');renderAvatar(avatar,person.avatar,person.name);const name=document.createElement('strong');name.textContent=person.name||person.username;button.append(avatar,name);button.addEventListener('click',()=>openConversation(person));sidebar.append(button);}}
   const noDirect=document.getElementById('directMessagesEmpty');if(noDirect)noDirect.hidden=conversations.length>0;
   let filtered = [...conversations];
   const search = messageSearch?.value.trim().toLowerCase();
@@ -89,7 +91,7 @@ export function renderConversations() {
     username.textContent = conversation.username || "@usuario";
     const avatar = document.createElement("span");
     avatar.className="nc-conversation-avatar";
-    avatar.textContent=String(conversation.name || conversation.username || "N").trim().slice(0,1).toUpperCase();
+    renderAvatar(avatar,conversation.avatar,conversation.name);
     card.appendChild(avatar);
     const identity=document.createElement("span");
     identity.className="nc-conversation-identity";
@@ -114,6 +116,7 @@ export function openConversation(person = null) {
     console.log("Abrindo nova conversa.");
     return;
   }
+  if(activePerson?.id!==person.id)composer?.reset();
   activePerson = person;
   renderConversations();
   document.getElementById("messagesPage").classList.add("nc-chat-open");
@@ -137,11 +140,13 @@ export function initializeMessages() {
   newConversationButton = document.getElementById("newConversationButton");
   emptyNewConversation = document.getElementById("emptyNewConversation");
   api("/api/auth/me").then(({user}) => {currentUserId=user.id;}).catch(console.warn);
-  document.getElementById("chatClose").addEventListener("click",()=>{activePerson=null;document.getElementById("chatPanel").hidden=true;document.getElementById("messagesPage").classList.remove("nc-chat-open");});
+  document.getElementById("chatClose").addEventListener("click",()=>{activePerson=null;composer.reset();document.getElementById("chatPanel").hidden=true;document.getElementById("messagesPage").classList.remove("nc-chat-open");});
+  composer=attachComposer(document.getElementById("chatForm"),{onError:message=>document.getElementById("chatStatus").textContent=message});
+  document.addEventListener("nightcallProfileSaved",refreshChat);
   document.getElementById("chatForm").addEventListener("submit",async event=>{
     event.preventDefault(); if(!activePerson)return;
-    const input=document.getElementById("chatInput"); const content=input.value.trim();if(!content)return;
-    try {await api(`/api/messages/${activePerson.id}`,{method:"POST",body:JSON.stringify({content})});input.value="";await refreshChat();await refreshConversations();}
+    const input=document.getElementById("chatInput"); const content=input.value.trim();if(composer.busy){document.getElementById("chatStatus").textContent="Aguarde o envio do arquivo.";return;}if(!content&&!composer.ids.length)return;
+    try {await api(`/api/messages/${activePerson.id}`,{method:"POST",body:JSON.stringify({content,attachments:composer.ids})});input.value="";composer.reset();await refreshChat();await refreshConversations();}
     catch(e){document.getElementById("chatStatus").textContent=e.message;}
   });
   refreshConversations();
@@ -167,6 +172,7 @@ export function initializeMessages() {
         }
       }catch{}
     });
+    stream.addEventListener("profile",async()=>{await refreshConversations();if(activePerson){const updated=conversations.find(p=>p.id===activePerson.id);if(updated)activePerson=updated;}refreshChat();});
     stream.addEventListener("social",()=>{refreshFriends();refreshConversations();});
   }
   setInterval(()=>{refreshConversations();refreshChat();},15000);

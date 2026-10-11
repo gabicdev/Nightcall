@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "packaged": true,
+  "screenshotCaptured": true,
+  "version": "13.13.0",
+  "flows": [
+    "upload de avatar",
+    "cadastro",
+    "perfil separado",
+    "modelo Jogos com 3 canais",
+    "mensagem",
+    "banner",
+    "recarregamento"
+  ],
+  "errors": []
+}

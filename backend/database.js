@@ -73,5 +73,11 @@ export function openDatabase(filename) {
   if(!db.prepare('PRAGMA table_info(community_channels)').all().some(column=>column.name==='category_id')){
     db.exec('ALTER TABLE community_channels ADD COLUMN category_id TEXT');
   }
+  db.exec(`CREATE TABLE IF NOT EXISTS media (
+    id TEXT PRIMARY KEY, owner_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL, type TEXT NOT NULL, purpose TEXT NOT NULL, data BLOB NOT NULL, created_at INTEGER NOT NULL
+  ); CREATE INDEX IF NOT EXISTS media_owner ON media(owner_id);`);
+  for(const table of ['messages','channel_messages'])if(!db.prepare('PRAGMA table_info('+table+')').all().some(c=>c.name==='attachments'))db.exec("ALTER TABLE "+table+" ADD COLUMN attachments TEXT NOT NULL DEFAULT '[]'");
+  if(!db.prepare('PRAGMA table_info(communities)').all().some(c=>c.name==='icon'))db.exec("ALTER TABLE communities ADD COLUMN icon TEXT NOT NULL DEFAULT ''");
   return db;
 }

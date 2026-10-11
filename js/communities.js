@@ -1,6 +1,8 @@
+import {renderAvatar,renderAttachments,attachComposer,uploadFile} from './media.js';
 import { closeSettings, updateActiveNavigation, readStorage, writeStorage } from './navigation.js';
 import { api } from './api.js';
 import { createGroupVoice } from './group-voice.js';
+import {connectionDescription} from './call-health.js';
 
 export function initializeCommunities() {
   const root = document.querySelector('#communityRoot');
@@ -14,6 +16,7 @@ export function initializeCommunities() {
   const title = get('communityTitle');
   const invite = get('communityInvite');
   const sendForm = get('communitySend');
+  const composer=attachComposer(sendForm,{onError:message=>fail(Error(message))});
   const formContainer = get('ncCommunityActions');
   const createCommunityForm = get('communityCreate');
   const joinCommunityForm = get('communityJoin');
@@ -80,13 +83,16 @@ export function initializeCommunities() {
   let communities = [];
   let active = null;
   let channel = null;
-  let voice = null;
+  let voice = null,voiceView=false;
   let selectedRole = null;
   let channelEntries = [];
   let inviteCode = '';
   let renamingChannel = null;
   let activeName = '';
-  let managementBusy = false;
+  let managementBusy = false,activeIcon='';
+  get('communityIconChoose').onclick=()=>get('communityIconFile').click();
+  get('communityIconRemove').onclick=()=>{get('communityIconValue').value='';renderAvatar(get('communityIconPreview'),'',activeName);};
+  get('communityIconFile').onchange=async()=>{const file=get('communityIconFile').files[0];if(!file)return;get('communityIconChoose').disabled=true;get('communityEditSubmit').disabled=true;try{const media=await uploadFile(file,'profile');get('communityIconValue').value=media.url;renderAvatar(get('communityIconPreview'),media.url,activeName);get('communitySettingsStatus').textContent='Imagem pronta. Salve para aplicar.';}catch(error){get('communitySettingsStatus').textContent=error.message;}finally{get('communityIconFile').value='';get('communityIconChoose').disabled=false;get('communityEditSubmit').disabled=false;}};
   const unreadSpaces=new Set();
   const notificationKey=()=>`nightcallCommunityNotifications:${readStorage('nightcallProfile',{}).id}:${active}`;
   const closeDirectory=()=>{get('communityDirectory').hidden=true;get('communitySwitch').setAttribute('aria-expanded','false');};
@@ -106,7 +112,7 @@ export function initializeCommunities() {
   get('communityBrowse').addEventListener('click',()=>{closeForms();setPanelOpen(true);refresh().catch(fail);});
   get('communityManage').addEventListener('click',()=>{
     closeDirectory();
-    get('communityEditName').value=activeName;
+    get('communityEditName').value=activeName;get('communityIconValue').value=activeIcon;renderAvatar(get('communityIconPreview'),activeIcon,activeName);
     get('communityDeleteName').value='';get('communityDelete').disabled=true;
     get('communityDeleteZone').hidden=selectedRole!=='owner';
     get('communitySettingsStatus').textContent='';get('communitySettings').showModal();
@@ -115,8 +121,8 @@ export function initializeCommunities() {
   get('communityDeleteName').addEventListener('input',()=>{get('communityDelete').disabled=managementBusy || get('communityDeleteName').value.trim()!==activeName;});
   get('communityEditForm').addEventListener('submit',async event=>{
     event.preventDefault();if(managementBusy)return;managementBusy=true;
-    const button=get('communityEditForm').querySelector('button');button.disabled=true;
-    try {await api('/api/communities/'+active,{method:'PATCH',body:JSON.stringify({name:get('communityEditName').value})});await refresh();await open(active);get('communitySettings').close();info('Nome da comunidade atualizado.');}
+    const button=get('communityEditSubmit');button.disabled=true;
+    try {await api('/api/communities/'+active,{method:'PATCH',body:JSON.stringify({name:get('communityEditName').value,icon:get('communityIconValue').value})});await refresh();await open(active);get('communitySettings').close();info('Nome da comunidade atualizado.');}
     catch(error){get('communitySettingsStatus').textContent=error.message;}finally{managementBusy=false;button.disabled=false;}
   });
   get('communityDelete').addEventListener('click',async()=>{
@@ -137,14 +143,67 @@ export function initializeCommunities() {
     try {await api('/api/channels/' + renamingChannel, {method:'PATCH', body:JSON.stringify({name:get('channelRenameName').value.trim()})}); get('channelRenameForm').hidden = true; await open(active); info('Canal atualizado.');} catch(error) {fail(error);}
   });
 
+  let voiceParticipants=[],voiceStarted=0,voiceSignature='';
+  let roomPresenceBusy=false;
+  function renderRoomParticipants(id, people) {
+    const button=[...channels.querySelectorAll('.nc-channel-item')].find(item=>item.dataset.channelId===id);
+    if(!button)return;
+    let list=button.nextElementSibling;
+    if(!list?.classList.contains('nc-room-participants')){list=document.createElement('div');list.className='nc-room-participants';list.dataset.roomId=id;button.after(list);}
+    const profile=readStorage('nightcallProfile',{});
+    const signature=JSON.stringify(people.map(p=>[p.id,p.name,p.avatar,p.muted,p.deaf,p.camera,p.screen]));
+    if(list.dataset.signature===signature)return;
+    list.dataset.signature=signature;list.replaceChildren();list.hidden=!people.length;
+    for(const person of people){
+      const row=document.createElement('div');row.className='nc-room-person';row.dataset.personId=person.id;
+      const avatar=document.createElement('span');avatar.className='nc-room-avatar';renderAvatar(avatar,person.id===profile.id?profile.avatar:person.avatar,person.name);
+      const name=document.createElement('span');name.className='nc-room-name';name.textContent=person.name||person.username;
+      row.append(avatar,name);
+      for(const [enabled,icon,label] of [[person.muted,'mic','Microfone silenciado'],[person.deaf,'headphones','Áudio desativado'],[person.screen,'screen','Transmitindo tela'],[person.camera,'camera','Câmera ligada']]){
+        if(enabled){const flag=document.createElement('span');flag.className='nc-room-flag';flag.title=label;flag.setAttribute('aria-label',label);flag.innerHTML=iconMarkup(icon);row.append(flag);}
+      }
+      list.append(row);
+    }
+  }
+  async function refreshRoomPresence(){
+    if(!active||root.hidden||roomPresenceBusy)return;
+    roomPresenceBusy=true;const community=active;
+    try {await Promise.all(channelEntries.filter(c=>c.kind==='voice').map(async c=>{
+      const {participants}=await api('/api/channels/'+c.id+'/voice');
+      if(active===community)renderRoomParticipants(c.id,participants);
+    }));} finally {roomPresenceBusy=false;}
+  }
+  function updateCallClock(){
+    const elapsed=Math.max(0,Math.floor((Date.now()-voiceStarted)/1000));
+    const time=[Math.floor(elapsed/3600),Math.floor(elapsed%3600/60),elapsed%60].map(n=>String(n).padStart(2,'0')).join(':');
+    root.querySelectorAll('.nc-call-clock').forEach(clock=>{clock.textContent=time;clock.setAttribute('aria-label','Tempo na chamada: '+time);});
+  }
+  setInterval(()=>{if(voice)updateCallClock();},1000);
+  function updateVoiceIndicators(){
+    if(!voice)return;
+    for(const participant of voiceParticipants){
+      const speaking=group.isSpeaking(participant.id);
+      root.querySelectorAll('[data-participant-id],[data-person-id]').forEach(row=>{
+        if((row.dataset.participantId||row.dataset.personId)===participant.id)row.classList.toggle('nc-speaking',speaking);
+      });
+      const row=[...messages.querySelectorAll('[data-participant-id]')].find(row=>row.dataset.participantId===participant.id);
+      const state=row?.querySelector('.nc-voice-state');const quality=group.health(participant.id);
+      if(state&&!participant.muted&&!participant.deaf&&participant.id!==group.self){state.textContent=connectionDescription(group.connectionState(participant.id),quality);state.dataset.quality=quality?.grade||'unknown';}
+    }
+  }
+  setInterval(()=>{if(voice&&!root.hidden)updateVoiceIndicators();},220);
+  const voiceDock=document.createElement('div');voiceDock.className='nc-voice-dock';voiceDock.hidden=true;
+  function updateVoiceDock(){voiceDock.hidden=!voice||voiceView&&!root.hidden;if(!voice)return;voiceDock.classList.toggle('nc-detached',root.hidden);if(root.hidden)document.body.append(voiceDock);else document.querySelector('.nc-community-account').before(voiceDock);voiceDock.replaceChildren();const go=document.createElement('button');go.type='button';go.className='nc-voice-dock-room';go.innerHTML='<span>Voz conectada</span><strong></strong>';go.querySelector('strong').textContent=channelEntries.find(c=>c.id===voice)?.name||'Sua sala';go.onclick=async()=>{setPanelOpen(true);channel=null;voiceView=true;sendForm.hidden=true;get('communityChannelTitle').textContent='Voz · '+(channelEntries.find(c=>c.id===voice)?.name||'Sua sala');highlightChannelButtons(channelEntries);await loadVoice();};const mute=document.createElement('button');mute.type='button';mute.textContent=group.muted?'Ativar microfone':'Silenciar';mute.setAttribute('aria-label',group.muted?'Ativar microfone da sala':'Silenciar microfone da sala');mute.onclick=()=>{group.setMute(!group.muted);updateVoiceDock();};const leave=document.createElement('button');leave.type='button';leave.textContent='Sair';leave.setAttribute('aria-label','Sair da sala de voz');leave.onclick=async()=>{await exitVoice();if(!root.hidden&&!channel)renderEmpty('Você saiu da chamada.','Escolha um canal para continuar.');};voiceDock.append(go,mute,leave);}
+
   const group = createGroupVoice((text) => {
-    status.textContent = text;
+    if(text)status.textContent=text;
+    if(voice&&voiceView)renderVoice(voiceParticipants);updateVoiceDock();
   });
 
   const setPanelOpen = (open) => {
     if(!open)get('communitySettings').close();
     if(!open){get('communityCategoryDialog').close();get('communityNotificationDialog').close();}
-    root.hidden = !open;
+    root.hidden = !open;updateVoiceDock();
     if (open) {closeSettings(); document.getElementById("ownProfile")?.close();} else closeForms();
     if (open) {
       document.body.classList.add('nc-community-open');
@@ -203,13 +262,13 @@ export function initializeCommunities() {
       get('communityChannelTitle').textContent = (entry.kind === 'text' ? '# ' : 'Voz · ') + entry.name;
       sendForm.hidden = entry.kind !== 'text';
       get('channelRenameForm').hidden = true;
-      channel = entry.kind === 'text' ? entry.id : null;
+      composer.reset();channel = entry.kind === 'text' ? entry.id : null;
       highlightChannelButtons(allChannels);
       if (entry.kind === 'voice') {
         await enterVoice(entry.id);
         return;
       }
-      await exitVoice();
+      voiceView=false;updateVoiceDock();
       await load();
       } catch(error) {fail(error);}
     });
@@ -226,63 +285,69 @@ export function initializeCommunities() {
 
   const highlightChannelButtons = (allChannels) => {
     channels.querySelectorAll('.nc-channel-item').forEach((button) => {
-      button.setAttribute('aria-current', String(button.dataset.channelId === (channel || voice)));
+      button.setAttribute('aria-current', String(button.dataset.channelId === (channel || voice)));button.classList.toggle('nc-channel-connected',button.dataset.channelId===voice);
     });
   };
 
   async function exitVoice() {
-    voice = null;
+    const old=voice;
+    const remaining=voiceParticipants.filter(p=>p.id!==group.self);
+    if(document.fullscreenElement===messages)await document.exitFullscreen().catch(()=>{});
+    voice = null;voiceView=false;voiceDock.hidden=true;voiceParticipants=[];voiceSignature='';messages.classList.remove('nc-voice-view');root.classList.remove('nc-call-stage');
     await group.leave();
+    if(old)renderRoomParticipants(old,remaining);
   }
 
+  const voiceIcons={mic:'<path d="M9 4a3 3 0 0 1 6 0v8a3 3 0 0 1-6 0ZM5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/>',headphones:'<path d="M4 14v-3a8 8 0 0 1 16 0v3M4 13h4v8H4ZM16 13h4v8h-4Z"/>',camera:'<rect x="3" y="5" width="12" height="14" rx="3"/><path d="m15 9 6-3v12l-6-3Z"/>',screen:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 22h8M12 17v5"/>',leave:'<path d="M3 16v-4q9-7 18 0v4h-5v-4H8v4Z"/>'};
+  const iconMarkup=name=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+voiceIcons[name]+'</svg>';
   async function renderVoice(participants) {
-    messages.replaceChildren();
-    messages.append(Object.assign(document.createElement('p'), {
-      textContent: 'Canal de voz · WebRTC (máximo 5 pessoas)',
-    }));
-
-    const me = await api('/api/auth/me');
-    const myId = me.user.id;
-
+    if(!voice||!voiceView)return;voiceParticipants=participants;renderRoomParticipants(voice,participants);updateVoiceDock();root.classList.add('nc-call-stage');
+    const profile=readStorage('nightcallProfile',{}),all=[...participants];
+    if(!all.some(p=>p.id===profile.id))all.unshift(profile);
+    const signature=JSON.stringify([all,group.muted,group.deaf,group.cameraActive,group.screenActive,all.map(p=>[group.connectionState(p.id),...Object.values(group.participantMedia(p.id)).map(stream=>stream?.getVideoTracks().map(t=>[t.id,t.readyState,t.muted]))])]);
+    if(signature===voiceSignature&&messages.querySelector('.nc-voice-stage'))return;voiceSignature=signature;
+    messages.replaceChildren();messages.classList.add('nc-voice-view');
+    const heading=document.createElement('div');heading.className='nc-voice-heading';
+    const identity=document.createElement('div');identity.className='nc-call-identity';const label=document.createElement('strong');label.textContent=channelEntries.find(c=>c.id===voice)?.name||'Sala de voz';
+    const summary=document.createElement('span');summary.textContent=all.length+' '+(all.length===1?'pessoa na chamada':'pessoas na chamada');identity.append(label,summary);
+    const utilities=document.createElement('div');utilities.className='nc-call-utilities';const clock=document.createElement('span');clock.className='nc-call-clock';
+    const fullscreen=document.createElement('button');fullscreen.type='button';fullscreen.setAttribute('aria-label','Alternar tela cheia da chamada');fullscreen.title='Tela cheia';fullscreen.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>';fullscreen.onclick=async()=>{try{if(document.fullscreenElement===messages)await document.exitFullscreen();else await messages.requestFullscreen();}catch{info('A tela cheia não está disponível neste dispositivo.');}};
+    utilities.append(clock,fullscreen);heading.append(identity,utilities);messages.append(heading);updateCallClock();
     const stage=document.createElement('div');stage.className='nc-voice-stage';
-    for (const participant of participants) {
-      const row = document.createElement('div');
-      row.className='nc-voice-tile';
-      const avatar=document.createElement('span');avatar.className='nc-voice-avatar';avatar.textContent=initials(participant.name || participant.username);
-      const name=document.createElement('strong');name.textContent=participant.name || participant.username;
-      row.append(avatar,name);
-      if (String(participant.id) !== String(myId)) {
-        const slider = document.createElement('input');
-        slider.type = 'range';
-        slider.min = '0';
-        slider.max = '100';
-        slider.step = '5';
-        slider.value = String(Math.round(group.getVolume(participant.id) * 100));
-        slider.setAttribute('aria-label', 'Volume de ' + (participant.name || participant.username));
-        slider.addEventListener('input', () => group.setVolume(participant.id, Number(slider.value) / 100));
-        row.append(slider);
-      }
-      stage.append(row);
-    }
-    messages.append(stage);
-    const mute = createButton(group.muted ? 'Ativar microfone' : 'Silenciar microfone', () => {
-      mute.textContent = group.setMute(!group.muted) ? 'Ativar microfone' : 'Silenciar microfone';
-    });
-    const deaf = createButton(group.deaf ? 'Voltar a ouvir' : 'Ensurdecer', () => {
-      deaf.textContent = group.setDeaf(!group.deaf) ? 'Voltar a ouvir' : 'Ensurdecer';
-    });
-    const leave = createButton('Sair do canal', async () => {
-      await exitVoice();
-      renderEmpty('Você saiu do canal de voz.', 'Selecione outro canal para continuar.');
-    });
-
-    const controls=document.createElement('div');controls.className='nc-voice-controls';controls.append(mute,deaf,leave);messages.append(controls);
+    stage.dataset.count=String(all.length);
+    for(const participant of all){
+      const own=participant.id===profile.id,row=document.createElement('article');row.className='nc-voice-tile';row.dataset.participantId=participant.id;
+      const avatar=document.createElement('div');avatar.className='nc-voice-avatar';renderAvatar(avatar,own?profile.avatar:participant.avatar,participant.name);row.append(avatar);
+      const media=group.participantMedia(participant.id);
+      for(const kind of ['camera','screen']){const stream=media[kind];if(!stream?.getVideoTracks().some(t=>t.readyState==='live'&&!t.muted))continue;const video=document.createElement('video');video.autoplay=true;video.playsInline=true;video.muted=true;video.srcObject=stream;video.dataset.voiceMedia=kind;video.setAttribute('aria-label',(kind==='camera'?'Câmera de ':'Tela de ')+participant.name);row.append(video);row.classList.add('nc-has-video');if(kind==='camera')avatar.hidden=true;video.play().catch(()=>{});}
+      const caption=document.createElement('div');caption.className='nc-voice-caption';const name=document.createElement('strong');name.textContent=(participant.name||participant.username)+(own?' · Você':'');const state=document.createElement('span');state.className='nc-voice-state';state.textContent=!own&&participant.deaf?'Áudio desativado':!own&&participant.muted?'Microfone silenciado':own?(group.deaf?'Áudio desativado':group.muted?'Microfone silenciado':'Conectado'):{connected:'Conectado',connecting:'Conectando…',new:'Conectando…',disconnected:'Reconectando…',failed:'Conexão interrompida'}[group.connectionState(participant.id)]||'Conectando…';caption.append(name,state);row.append(caption);
+      if(!own){const volume=document.createElement('input');volume.type='range';volume.min='0';volume.max='100';volume.value=String(Math.round(group.getVolume(participant.id)*100));volume.setAttribute('aria-label','Volume de '+participant.name);volume.oninput=()=>group.setVolume(participant.id,Number(volume.value)/100);row.append(volume);}stage.append(row);
+    }messages.append(stage);
+    const controls=document.createElement('div');controls.className='nc-voice-controls';
+    function control(icon,text,active,action){const button=document.createElement('button');button.type='button';button.innerHTML=iconMarkup(icon)+'<span></span>';button.querySelector('span').textContent=text;button.title=text;button.setAttribute('aria-label',text);button.setAttribute('aria-pressed',String(active));button.onclick=async()=>{button.disabled=true;try{await action();voiceSignature='';await renderVoice(voiceParticipants);}catch(error){fail(error);}finally{button.disabled=false;}};controls.append(button);return button;}
+    control('mic',group.muted?'Ativar microfone':'Silenciar microfone',group.muted,()=>{if(group.deaf)group.setDeaf(false);group.setMute(!group.muted);});
+    control('headphones',group.deaf?'Voltar a ouvir':'Ensurdecer',group.deaf,()=>group.setDeaf(!group.deaf));
+    control('camera',group.cameraActive?'Desligar câmera':'Ativar câmera',group.cameraActive,()=>group.toggleCamera());
+    control('screen',group.screenActive?'Parar transmissão':'Compartilhar tela',group.screenActive,()=>group.toggleScreen());
+    control('leave','Sair do canal',false,async()=>{await exitVoice();renderEmpty('Você saiu da chamada.','Selecione uma sala de voz para entrar novamente.');});
+    const audioSettings=document.createElement('details');audioSettings.className='nc-call-audio-settings';
+    const settingsLabel=document.createElement('summary');settingsLabel.textContent='Áudio e conexão';
+    const microphoneLabel=document.createElement('label');microphoneLabel.textContent='Microfone';const microphone=document.createElement('select');microphone.setAttribute('aria-label','Microfone da sala');
+    const defaultDevice=document.createElement('option');defaultDevice.value='';defaultDevice.textContent='Dispositivo padrão';microphone.append(defaultDevice);microphoneLabel.append(microphone);
+    microphone.onchange=async()=>{microphone.disabled=true;try{await group.setMicrophone(microphone.value);}catch(error){microphone.value=group.microphoneId;fail(error);}finally{microphone.disabled=false;}};
+    navigator.mediaDevices.enumerateDevices().then(devices=>{for(const device of devices.filter(d=>d.kind==='audioinput'))microphone.append(Object.assign(document.createElement('option'),{value:device.deviceId,textContent:device.label||'Microfone'}));microphone.value=group.microphoneId;}).catch(()=>{});
+    const reconnect=document.createElement('button');reconnect.type='button';reconnect.textContent='Recuperar conexão';reconnect.onclick=async()=>{reconnect.disabled=true;try{await group.reconnect();}finally{reconnect.disabled=false;}};
+    audioSettings.append(settingsLabel,microphoneLabel,reconnect);messages.append(audioSettings,controls);updateVoiceIndicators();
+    stage.querySelectorAll('video').forEach(video=>{video.tabIndex=0;video.title='Clique para ampliar';video.onclick=()=>{const row=video.closest('.nc-voice-tile');const focused=row.classList.contains('nc-focused-tile');stage.querySelectorAll('.nc-focused-tile').forEach(tile=>tile.classList.remove('nc-focused-tile'));stage.classList.toggle('nc-focus-mode',!focused);if(!focused)row.classList.add('nc-focused-tile');};video.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();video.click();}};});
   }
 
   async function enterVoice(channelId) {
+    if(voice===channelId){voiceView=true;channel=null;sendForm.hidden=true;await loadVoice();return;}
     await exitVoice();
+    document.dispatchEvent(new CustomEvent('nightcallGroupCallStarted'));
+    renderEmpty('Entrando na chamada…','Permita o acesso ao microfone para continuar.');
     const participants = await group.join(channelId);
-    voice = channelId;
+    voice = channelId;channel=null;sendForm.hidden=true;voiceView=true;voiceStarted=Date.now();info('');
     highlightChannelButtons(channelEntries);
     await renderVoice(participants);
   }
@@ -290,14 +355,14 @@ export function initializeCommunities() {
   async function loadVoice() {
     if (!voice) return;
     const participants = await group.refresh();
-    await renderVoice(participants);
+    voiceParticipants=participants;renderRoomParticipants(voice,participants);if(voiceView)await renderVoice(participants);else updateVoiceDock();
   }
 
   async function refresh() {
     const response = await api('/api/communities');
     communities = response.communities;
     const rail=document.getElementById('communityRail');
-    if(rail){rail.replaceChildren();for(const community of communities){const icon=document.createElement('button');icon.type='button';icon.className='nc-space-rail-icon';icon.dataset.communityId=community.id;icon.classList.toggle('nc-unread',unreadSpaces.has(community.id));icon.textContent=initials(community.name);icon.title=community.name;icon.setAttribute('aria-label','Abrir comunidade '+community.name);icon.setAttribute('aria-current',String(community.id===active && !root.hidden));icon.addEventListener('click',()=>{setPanelOpen(true);open(community.id).catch(fail);});rail.append(icon);}}
+    if(rail){rail.replaceChildren();for(const community of communities){const icon=document.createElement('button');icon.type='button';icon.className='nc-space-rail-icon';icon.dataset.communityId=community.id;icon.classList.toggle('nc-unread',unreadSpaces.has(community.id));renderAvatar(icon,community.icon,initials(community.name));icon.title=community.name;icon.setAttribute('aria-label','Abrir comunidade '+community.name);icon.setAttribute('aria-current',String(community.id===active && !root.hidden));icon.addEventListener('click',()=>{setPanelOpen(true);open(community.id).catch(fail);});rail.append(icon);}}
     if(active && !communities.some(item=>item.id===active)){await exitVoice();active=null;channel=null;get('communitySettings').close();}
 
     get('communitySwitch').disabled=!communities.length;
@@ -325,7 +390,7 @@ export function initializeCommunities() {
     get('communityDirectory').hidden=true;get('communitySwitch').setAttribute('aria-expanded','false');
     if (id !== active) await exitVoice();
     const data = await api('/api/communities/' + id);
-    active = id;
+    active = id;activeIcon=data.community.icon||'';
     unreadSpaces.delete(id);document.querySelectorAll('#communityRail button').forEach(icon=>{if(icon.dataset.communityId===id)icon.classList.remove('nc-unread');});
     document.querySelectorAll('#communityRail button').forEach(icon=>icon.setAttribute('aria-current',String(icon.title===data.community.name && !root.hidden)));
     selectedRole = data.community.role;
@@ -351,6 +416,7 @@ export function initializeCommunities() {
     const voiceChannels=data.channels.filter(entry=>entry.kind==='voice' && !entry.categoryId);
     if(voiceChannels.length){const label=document.createElement('p');label.className='nc-channel-section-label';label.textContent='SALAS DE VOZ';channels.append(label);for(const entry of voiceChannels)channels.append(createChannelButton(entry,data.channels));}
     for(const category of data.categories||[]){const label=document.createElement('p');label.className='nc-channel-section-label';label.textContent=category.name;channels.append(label);const entries=data.channels.filter(entry=>entry.categoryId===category.id);for(const entry of entries)channels.append(createChannelButton(entry,data.channels));if(!entries.length){const empty=document.createElement('small');empty.className='nc-muted';empty.textContent='Sem canais';channels.append(empty);}}
+    await refreshRoomPresence();
 
     members.replaceChildren();
     get('communityRoles').replaceChildren();get('communityRolesSection').hidden=selectedRole!=='owner';
@@ -359,7 +425,7 @@ export function initializeCommunities() {
       row.className = 'nc-member-row';
       const name = document.createElement('span');
       name.textContent = member.name || member.username;
-      const badge=document.createElement('span');badge.className='nc-member-avatar';badge.textContent=initials(member.name || member.username);
+      const badge=document.createElement('span');badge.className='nc-member-avatar';renderAvatar(badge,member.avatar,member.name);
       const identity=document.createElement('span');identity.className='nc-member-identity';
       const role=document.createElement('small');role.textContent={owner:'Dono',admin:'Administrador',member:'Membro'}[member.role];identity.append(name,role);row.append(badge,identity);
       if (selectedRole === 'owner' && member.role !== 'owner') {
@@ -394,7 +460,7 @@ export function initializeCommunities() {
     get('communityChannelCreate').hidden = true;
     get('communityChannelManage').hidden = !['admin', 'owner'].includes(selectedRole);
 
-    if (voice && data.channels.some(entry => entry.id === voice)) {
+    if (voice && voiceView && data.channels.some(entry => entry.id === voice)) {
       sendForm.hidden = true;
       get('communityChannelTitle').textContent = 'Voz · ' + data.channels.find(entry => entry.id === voice).name;
       await loadVoice();
@@ -415,6 +481,8 @@ export function initializeCommunities() {
   }
 
   async function load() {
+    root.classList.remove('nc-call-stage');
+    messages.classList.remove('nc-voice-view');
     sendForm.hidden = !channel;
     if (!channel) {
       renderEmpty('Selecione um canal.', 'Escolha um canal de texto ou um canal de voz na coluna ao lado.');
@@ -428,12 +496,12 @@ export function initializeCommunities() {
     }
     for (const message of data.messages) {
       const line = document.createElement('article');line.className='nc-channel-message';
-      const avatar=document.createElement('span');avatar.className='nc-message-avatar';avatar.textContent=initials(message.senderName);
+      const avatar=document.createElement('span');avatar.className='nc-message-avatar';renderAvatar(avatar,message.senderAvatar,message.senderName);
       const copy=document.createElement('div'),meta=document.createElement('header'),content=document.createElement('p');
       const strong = document.createElement('strong');
       strong.textContent = message.senderName;
       const time=document.createElement('time');time.dateTime=new Date(message.createdAt).toISOString();time.textContent=new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit'}).format(message.createdAt);time.title=new Date(message.createdAt).toLocaleString('pt-BR');
-      meta.append(strong,time);content.textContent=message.content;copy.append(meta,content);line.append(avatar,copy);
+      meta.append(strong,time);content.textContent=message.content;copy.append(meta,content);renderAttachments(copy,message.attachments);line.append(avatar,copy);
       messages.append(line);
     }
     messages.scrollTop = messages.scrollHeight;
@@ -458,13 +526,13 @@ export function initializeCommunities() {
         method:'POST',
         body: JSON.stringify({ name, template: selectedTemplate }),
       });
-      field.value = '';
+      field.value = '';composer.reset();
       closeForms();
       setPanelOpen(true);
       createCommunityForm.hidden = true;
       await refresh();
       await open(response.community.id);
-      info('Comunidade criada com sucesso.');
+      info('');
     } catch (error) {
       fail(error);
     } finally {creating = false; get('communityCreateSubmit').disabled = false;}
@@ -478,7 +546,7 @@ export function initializeCommunities() {
         method:'POST',
         body: JSON.stringify({ code: field.value.trim().toLowerCase() }),
       });
-      field.value = '';
+      field.value = '';composer.reset();
       closeForms();
       joinCommunityForm.hidden = true;
       setPanelOpen(true);
@@ -500,7 +568,7 @@ export function initializeCommunities() {
         method:'POST',
         body: JSON.stringify({ name, kind: get('communityChannelKind').value,categoryId:get('communityChannelCategory').value || null }),
       });
-      field.value = '';
+      field.value = '';composer.reset();
       await open(active);
       info('Canal criado.');
     } catch (error) {
@@ -513,11 +581,13 @@ export function initializeCommunities() {
     if (!channel) return;
     try {
       const field = get('communityText');
+      if(composer.busy)throw Error('Aguarde o envio do arquivo.');
+      if(!field.value.trim()&&!composer.ids.length)return;
       await api('/api/channels/' + channel + '/messages', {
         method:'POST',
-        body: JSON.stringify({ content: field.value }),
+        body: JSON.stringify({ content: field.value,attachments:composer.ids }),
       });
-      field.value = '';
+      field.value = '';composer.reset();
       await load();
     } catch (error) {
       fail(error);
@@ -539,11 +609,14 @@ export function initializeCommunities() {
     });
   });
 
+  document.addEventListener('nightcallPrivateCallStarted',()=>{if(voice)exitVoice().then(()=>renderEmpty('Você entrou em uma chamada privada.','Selecione uma sala de voz para voltar.')).catch(fail);});
   window.addEventListener('beforeunload', () => {
     group.leave().catch(() => {});
   });
 
   const events = new EventSource('/api/events');
+  events.addEventListener('profile',()=>{if(!root.hidden){refresh().then(()=>voice?loadVoice():load()).catch(fail);}});
+  document.addEventListener('nightcallProfileSaved',()=>{if(voice)loadVoice().catch(fail);});
   events.addEventListener('community', async event => {
     try {
       const details=JSON.parse(event.data);
@@ -557,5 +630,7 @@ export function initializeCommunities() {
       if(!root.hidden){await refresh();if(channel)await load();if(voice)await loadVoice();}
     }catch(error){fail(error);}
   });
+  setInterval(()=>{if(voice&&!root.hidden)loadVoice().catch(fail);},4000);
+  setInterval(()=>refreshRoomPresence().catch(fail),4000);
   refresh().catch(fail);
 }

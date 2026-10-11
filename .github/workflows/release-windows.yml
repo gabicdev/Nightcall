@@ -1,0 +1,55 @@
+name: Preparar release Windows
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Conferir tag e versão
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: node scripts/check-release-tag.cjs
+      - name: Instalar dependências
+        run: npm ci
+      - name: Verificar e gerar aplicativo
+        run: |
+          npm test
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run check:desktop
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run dist:win -- --publish never
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run check:release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Criar rascunho com os arquivos completos
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          $files = @(Get-ChildItem -LiteralPath release -File | Where-Object { $_.Name -match '\.exe$|\.blockmap$|^latest\.yml$' } | ForEach-Object FullName)
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          gh release create $env:RELEASE_TAG @files --draft --verify-tag --title "Nightcall $version" --notes-file RELEASE-NOTES.md
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

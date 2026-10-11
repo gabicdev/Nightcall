@@ -1,3 +1,4 @@
+import {renderAvatar} from './media.js';
 import { renderFriends } from "./friends.js";
 import { renderConversations } from "./messages.js";
 import { openSection } from "./settings.js";
@@ -65,7 +66,7 @@ export function loadCurrentUser() {
   const communityAccountName=document.getElementById('communityAccountName');
   if(communityAccountName)communityAccountName.textContent=currentUser.name;
   const communityAccountAvatar=document.getElementById('communityAccountAvatar');
-  if(communityAccountAvatar)communityAccountAvatar.textContent=(currentUser.name||'N').trim().slice(0,1).toUpperCase();
+  if(communityAccountAvatar)renderAvatar(communityAccountAvatar,currentUser.avatar,currentUser.name);
   if (fallbackAvatar) fallbackAvatar.textContent = (currentUser.name || "N").trim().charAt(0).toUpperCase();
   if (myAvatar) {
     if (currentUser.avatar) {

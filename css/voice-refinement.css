@@ -1,0 +1,50 @@
+/* Nightcall: sala de voz com palco amplo e presença junto ao canal. */
+.nc-room-participants{padding:3px 8px 9px 33px;display:grid;gap:2px}
+.nc-room-person{display:flex;align-items:center;gap:8px;min-height:31px;color:#b5a7c5;font-size:12px;border-radius:7px;padding:3px 4px;min-width:0}
+.nc-room-person:hover{background:#ffffff06;color:#ede2f5}
+.nc-room-avatar{position:relative;display:grid;place-items:center;flex:none;width:23px;height:23px;border-radius:50%;font-size:9px;background:#382543;color:#dbcae8;overflow:hidden}
+.nc-room-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.nc-room-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nc-room-flag{display:flex;color:#a593b5;flex:none}
+.nc-room-flag svg{width:13px;height:13px}
+.nc-channel-connected{background:#252030!important;border-color:transparent!important}
+.nc-channel-connected .nc-channel-copy strong{color:#b8e7cb!important}
+.nc-call-stage .nc-community-grid{grid-template-columns:235px minmax(0,1fr)!important}
+.nc-call-stage .nc-members{display:none!important}
+.nc-call-stage .nc-community-main{padding:16px 22px 14px!important;background:#0c0912!important}
+.nc-call-stage .nc-channel-heading{margin-bottom:0;border-bottom:1px solid #ffffff07;padding-bottom:14px}
+.nc-community-messages.nc-voice-view{padding:18px 0 0!important;gap:0;background:#0c0912!important}
+.nc-voice-heading{margin:0 2px 12px;color:#9786aa;flex:none;min-height:35px}
+.nc-call-identity{display:flex;align-items:center;gap:12px}
+.nc-voice-heading .nc-call-identity strong{font-size:13px!important;color:#d7c7e1!important;font-weight:500}
+.nc-call-identity>span{font-size:11px;color:#998aa7;border-left:1px solid #ffffff12;padding-left:12px}
+.nc-call-utilities{display:flex;align-items:center;gap:14px}
+.nc-call-clock{font-variant-numeric:tabular-nums;font-size:11px;color:#9e8cae;letter-spacing:1px}
+.nc-call-utilities button{display:grid;place-items:center;width:32px;height:32px;padding:6px!important;background:transparent!important;color:#b7a3ca;border:0;border-radius:8px}
+.nc-call-utilities button:hover{background:#24192f!important;color:#fff}
+.nc-call-utilities svg{width:19px;height:19px}
+.nc-voice-stage{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:center;justify-content:center;align-content:center;padding:18px 0 34px;min-height:0}
+.nc-voice-stage[data-count="1"]{grid-template-columns:minmax(0,920px)}
+.nc-voice-stage[data-count="5"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+.nc-voice-tile,.nc-voice-tile.nc-has-video{min-height:0;max-height:none;aspect-ratio:16/9;border-radius:13px;border:1px solid #392642;background:radial-gradient(ellipse at 50% 45%,#291b38,#181120 75%);box-shadow:none;padding:20px}
+.nc-voice-tile:nth-child(even){background:radial-gradient(ellipse at 50% 45%,#241735,#120d1d 75%)}
+.nc-voice-avatar{width:86px;height:86px;border:2px solid #9475ac44;background:#5f3e7e;font-size:27px;box-shadow:0 5px 30px #05030830}
+.nc-voice-caption{left:12px;right:12px;bottom:12px;padding:7px 10px;background:#08060da6;border-radius:8px;min-height:31px}
+.nc-voice-caption strong{font-size:12px;font-weight:500}
+.nc-voice-state{font-size:10px;color:#c3b2cc}
+.nc-voice-tile input{opacity:0;transition:opacity .15s;top:14px;right:14px;width:78px;background:#100c18}
+.nc-voice-tile:hover input,.nc-voice-tile:focus-within input{opacity:.9}
+.nc-voice-tile.nc-has-video{padding:0}
+.nc-voice-tile video{border-radius:0}
+.nc-voice-controls{align-self:center;width:auto;max-width:100%;flex-wrap:nowrap;gap:7px;padding:8px;background:#16101ef5;border:1px solid #3c2b46;border-radius:15px;box-shadow:0 5px 35px #0005;margin-bottom:5px}
+.nc-voice-controls button{width:48px;height:44px;min-height:44px;padding:11px!important;border-radius:10px!important;background:#251a30!important;border-color:transparent!important}
+.nc-voice-controls button:hover{background:#382546!important}
+.nc-voice-controls button>span{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.nc-voice-controls button[aria-pressed="true"]{background:#8053ab!important;color:#fff!important}
+.nc-voice-controls button:last-child{width:62px;background:#bf3855!important;border-color:transparent!important;margin-left:5px}
+.nc-voice-controls button:last-child:hover{background:#d34361!important}
+.nc-voice-view:fullscreen{padding:24px 28px!important;width:100vw;height:100dvh;background:#0c0912!important}
+.nc-voice-view:fullscreen .nc-voice-stage{width:100%;max-width:1700px;align-self:center}
+@media(max-width:1050px){.nc-call-stage .nc-community-grid{grid-template-columns:200px minmax(0,1fr)!important}.nc-voice-stage[data-count="5"]{grid-template-columns:repeat(2,minmax(0,1fr))}.nc-voice-avatar{width:65px;height:65px;font-size:22px}.nc-voice-caption{left:8px;right:8px;bottom:8px;gap:5px}.nc-voice-state{font-size:9px}}
+@media(max-width:760px){.nc-call-stage .nc-community-main{padding:14px!important}.nc-voice-stage{grid-template-columns:minmax(0,1fr)!important;padding-bottom:20px;gap:12px;min-height:240px}.nc-voice-tile,.nc-voice-tile.nc-has-video{aspect-ratio:16/9;min-height:180px;max-height:none}.nc-call-identity{flex-direction:column;align-items:flex-start;gap:4px}.nc-call-identity>span{border:0;padding:0}.nc-voice-heading{display:flex;gap:10px}.nc-call-utilities{gap:6px}.nc-voice-view:fullscreen{overflow:auto!important;padding:16px!important}.nc-room-participants{padding-left:25px}}
+@media(max-width:760px){.nc-call-stage .nc-community-main{min-width:0!important;width:100%!important;box-sizing:border-box}.nc-call-stage .nc-community-grid{width:100%;min-width:0}.nc-voice-view,.nc-voice-stage{min-width:0;max-width:100%;box-sizing:border-box}.nc-call-stage .nc-community-channels #communityChannels{max-height:290px!important}}

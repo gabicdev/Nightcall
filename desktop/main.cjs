@@ -60,7 +60,7 @@ const start=async()=>{
     url=`http://127.0.0.1:${server.address().port}`;
   }
   activeUrl=url;
-  const win=new BrowserWindow({show:!testing,icon:path.join(root,'assets/nightcall-mark.png'),width:1250,height:800,minWidth:850,minHeight:560,backgroundColor:'#101018',title:'Nightcall',autoHideMenuBar:true,webPreferences:{nodeIntegration:false,contextIsolation:true,sandbox:true,preload:path.join(__dirname,'preload.cjs')}});
+  const win=new BrowserWindow({show:!testing,icon:path.join(root,'assets/nightcall-mark.png'),width:1250,height:800,minWidth:850,minHeight:560,backgroundColor:'#101018',title:'Nightcall',autoHideMenuBar:true,webPreferences:{backgroundThrottling:false,nodeIntegration:false,contextIsolation:true,sandbox:true,preload:path.join(__dirname,'preload.cjs')}});
   win.webContents.setWindowOpenHandler(({url:external})=>{
     try {const parsed=new URL(external);if(parsed.protocol==='https:' && !parsed.username && !parsed.password)shell.openExternal(parsed.toString()).catch(()=>{});} catch {}
     return {action:'deny'};
@@ -116,6 +116,9 @@ const start=async()=>{
   updates.start();
 };
 ipcMain.handle('nightcall:connection-info',(event)=>trustedSender(event)?({mode:activeUrl.startsWith('https:')?'remote':'local',origin:activeUrl||'',hasError:!!startupError}):null);
+ipcMain.handle('nightcall:update-status',event=>trustedSender(event)?updates?.status():null);
+ipcMain.handle('nightcall:check-updates',async event=>{if(!trustedSender(event)||!updates)return null;await updates.check(false);return updates.status();});
+ipcMain.handle('nightcall:install-update',async event=>{if(!trustedSender(event)||!updates||updates.status().state!=='ready')return false;await updates.show();return true;});
 if(singleInstance) app.whenReady().then(start).catch(error=>{
   startupError=String(error?.stack||error);
   try {

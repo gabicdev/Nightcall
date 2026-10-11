@@ -1,0 +1,105 @@
+/* Uploaded media and live call surfaces share the Nightcall palette. */
+body,input,button,select,textarea{font-family:Segoe UI,Arial,sans-serif}
+.nc-message-avatar,.nc-member-avatar,.nc-conversation-avatar,.nc-direct-conversation>span,.result-avatar,#communityAccountAvatar,.nc-voice-avatar{position:relative;overflow:hidden;flex-shrink:0}
+.nc-message-avatar img,.nc-member-avatar img,.nc-conversation-avatar img,.nc-direct-conversation>span img,.result-avatar img,#communityAccountAvatar img,.nc-voice-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.nc-voice-avatar [hidden]{display:none!important}
+.nc-own-profile-avatar img{z-index:1}
+.add-friend-modal{background:#191322!important;border:1px solid #493757!important;border-radius:22px!important;padding:30px!important;max-width:500px}
+.add-friend-modal .modal-label{color:#b39ad9;font-size:10px;letter-spacing:2px}
+.add-friend-modal h2{font-size:26px;letter-spacing:-.6px}
+.add-friend-modal .modal-header p{font-size:14px;line-height:1.6;color:#b9abc8}
+.add-friend-search{background:#110c1a!important;border:1px solid #493557!important;border-radius:12px!important;padding:0 14px!important;margin-top:26px}
+.add-friend-search:focus-within{border-color:#b08bd7!important;box-shadow:0 0 0 3px #9361cd19}
+#addFriendUsername{border:0!important;box-shadow:none!important;background:transparent!important;padding:15px 10px!important;font-size:15px!important;min-width:0}
+.nc-username-prefix{color:#bba2df;font-size:17px}
+.nc-friend-hint{margin:10px 0 0;color:#a391b8;font-size:12px}
+.add-friend-modal .modal-footer{margin-top:26px;gap:10px}
+.add-friend-modal button{border-radius:10px!important;font-size:13px!important}
+.add-friend-modal .modal-search-button,#sendFriendRequest{background:#8656bb!important;border-color:#9869cf!important}
+.add-friend-result{border:1px solid #483259!important;background:#241a31!important;border-radius:12px!important;padding:14px!important;gap:12px}
+.result-avatar{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:#65428b;color:white}
+#addFriendError:not(:empty){margin-top:16px;padding:12px;border-radius:10px;background:#2c2038;color:#dfc9eb;font-size:13px;line-height:1.5}
+.nc-image-upload-actions{display:flex;align-items:center;gap:8px;margin:10px 0 12px;flex-wrap:wrap}
+.nc-image-upload-actions button{background:#2b1f38;border:1px solid #4e375f;border-radius:9px;padding:9px 12px;color:#e5d4f1;cursor:pointer;font-size:12px}
+.nc-image-upload-actions button:disabled{opacity:.5}
+#profileSaveStatus{font-size:13px;line-height:1.5;color:#d9bce9;margin:12px 0}
+#bannerPreview{object-fit:cover;max-height:180px;width:100%;border-radius:12px}
+.nc-attachments{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-top:10px;max-width:100%}
+.nc-attachments figure{margin:0;max-width:min(430px,100%);min-width:0;overflow:hidden;border-radius:12px}
+.nc-media-message{background:#21172d;border:1px solid #35263f}
+.nc-attachments img,.nc-attachments video{display:block;width:auto;max-width:100%;max-height:340px;object-fit:contain}
+.nc-attachments audio{display:block;max-width:100%;width:320px}
+.nc-attachments a{display:block;padding:9px 12px;font-size:11px;color:#c6afd9;text-decoration:none;overflow-wrap:anywhere}
+.nc-attachments a:hover{color:#fff;text-decoration:underline}
+.nc-attachments .nc-sticker-message img{width:160px;height:160px;object-fit:contain;background:transparent}
+.nc-private-message-copy,.nc-channel-message-copy{min-width:0}
+.chat-message p:empty,.nc-channel-message p:empty{display:none}
+.chat-form,.nc-message-form{position:relative;display:flex;align-items:center;gap:8px;flex:none}
+.nc-message-form #communityText,.chat-form #chatInput{min-width:0;flex:1;width:auto!important;font-size:14px!important}
+.nc-message-form button.nc-composer-tool,.chat-form button.nc-composer-tool{flex:none!important;width:36px;height:36px;padding:7px!important;border:0!important;background:transparent!important;color:#c3a9da!important;display:grid;place-items:center;font-size:24px!important;border-radius:9px!important}
+.nc-message-form button.nc-composer-tool:hover,.chat-form button.nc-composer-tool:hover{background:#382747!important;color:#fff!important}
+.nc-composer-tool svg{width:21px;height:21px}
+.nc-upload-tray{flex:none;display:flex;gap:8px;flex-wrap:wrap;max-height:160px;overflow:auto;padding:10px 12px;background:#191121;border-radius:12px 12px 0 0;color:#cdb7df;font-size:12px}
+.nc-upload-tray[hidden],.nc-sticker-picker[hidden]{display:none!important}
+.nc-upload-chip{display:flex;align-items:center;gap:8px;padding:7px;background:#2a1c37;border-radius:10px;max-width:240px}
+.nc-upload-chip img{width:42px;height:42px;object-fit:cover;border-radius:6px}
+.nc-upload-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}
+.nc-upload-chip button{background:transparent;border:0;color:#cfb6e4;font-size:20px;cursor:pointer}
+.nc-sticker-picker{flex:none;padding:18px;margin:8px 0;border:1px solid #4d365f;background:#1e152a;border-radius:16px;max-height:310px;overflow:auto}
+.nc-sticker-picker>strong{font-size:14px;color:#e3d1ef}
+.nc-sticker-picker button{padding:8px 12px;background:#352444;color:#dfc6f1;border:0;border-radius:8px;cursor:pointer}
+.nc-sticker-picker>button:first-of-type{float:right;background:transparent}
+.nc-sticker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px;margin:16px 0}
+.nc-sticker-grid button{padding:5px;background:#140e1c;min-height:75px}
+.nc-sticker-grid img{width:100%;height:75px;object-fit:contain}
+.nc-sticker-grid p{grid-column:1/-1;color:#bda6d0;font-size:13px}
+#communitySwitch{font-size:15px!important}
+#communityDirectory.nc-server-menu .nc-server-menu-group button{font-size:13px!important;padding:12px!important;min-height:42px!important}
+#communityDirectory.nc-server-menu svg{width:20px!important;height:20px!important;flex-shrink:0;color:#bda1d8}
+.nc-server-menu-group:last-child{border-bottom:0}
+.nc-space-rail-icon{border-radius:17px!important;background:linear-gradient(150deg,#604581,#332342)!important;border:1px solid #765394!important;box-shadow:inset 0 1px 0 #ffffff0c;font-size:16px!important;font-weight:650!important;letter-spacing:-.5px}
+.nc-space-rail-icon[aria-current="true"]{background:#8455b3!important;border-color:#c8a2ed!important;box-shadow:0 0 0 3px #a873d119}
+.nc-community-messages.nc-voice-view{display:flex;flex-direction:column;overflow:auto!important;padding:16px 0!important}
+.nc-voice-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 4px 20px;color:#bda7ce}
+.nc-voice-heading strong{font-size:18px!important;font-weight:600;color:#e8d9f2!important}
+.nc-voice-heading span{font-size:12px}
+.nc-voice-stage{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));align-content:center;gap:16px;padding:10px 0 28px;flex:1}
+.nc-voice-tile{position:relative;min-height:260px;max-height:440px;aspect-ratio:16/10;overflow:hidden;border:1px solid #493155;background:radial-gradient(ellipse at 50% 25%,#3c2851,#1b1328 75%);border-radius:18px;padding:28px;gap:16px;box-shadow:0 14px 36px #08061124}
+.nc-voice-avatar{width:88px;height:88px;border-radius:50%;font-size:28px;background:#704a99;border:2px solid #9a76bd55;display:grid;place-items:center}
+.nc-voice-caption{display:flex;align-items:center;justify-content:space-between;gap:14px;position:absolute;bottom:16px;left:18px;right:18px;background:#110b1bab;padding:10px 12px;border-radius:10px;z-index:2}
+.nc-voice-caption strong{font-size:13px;color:#eddef8}
+.nc-voice-state{font-size:11px;color:#bfb0cd}
+.nc-voice-tile input{position:absolute;top:15px;right:18px;width:80px;opacity:.7}
+.nc-voice-tile video{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;background:#0b0710;border-radius:12px}
+.nc-voice-tile.nc-has-video{padding:0;aspect-ratio:16/10}
+.nc-has-video .nc-voice-avatar{display:none}
+.nc-has-video video[data-voice-media="camera"]:has(+video){position:absolute;right:16px;bottom:75px;width:24%;height:26%;border:1px solid #75538b;z-index:2}
+.nc-voice-controls{position:sticky;bottom:0;display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;background:#191121f5;border:1px solid #3b2a47;border-radius:16px;box-shadow:0 8px 32px #07041040;flex:none}
+.nc-voice-controls button{display:flex;align-items:center;justify-content:center;gap:9px;min-height:46px;padding:12px 15px!important;font-size:12px!important}
+.nc-voice-controls button svg{width:21px;height:21px;flex:none}
+.nc-voice-controls button[aria-pressed="true"]{background:#754b9f!important;border-color:#a07cc3!important}
+.nc-voice-controls button:last-child{background:#ad3556!important;border-color:#c54a6b!important}
+.nc-voice-controls button:disabled{opacity:.5;cursor:wait}
+.nc-private-call-participants{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;flex:none}
+.nc-private-call-participants[hidden]{display:none!important}
+.nc-private-call-tile{display:flex;align-items:center;justify-content:center;gap:14px;min-height:110px;padding:18px;background:linear-gradient(135deg,#342044,#1c1429);border:1px solid #4b315a;border-radius:13px}
+.nc-private-call-tile .nc-voice-avatar{width:54px;height:54px;font-size:19px}
+.nc-private-call-tile strong{font-size:14px;font-weight:600;color:#e5d6ed}
+.voice-controls .nc-call-actions{gap:8px;flex-wrap:wrap}
+.voice-controls .nc-call-actions button{border-radius:10px!important;font-size:12px!important;padding:10px 13px!important}
+.voice-controls .nc-call-preferences{padding:10px 0 0;border-top:1px solid #392745;gap:12px}
+.voice-controls .nc-stream-stage{max-height:38vh;width:100%}
+.voice-controls .call-videos{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.nc-incoming-call{position:fixed;inset:0;margin:auto;width:min(380px,calc(100vw - 32px));background:#1c1426;color:#f4e9fa;border:1px solid #76518d;border-radius:22px;padding:30px;box-shadow:0 25px 100px #0009;text-align:center}
+.nc-incoming-call::backdrop{background:#090512b3;backdrop-filter:blur(5px)}
+.nc-incoming-call>span{display:block;font-size:10px;letter-spacing:2px;color:#bf9cdd}
+.nc-incoming-call strong{display:block;margin:20px 0 10px;font-size:21px}
+.nc-incoming-call p{font-size:13px;color:#ba9ecd;margin-bottom:24px}
+.nc-incoming-call button{padding:12px 22px;margin:0 5px;border:0;background:#8251b3;color:white;border-radius:12px;cursor:pointer}
+.nc-incoming-call button:last-child{background:#39223f}
+@media(max-width:760px){.nc-voice-stage{grid-template-columns:1fr}.nc-voice-tile{min-height:220px;max-height:350px}.nc-voice-controls{gap:6px;padding:10px}.nc-voice-controls button{padding:10px!important}.nc-voice-controls button span{display:none}.nc-voice-heading{display:block}.nc-voice-heading span{display:block;margin-top:8px}.nc-private-call-tile{flex-direction:column;gap:8px;padding:12px}.nc-private-call-tile strong{font-size:12px}.nc-attachments figure{max-width:100%}.nc-chat-open .chat-form{padding:10px!important}.nc-sticker-picker{max-height:220px}.add-friend-modal{padding:24px!important}}
+
+.nc-space-rail-icon,.nc-space-icon-preview{position:relative;overflow:hidden}.nc-space-rail-icon img,.nc-space-icon-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}.nc-community-icon-editor{display:flex;gap:18px;align-items:center;margin-bottom:24px}.nc-space-icon-preview{display:grid;place-items:center;flex:none;width:80px;height:80px;border-radius:24px;background:#704895;font-size:25px;color:white}.nc-community-icon-editor p{font-size:11px;margin:8px 0 12px;color:#b89dcc}.nc-community-icon-editor button{font-size:12px!important;padding:8px 10px!important;margin-right:5px}.nc-community-icon-editor input[hidden]{display:none!important}
+
+.nc-voice-dock{display:flex;align-items:center;gap:5px;flex:none;padding:10px 8px;margin-top:8px;border:1px solid #426153;border-radius:12px;background:#15241d;color:#b8e8c9}.nc-voice-dock[hidden]{display:none!important}.nc-voice-dock button{border:0;background:transparent;color:inherit;cursor:pointer;font-size:10px;padding:6px}.nc-voice-dock .nc-voice-dock-room{flex:1;min-width:0;text-align:left}.nc-voice-dock-room span{display:block;font-size:10px;color:#87d2a7}.nc-voice-dock-room strong{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nc-voice-dock button:last-child{color:#f0a3b9}.nc-voice-dock.nc-detached{position:fixed;left:84px;bottom:86px;width:248px;z-index:30;margin:0;box-shadow:0 14px 35px #0004}.nc-channel-connected .nc-channel-glyph{color:#9be6b5!important}
+@media(max-width:760px){.nc-voice-dock.nc-detached{left:66px;right:12px;bottom:85px;width:auto}}

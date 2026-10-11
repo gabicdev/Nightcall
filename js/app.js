@@ -8,6 +8,7 @@ import { initializeProfile } from "./profile.js";
 import { initializeCalls } from "./calls.js";
 import { initializeAudio } from "./audio.js";
 import { initializePreferences } from "./preferences.js";
+import {initializeReleaseSettings} from './release-settings.js';
 
 await authenticate();
 
@@ -21,5 +22,6 @@ initializeSettings();
 initializeProfile();
 initializeAudio();
 initializePreferences();
+initializeReleaseSettings();
 
 document.dispatchEvent(new CustomEvent("nightcallProfileSaved"));

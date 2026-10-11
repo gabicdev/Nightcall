@@ -1,0 +1,36 @@
+.nc-speaking .nc-voice-avatar,.nc-speaking .nc-room-avatar{outline:2px solid #8bcfaf;outline-offset:3px;box-shadow:0 0 20px #74d2a229}
+.nc-voice-tile.nc-speaking{border-color:#70ba92;box-shadow:inset 0 0 0 1px #70ba9240}
+.nc-speaking .nc-room-name{color:#d1f1df}
+[data-quality="poor"]{color:#efa2b4!important}
+[data-quality="fair"]{color:#e1c49b!important}
+[data-quality="good"]{color:#a9d9bf!important}
+.nc-call-audio-settings{align-self:center;margin:0 0 12px;color:#b8a5ca;font-size:11px;text-align:center;flex:none;max-width:100%}
+.nc-call-audio-settings summary{cursor:pointer;list-style:none;padding:7px 16px;border-radius:8px}
+.nc-call-audio-settings summary:hover{background:#21162c;color:#eadff3}
+.nc-call-audio-settings[open]{background:#1c1327;padding:8px 16px 14px;border:1px solid #3f2b4d;border-radius:12px}
+.nc-call-audio-settings label{display:inline-flex;align-items:center;gap:12px;margin:8px;max-width:100%}
+.nc-call-audio-settings select{max-width:220px;font-size:11px!important;padding:7px!important}
+.nc-call-audio-settings button{font-size:11px!important;padding:8px 12px!important;background:#382249!important}
+.nc-voice-stage.nc-focus-mode{grid-template-columns:repeat(3,minmax(0,1fr))}
+.nc-focus-mode .nc-focused-tile{grid-column:1/-1;aspect-ratio:16/9;max-height:65vh}
+.nc-voice-tile video{cursor:zoom-in}
+.nc-focused-tile video{cursor:zoom-out}
+.nc-private-quality{font-size:11px;margin:5px 0;color:#b8a4c9;flex:none}
+.nc-private-call-tile.nc-speaking{border-color:#81cba4;background:linear-gradient(135deg,#302d40,#18251f)}
+.nc-release-card{margin-top:28px;border:1px solid #463152;background:#1b1324;border-radius:15px;padding:22px;color:#d2bddf}
+.nc-release-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nc-release-card h3{font-size:16px!important;margin:0 0 8px!important;color:#eee2f6!important}
+.nc-release-card p{font-size:12px;line-height:1.7;margin:8px 0;color:#ba9fce}
+.nc-release-badge{flex:none;display:inline-block;border:1px solid #5b3d6c;border-radius:30px;font-size:10px;padding:6px 10px;color:#d9bbef}
+.nc-release-badge[data-state="ready"],.nc-release-badge[data-state="current"]{color:#aee1c4;border-color:#456c55}
+.nc-release-card progress{width:100%;accent-color:#a075d1;height:6px;margin:12px 0}
+.nc-release-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px}
+.nc-release-actions button,.nc-network-summary button{border:1px solid #5a3d71!important;background:#382149!important;border-radius:9px!important;padding:10px 13px!important;font-size:12px!important;color:#eee1fa!important}
+.nc-release-actions button:disabled{opacity:.45;cursor:default}
+.nc-release-actions a{font-size:11px;color:#bca3d3;text-decoration:none;margin-left:auto}
+.nc-release-actions a:hover{color:#fff}
+.nc-network-summary{display:flex;gap:16px;align-items:center;border-top:1px solid #3f2b4d;padding-top:14px;margin-top:20px}
+.nc-network-summary p{flex:1;margin:0}
+.nc-network-summary button{flex:none}
+@media(max-width:760px){.nc-call-audio-settings label{display:flex;flex-direction:column;gap:8px}.nc-call-audio-settings select{max-width:100%}.nc-release-card{padding:16px}.nc-release-heading,.nc-network-summary{align-items:flex-start;flex-direction:column}.nc-release-actions a{margin-left:0}.nc-focus-mode .nc-focused-tile{max-height:none}}
+.nc-upload-failed{border:1px solid #a94e66!important;color:#eac0cc;background:#392030!important;max-width:100%}.nc-upload-failed>span{white-space:normal!important}.nc-upload-failed button{color:#ffe3ed!important}.nc-upload-progress{font-size:12px;color:#c8b5da}.nc-sticker-picker input[type=search]{display:block;width:100%;background:#120d1b;border:1px solid #4c355b;border-radius:9px;color:#eee2f6;font:inherit;padding:10px;margin:14px 0}

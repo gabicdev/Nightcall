@@ -1,3 +1,4 @@
+import {decodeUpload,publicMedia,messageMedia} from './media.js';
 import http from "node:http";
 import { readFile } from "node:fs/promises";
 import { resolve, extname, relative, isAbsolute } from "node:path";
@@ -55,13 +56,13 @@ export function createServer({
     });
     res.end(JSON.stringify(data));
   };
-  async function body(req) {
+  async function body(req, limit=16384) {
     let text = "";
     if (!req.headers["content-type"]?.startsWith("application/json"))
       throw Object.assign(Error("Envie JSON."), { status: 415 });
     for await (const part of req) {
       text += part;
-      if (Buffer.byteLength(text) > 16384)
+      if (Buffer.byteLength(text) > limit)
         throw Object.assign(Error("Dados grandes demais."), { status: 413 });
     }
     try {
@@ -92,7 +93,7 @@ export function createServer({
         ),
         { status: 400 },
       );
-    if (avatar) {
+    if (avatar && !/^\/api\/media\/[a-f0-9-]+$/.test(avatar)) {
       let url;
       try {
         url = new URL(avatar);
@@ -102,7 +103,7 @@ export function createServer({
           status: 400,
         });
     }
-    if (banner) {
+    if (banner && !/^\/api\/media\/[a-f0-9-]+$/.test(banner)) {
       let url;
       try { url = new URL(banner); } catch {}
       if (!url || !['http:', 'https:'].includes(url.protocol)) throw Object.assign(Error('Banner deve ser um link HTTP ou HTTPS.'), {status:400});
@@ -116,7 +117,7 @@ export function createServer({
     res.setHeader("X-Frame-Options", "DENY");
     res.setHeader(
       "Content-Security-Policy",
-      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: http: data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: http: data:; connect-src 'self'; media-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
     );
     try {
       const path = new URL(req.url, "http://localhost").pathname;
@@ -190,6 +191,38 @@ export function createServer({
         }
         const user = sessions.user(req);
         if (!user) return reply(res, 401, { error: "Entre na sua conta." });
+        if(path==='/api/media' && req.method==='POST'){
+          const input=decodeUpload(await body(req,12*1024*1024));
+          const used=db.prepare('SELECT COALESCE(SUM(length(data)),0) total FROM media WHERE owner_id=?').get(user.id).total;
+          if(used+input.size>128*1024*1024)return reply(res,413,{error:'Limite de arquivos desta conta alcançado (128 MB).'});
+          db.prepare('INSERT INTO media VALUES (?,?,?,?,?,?,?)').run(input.id,user.id,input.name,input.type,input.purpose,input.data,Date.now());
+          return reply(res,201,{media:publicMedia(input)});
+        }
+        if(path==='/api/stickers' && req.method==='GET')return reply(res,200,{stickers:db.prepare("SELECT * FROM media WHERE owner_id=? AND purpose='sticker' ORDER BY created_at DESC LIMIT 100").all(user.id).map(publicMedia)});
+        const mediaMatch=path.match(/^\/api\/media\/([a-f0-9-]+)$/);
+        if(mediaMatch && ['GET','HEAD'].includes(req.method)){
+          const item=db.prepare('SELECT * FROM media WHERE id=?').get(mediaMatch[1]);
+          if(!item)return reply(res,404,{error:'Arquivo não encontrado.'});
+          let allowed=item.owner_id===user.id;
+          const url='/api/media/'+item.id;
+          if(item.purpose==='profile'){allowed ||= !!db.prepare('SELECT 1 FROM users WHERE avatar=? OR banner=?').get(url,url);allowed ||= !!db.prepare('SELECT 1 FROM communities c JOIN community_members m ON m.community_id=c.id WHERE c.icon=? AND m.user_id=?').get(url,user.id);}
+          if(!allowed){
+            const privateMessages=db.prepare(`SELECT sender_id,receiver_id FROM messages WHERE (sender_id=? OR receiver_id=?) AND EXISTS (SELECT 1 FROM json_each(attachments) WHERE json_extract(value,'$.id')=?)`).all(user.id,user.id,item.id);
+            allowed=privateMessages.some(m=>!db.prepare('SELECT 1 FROM blocks WHERE (owner_id=? AND blocked_id=?) OR (owner_id=? AND blocked_id=?)').get(m.sender_id,m.receiver_id,m.receiver_id,m.sender_id));
+          }
+          if(!allowed)allowed=!!db.prepare(`SELECT 1 FROM channel_messages m JOIN community_channels c ON c.id=m.channel_id JOIN community_members cm ON cm.community_id=c.community_id WHERE cm.user_id=? AND EXISTS (SELECT 1 FROM json_each(m.attachments) WHERE json_extract(value,'$.id')=?)`).get(user.id,item.id);
+          if(!allowed)return reply(res,403,{error:'Arquivo privado.'});
+          let start=0,end=item.data.length-1,statusCode=200;
+          if(req.headers.range){
+            const match=/^bytes=(\d*)-(\d*)$/.exec(req.headers.range);
+            if(!match||(!match[1]&&!match[2])){res.setHeader('Content-Range','bytes */'+item.data.length);return reply(res,416,{error:'Trecho inválido.'});}
+            if(!match[1])start=Math.max(0,item.data.length-Number(match[2]));else {start=Number(match[1]);if(match[2])end=Math.min(end,Number(match[2]));}
+            if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start>end||start>=item.data.length){res.setHeader('Content-Range','bytes */'+item.data.length);return reply(res,416,{error:'Trecho inválido.'});}
+            statusCode=206;res.setHeader('Content-Range',`bytes ${start}-${end}/${item.data.length}`);
+          }
+          res.writeHead(statusCode,{'Content-Type':item.type,'Content-Length':end-start+1,'Accept-Ranges':'bytes','Cache-Control':'private, max-age=86400'});
+          return res.end(req.method==='HEAD'?undefined:item.data.subarray(start,end+1));
+        }
         if (path === "/api/events" && req.method === "GET") {
           if ((connections.get(user.id)?.size || 0) >= 4) return reply(res,429,{error:"Limite de conexões simultâneas."});
           res.writeHead(200, {
@@ -233,6 +266,7 @@ export function createServer({
           return reply(res, 200, { user: publicUser(user) });
         if (path === "/api/profile" && req.method === "PUT") {
           const profile = validateProfile({ banner: user.banner || "", ...await body(req) });
+          for(const value of [profile.avatar,profile.banner])if(value.startsWith('/api/media/')&&!db.prepare("SELECT 1 FROM media WHERE id=? AND owner_id=? AND purpose='profile'").get(value.split('/').pop(),user.id))return reply(res,403,{error:'Imagem de perfil indisponível.'});
           db.prepare(
             "UPDATE users SET username=?, name=?, bio=?, avatar=?, banner=? WHERE id=?",
           ).run(
@@ -243,6 +277,7 @@ export function createServer({
             profile.banner,
             user.id,
           );
+          broadcast(db.prepare('SELECT id FROM users').all().map(u=>u.id),'profile',{userId:user.id});
           return reply(res, 200, {
             user: publicUser(
               db.prepare("SELECT * FROM users WHERE id=?").get(user.id),
@@ -258,15 +293,15 @@ export function createServer({
         const target = (id) => db.prepare("SELECT * FROM users WHERE id=?").get(id);
         // 0.9: sinalização efêmera, apenas para amigos, sem armazenar SDP/ICE.
         if (path === "/api/calls/signal" && req.method === "POST") {
-          const input = await body(req);
+          const input = await body(req,64*1024);
           const {to, type, callId, payload} = input;
           if (typeof to !== "string" || to === user.id || !target(to) ||
               !isFriend(user.id,to) || isBlocked(user.id,to))
             return reply(res,403,{error:"Chamada permitida somente entre amigos."});
-          if (!["offer","answer","ice","hangup","reject","busy"].includes(type) ||
+          if (!["offer","answer","ice","hangup","reject","busy","media-state","reconnect"].includes(type) ||
               typeof callId !== "string" || !/^[a-zA-Z0-9-]{8,80}$/.test(callId) ||
-              (payload !== undefined && (typeof payload !== "object" || payload === null || Array.isArray(payload) ||
-                JSON.stringify(payload).length > 12000)))
+              (["offer","answer","ice","media-state","reconnect"].includes(type) && (!payload || typeof payload !== "object" || Array.isArray(payload) ||
+                JSON.stringify(payload).length > 48*1024)))
             return reply(res,400,{error:"Sinal de chamada inválido."});
           const now=Date.now();
           const rate=signalingRate.get(user.id)||{at:now,count:0};
@@ -356,7 +391,7 @@ export function createServer({
         const community = (cid) => db.prepare('SELECT * FROM communities WHERE id=?').get(cid);
         const roleCanManage = (role) => role === 'owner' || role === 'admin';
         if (path === '/api/communities' && req.method === 'GET') {
-          const communities = db.prepare(`SELECT c.id,c.name,c.owner_id ownerId,CASE WHEN m.role IN ('owner','admin') THEN c.invite_code ELSE NULL END inviteCode,m.role FROM communities c JOIN community_members m ON m.community_id=c.id WHERE m.user_id=? ORDER BY c.created_at DESC`).all(user.id);
+          const communities = db.prepare(`SELECT c.id,c.name,c.icon,c.owner_id ownerId,CASE WHEN m.role IN ('owner','admin') THEN c.invite_code ELSE NULL END inviteCode,m.role FROM communities c JOIN community_members m ON m.community_id=c.id WHERE m.user_id=? ORDER BY c.created_at DESC`).all(user.id);
           return reply(res,200,{communities});
         }
         if (path === '/api/communities' && req.method === 'POST') {
@@ -368,7 +403,7 @@ export function createServer({
           const id=randomUUID(), code=randomUUID().replaceAll('-','').slice(0,12), now=Date.now();
           db.exec('BEGIN');
           try {
-            db.prepare('INSERT INTO communities VALUES (?,?,?,?,?)').run(id,normalizedName,user.id,code,now);
+            db.prepare('INSERT INTO communities (id,name,owner_id,invite_code,created_at) VALUES (?,?,?,?,?)').run(id,normalizedName,user.id,code,now);
             db.prepare('INSERT INTO community_members VALUES (?,?,?,?)').run(id,user.id,'owner',now);
             templates[template].forEach((channelName,index,all) => db.prepare('INSERT INTO community_channels (id,community_id,name,kind,created_at) VALUES (?,?,?,?,?)').run(randomUUID(),id,channelName,index === all.length - 1 ? 'voice' : 'text',now + index));
             db.exec('COMMIT');
@@ -393,7 +428,8 @@ export function createServer({
             if(!roleCanManage(access.role))return reply(res,403,{error:'Sem permissão para editar a comunidade.'});
             const data=await body(req), name=typeof data.name==='string'?data.name.trim().replace(/\s+/g,' '):'';
             if(name.length<3||name.length>40)return reply(res,400,{error:'Nome inválido (3–40 caracteres).'});
-            db.prepare('UPDATE communities SET name=? WHERE id=?').run(name,cid);
+            const icon=data.icon===undefined?c.icon:data.icon;if(typeof icon!=='string'||(icon && icon!==c.icon && (!/^\/api\/media\/[a-f0-9-]+$/.test(icon)||!db.prepare("SELECT 1 FROM media WHERE id=? AND owner_id=? AND purpose='profile'").get(icon.split('/').pop(),user.id))))return reply(res,403,{error:'Ícone indisponível. Escolha uma imagem da sua conta.'});
+            db.prepare('UPDATE communities SET name=?,icon=? WHERE id=?').run(name,icon,cid);
             broadcast(recipients,'community',{communityId:cid});
             return reply(res,200,{ok:true,name});
           }
@@ -412,8 +448,8 @@ export function createServer({
           if(!c||!access)return reply(res,404,{error:'Comunidade não encontrada.'});
           const channels=db.prepare('SELECT id,name,kind,category_id categoryId FROM community_channels WHERE community_id=? ORDER BY created_at,id').all(cid);
           const categories=db.prepare('SELECT id,name FROM community_categories WHERE community_id=? ORDER BY created_at,id').all(cid);
-          const members=db.prepare('SELECT u.id,u.username,u.name,m.role FROM community_members m JOIN users u ON u.id=m.user_id WHERE m.community_id=? ORDER BY m.joined_at').all(cid);
-          return reply(res,200,{community:{id:c.id,name:c.name,ownerId:c.owner_id,inviteCode:roleCanManage(access.role)?c.invite_code:null,role:access.role},channels,categories,members});
+          const members=db.prepare('SELECT u.id,u.username,u.name,u.avatar,m.role FROM community_members m JOIN users u ON u.id=m.user_id WHERE m.community_id=? ORDER BY m.joined_at').all(cid);
+          return reply(res,200,{community:{id:c.id,name:c.name,icon:c.icon,ownerId:c.owner_id,inviteCode:roleCanManage(access.role)?c.invite_code:null,role:access.role},channels,categories,members});
         }
         const categoryCreate=path.match(/^\/api\/communities\/([a-f0-9-]+)\/categories$/);
         if(categoryCreate && req.method==='POST') {
@@ -465,14 +501,20 @@ export function createServer({
             broadcast(db.prepare('SELECT user_id FROM community_members WHERE community_id=?').all(ch.community_id).map(m=>m.user_id),'community');
             return reply(res,200,{ok:true,changed:previous?.channelId!==ch.id});
           }
+          if(req.method==='PATCH'){
+            const presence=voicePresence.get(user.id);if(presence?.channelId!==ch.id)return reply(res,403,{error:'Entre na sala antes de alterar seus controles.'});
+            const flags=await body(req);for(const key of ['muted','deaf','camera','screen']){if(typeof flags[key]!=='boolean')return reply(res,400,{error:'Estado de mídia inválido.'});}
+            Object.assign(presence,flags,{until:Date.now()+45000});broadcast(db.prepare('SELECT user_id FROM community_members WHERE community_id=?').all(ch.community_id).map(m=>m.user_id),'community');return reply(res,200,{ok:true});
+          }
           if(req.method==='DELETE'){
             if(voicePresence.get(user.id)?.channelId===ch.id)voicePresence.delete(user.id);
             broadcast(db.prepare('SELECT user_id FROM community_members WHERE community_id=?').all(ch.community_id).map(m=>m.user_id),'community');
             return reply(res,200,{ok:true});
           }
           if(req.method==='GET'){
-            const rows=db.prepare('SELECT u.id,u.username,u.name FROM users u JOIN community_members m ON m.user_id=u.id WHERE m.community_id=?').all(ch.community_id);
-            return reply(res,200,{participants:rows.filter(m=>{const v=voicePresence.get(m.id);return v?.channelId===ch.id && v.until>Date.now();})});
+            const presence=voicePresence.get(user.id);if(presence?.channelId===ch.id)presence.until=Date.now()+45000;
+            const rows=db.prepare('SELECT u.id,u.username,u.name,u.avatar FROM users u JOIN community_members m ON m.user_id=u.id WHERE m.community_id=?').all(ch.community_id);
+            return reply(res,200,{participants:rows.filter(m=>{const v=voicePresence.get(m.id);return v?.channelId===ch.id && v.until>Date.now();}).map(m=>{const v=voicePresence.get(m.id);return {...m,muted:!!v.muted,deaf:!!v.deaf,camera:!!v.camera,screen:!!v.screen};})});
           }
         }
         // Sinalização de voz em grupo: destino deve estar presente no MESMO canal.
@@ -482,10 +524,10 @@ export function createServer({
           if(!ch || ch.kind!=='voice' || !member(ch.community_id))return reply(res,403,{error:'Canal indisponível.'});
           const live=id=>{const v=voicePresence.get(id);return v?.channelId===ch.id && v.until>Date.now();};
           if(!live(user.id))return reply(res,403,{error:'Entre no canal antes de transmitir.'});
-          const {to,type,payload}=await body(req);
+          const {to,type,payload}=await body(req,64*1024);
           if(typeof to!=='string'||to===user.id||!live(to)||!db.prepare('SELECT 1 FROM community_members WHERE community_id=? AND user_id=?').get(ch.community_id,to))return reply(res,403,{error:'Destino não está no canal.'});
-          if(!['offer','answer','ice','leave'].includes(type) || (type!=='leave' &&
-             (!payload||typeof payload!=='object'||Array.isArray(payload)||JSON.stringify(payload).length>12000)))
+          if(!['offer','answer','ice','leave','reconnect'].includes(type) || (type!=='leave' &&
+             (!payload||typeof payload!=='object'||Array.isArray(payload)||JSON.stringify(payload).length>48*1024)))
              return reply(res,400,{error:'Sinal inválido.'});
           const now=Date.now(),rate=signalingRate.get(user.id)||{at:now,count:0};
           if(now-rate.at>10000){rate.at=now;rate.count=0;}
@@ -503,14 +545,14 @@ export function createServer({
           if(channel.kind!=='text')return reply(res,400,{error:'Canal de voz não aceita mensagens.'});
           if(req.method==='GET'){
             const before=Number(new URL(req.url,'http://localhost').searchParams.get('before'))||Date.now()+1;
-            const messages=db.prepare(`SELECT m.id,m.sender_id senderId,u.name senderName,m.content,m.created_at createdAt FROM channel_messages m JOIN users u ON u.id=m.sender_id WHERE m.channel_id=? AND m.created_at<? ORDER BY m.created_at DESC LIMIT 100`).all(channel.id,before).reverse();
-            return reply(res,200,{messages});
+            const messages=db.prepare(`SELECT m.id,m.sender_id senderId,u.name senderName,u.avatar senderAvatar,m.content,m.attachments,m.created_at createdAt FROM channel_messages m JOIN users u ON u.id=m.sender_id WHERE m.channel_id=? AND m.created_at<? ORDER BY m.created_at DESC LIMIT 100`).all(channel.id,before).reverse();
+            return reply(res,200,{messages:messages.map(m=>({...m,attachments:JSON.parse(m.attachments||'[]')}))});
           }
           if(req.method==='POST'){
-            const {content}=await body(req);
-            if(typeof content!=='string'||!content.trim()||content.length>2000)return reply(res,400,{error:'Mensagem inválida.'});
-            const msg={id:randomUUID(),senderId:user.id,content:content.trim(),createdAt:Date.now()};
-            db.prepare('INSERT INTO channel_messages VALUES (?,?,?,?,?)').run(msg.id,channel.id,user.id,msg.content,msg.createdAt);
+            const {content='',attachments:input=[]}=await body(req);const attachments=messageMedia(db,user.id,input);
+            if(typeof content!=='string'||(!content.trim()&&!attachments.length)||content.length>2000)return reply(res,400,{error:'Mensagem inválida.'});
+            const msg={id:randomUUID(),senderId:user.id,content:content.trim(),attachments,createdAt:Date.now()};
+            db.prepare('INSERT INTO channel_messages (id,channel_id,sender_id,content,created_at,attachments) VALUES (?,?,?,?,?,?)').run(msg.id,channel.id,user.id,msg.content,msg.createdAt,JSON.stringify(attachments));
             broadcast(db.prepare('SELECT user_id FROM community_members WHERE community_id=?').all(channel.community_id).map(x=>x.user_id),'community',{communityId:channel.community_id,from:user.id,hasMessage:true});
             return reply(res,201,{message:msg});
           }
@@ -527,16 +569,16 @@ export function createServer({
           if (!target(otherId) || isBlocked(user.id,otherId) || !isFriend(user.id,otherId)) return reply(res,403,{error:"Mensagens permitidas apenas entre amigos."});
           if (req.method === "GET") {
             const before = Number(new URL(req.url,"http://localhost").searchParams.get("before")) || Date.now()+1;
-            const messages = db.prepare(`SELECT id,sender_id senderId,receiver_id receiverId,content,created_at createdAt FROM messages
+            const messages = db.prepare(`SELECT id,sender_id senderId,receiver_id receiverId,content,attachments,created_at createdAt FROM messages
               WHERE ((sender_id=? AND receiver_id=?) OR (sender_id=? AND receiver_id=?)) AND created_at<? ORDER BY created_at DESC LIMIT 100`).all(user.id,otherId,otherId,user.id,before).reverse();
-            return reply(res,200,{messages});
+            return reply(res,200,{messages:messages.map(m=>({...m,attachments:JSON.parse(m.attachments||'[]')}))});
           }
           if (req.method === "POST") {
-            const {content} = await body(req);
-            if (typeof content !== "string" || !content.trim() || content.length>2000)
+            const {content='',attachments:input=[]} = await body(req);const attachments=messageMedia(db,user.id,input);
+            if (typeof content !== "string" || (!content.trim() && !attachments.length) || content.length>2000)
               return reply(res,400,{error:"A mensagem deve ter de 1 a 2000 caracteres."});
-            const message = {id:randomUUID(), senderId:user.id, receiverId:otherId, content:content.trim(), createdAt:Date.now()};
-            db.prepare("INSERT INTO messages VALUES (?,?,?,?,?)").run(message.id,message.senderId,message.receiverId,message.content,message.createdAt);
+            const message = {id:randomUUID(), senderId:user.id, receiverId:otherId, content:content.trim(), attachments, createdAt:Date.now()};
+            db.prepare("INSERT INTO messages (id,sender_id,receiver_id,content,created_at,attachments) VALUES (?,?,?,?,?,?)").run(message.id,message.senderId,message.receiverId,message.content,message.createdAt,JSON.stringify(attachments));
             broadcast([user.id,otherId],"message",{from:user.id});
             return reply(res,201,{message});
           }

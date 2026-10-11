@@ -28,7 +28,7 @@ O **Nightcall** está sendo construído para esses momentos: um aplicativo de co
 
 ### Conversas que continuam
 
-Adicione amigos, envie mensagens privadas e encontre suas conversas em um só lugar. Para combinar a próxima partida ou simplesmente perguntar como foi o dia.
+Adicione amigos, envie mensagens, fotos, vídeos, áudios e figurinhas e encontre suas conversas em um só lugar. Para combinar a próxima partida ou simplesmente perguntar como foi o dia.
 
 ### Uma comunidade com a sua cara
 
@@ -40,7 +40,7 @@ Salas de voz e chamadas com áudio, vídeo e compartilhamento de tela aproximam 
 
 ### Seu perfil, seu jeito
 
-Avatar, biografia e banner ajudam a apresentar quem você é. Preferências de aparência, áudio e notificações permitem ajustar a experiência à sua rotina.
+Fotos e GIFs do seu computador, biografia e banner ajudam a apresentar quem você é. Preferências de aparência, áudio e notificações permitem ajustar a experiência à sua rotina.
 
 ## Uma identidade própria
 
