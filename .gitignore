@@ -8,3 +8,9 @@ data/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
+
+release/
+evidence/
+.wrangler/
+.env.*
+!.env.example
