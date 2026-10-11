@@ -70,12 +70,23 @@ export function renderConversations() {
   filtered.forEach(function (conversation) {
     const card = document.createElement("article");
     card.className = "conversation-card";
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", "Abrir conversa com " + (conversation.name || conversation.username || "usuário"));
     const name = document.createElement("strong");
     name.textContent = conversation.name || "Usuário";
     const username = document.createElement("span");
     username.textContent = conversation.username || "@usuario";
-    card.appendChild(name);
-    card.appendChild(username);
+    const avatar = document.createElement("span");
+    avatar.className="nc-conversation-avatar";
+    avatar.textContent=String(conversation.name || conversation.username || "N").trim().slice(0,1).toUpperCase();
+    card.appendChild(avatar);
+    const identity=document.createElement("span");
+    identity.className="nc-conversation-identity";
+    identity.appendChild(name);
+    identity.appendChild(username);
+    card.appendChild(identity);
+    card.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openConversation(conversation);}});
     card.addEventListener("click", function () {
       openConversation(conversation);
     });

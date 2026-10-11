@@ -1,0 +1,52 @@
+/* Nightcall Atelier 13.7 — DMs, friends and settings, restrained night UI */
+:root{--atelier-panel:#141121;--atelier-raised:#1c172d;--atelier-border:#302741;--atelier-muted:#aaa0c1;--atelier-accent:#a98bfb}
+#friendsPage,#messagesPage{width:min(100%,1180px);margin:0 auto;padding:8px 0 40px!important;overflow:visible}
+#friendsPage .friends-header,#messagesPage .messages-header{margin:0 0 24px!important;padding:3px 0 22px;border-bottom:1px solid #302640}
+#friendsPage .friends-header h2,#messagesPage .messages-header h2{font-size:clamp(28px,2.4vw,38px)!important;letter-spacing:-.045em;color:#f7f3ff}
+#friendsPage .friends-header p,#messagesPage .messages-header p{font-size:14px;color:#b2a9c9}
+.add-friend-button,.new-conversation-button,#emptyAddFriend,#emptyNewConversation{min-height:42px!important;background:#6c4db0!important;border:1px solid #8366cc!important;color:#fff!important;border-radius:12px!important;padding:10px 16px!important;box-shadow:none!important;font-size:13px!important}
+.add-friend-button:hover,.new-conversation-button:hover,#emptyAddFriend:hover,#emptyNewConversation:hover{background:#8061c5!important}
+.friends-search,.messages-search{display:flex;align-items:center;gap:12px;min-height:56px!important;padding:8px 16px!important;border:1px solid #332a47!important;background:#191627!important;border-radius:14px!important;margin:0 0 22px!important}
+.friends-search input,.messages-search input{background:transparent!important;border:0!important;outline:0!important;flex:1;color:#f3edff;font-size:14px}
+.friends-search .search-icon,.messages-search span:first-child{color:#b9a5ed;font-size:23px}
+.friends-tabs{display:flex;gap:18px;border-bottom:1px solid #332a47;margin-bottom:20px}
+.friends-tab{background:transparent!important;color:#b5aacb;border:0!important;border-radius:0!important;padding:13px 8px!important;font-size:13px}
+.friends-tab.active{color:#f3e9ff!important;border-bottom:2px solid #a98bfb!important}
+.friends-list-section,.conversations-section{border:0!important;background:transparent!important;padding:0!important;min-height:0!important}
+.friends-list-title,.conversations-title{margin:0 0 15px!important}
+.friends-list-title h3,.conversations-title h3{font-size:11px!important;letter-spacing:.13em;color:#aaa0c1;text-transform:uppercase}
+.friend-card,.conversation-card{display:flex!important;align-items:center;gap:14px;min-height:72px;padding:12px 16px!important;background:#171424!important;border:1px solid #302741!important;border-radius:15px!important;margin:0 0 9px;transition:background .16s,border-color .16s}
+.friend-card:hover,.conversation-card:hover{background:#211a34!important;border-color:#634b91!important}
+.friend-avatar,.nc-conversation-avatar{height:42px;width:42px;min-width:42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#795bcb,#45337e);color:white;font-size:17px;font-weight:700;overflow:hidden}
+.friend-avatar-placeholder{font-size:17px!important}
+.friend-info,.nc-conversation-identity{display:grid;gap:3px;min-width:0;flex:1}
+.friend-info strong,.nc-conversation-identity strong{font-size:14px;color:#f6f1ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.friend-info .friend-username,.nc-conversation-identity span{font-size:12px;color:#a79fbf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.friend-action{border-radius:10px!important;padding:9px 11px!important;min-width:38px!important;font-size:12px!important;background:#29213c!important;color:#eee7ff!important;white-space:nowrap}
+.friend-action:hover{background:#443263!important}
+.friends-empty,.messages-empty{min-height:290px!important;padding:38px 20px!important;border:1px dashed #3a2e53!important;background:linear-gradient(155deg,#161325,#11101d)!important;border-radius:20px!important;text-align:center}
+.friends-empty .empty-icon,.messages-empty .empty-icon{font-size:25px!important;background:#281f40!important;color:#c8b6ff!important}
+.friends-empty h3,.messages-empty h3{font-size:19px!important;margin-top:12px!important}
+.friends-empty p,.messages-empty p{color:#b1a8c5!important;line-height:1.6}
+.chat-panel{margin:22px 0 0!important;border:1px solid #382b55!important;border-radius:20px!important;background:#141121!important;min-height:420px;display:flex;flex-direction:column;overflow:hidden}
+.chat-panel[hidden]{display:none!important}
+.chat-header{min-height:66px;padding:16px 20px!important;border-bottom:1px solid #302741!important;background:#1b162b!important}
+.chat-header strong{font-size:15px!important;color:#f2eaff}
+.chat-header button{background:#2a223d!important;border-radius:10px!important;color:#e5dcff!important}
+.chat-history{height:auto!important;min-height:240px;max-height:55vh;flex:1;padding:24px!important;gap:12px!important}
+.chat-message{max-width:min(76%,620px)!important;background:#272038!important;border:1px solid #382b50!important;border-radius:16px 16px 16px 5px!important;padding:12px 15px!important;line-height:1.55}
+.chat-message.mine{background:#493674!important;border-color:#634c91!important;border-radius:16px 16px 5px 16px!important}
+.chat-form{padding:16px!important;background:#1a1629!important;border-top:1px solid #302741!important}
+.chat-form input{border-radius:12px!important;background:#0f0d1b!important;border:1px solid #443455!important;padding:13px!important;font-size:14px}
+.chat-form button{border-radius:12px!important;background:#7251bb!important;padding:12px 18px!important}
+.settings-modal-wrapper{border-color:#3b3053!important;background:#10101d!important}
+.settings-sidebar{background:#151222!important;border-right:1px solid #302741!important}
+.settings-main{background:radial-gradient(circle at top right,#1b1532,transparent 40%),#100e1b!important}
+.settings-main .card,.settings-section .card{border-radius:18px!important;border:1px solid #312842!important;background:#1a1629!important}
+.settings-account-mini .settings-mini-avatar{background:#503684!important;color:#eee6ff!important;font-weight:700;font-size:18px}
+.settings-nav-item.active{background:#312549!important;color:#f0e5ff!important}
+.profile-preview .avatar-preview img:not(.visible){display:none!important}
+#avatarPreview:not(.visible){display:none!important}
+button:focus-visible,[role=button]:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #bb9dff!important;outline-offset:2px}
+@media(max-width:850px){#friendsPage,#messagesPage{padding:0 0 20px!important}.friends-header,.messages-header{flex-wrap:wrap}.friend-card,.conversation-card{padding:12px!important}.chat-message{max-width:92%!important}}
+@media(prefers-reduced-motion:reduce){.friend-card,.conversation-card{transition:none!important}}

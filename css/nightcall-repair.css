@@ -1,0 +1,27 @@
+/* Nightcall 13.5: interface repair. Final single-purpose layout rules. */
+.main-sidebar{width:72px!important;min-width:72px!important;flex-basis:72px!important;display:flex!important;flex-direction:column!important;align-items:center!important;padding:14px 8px!important;gap:14px!important;background:#0d0b16!important;border-right:1px solid #272135!important}
+.main-sidebar .logo{position:relative!important;display:grid!important;place-items:center!important;width:48px!important;height:48px!important;min-height:48px!important;padding:0!important;overflow:hidden!important;border:1px solid #5b4385!important;border-radius:16px!important;background:#120f22!important}
+.main-sidebar .logo img{width:100%!important;height:100%!important;object-fit:contain!important;display:block!important}
+#communityToggle{display:grid!important;place-items:center!important;position:relative!important;order:2!important;inset:auto!important;width:44px!important;height:44px!important;padding:10px!important;margin:0!important}
+#communityToggle svg{width:23px;height:23px}
+.main-navigation{display:flex!important;flex-direction:column!important;align-items:center!important;gap:10px!important;width:100%!important;order:1!important}
+.main-navigation .nav-button{display:grid!important;place-items:center!important;width:44px!important;height:44px!important;padding:0!important;flex:none!important}
+#logoutButton{order:5!important;margin-top:auto!important;position:static!important;display:grid!important;place-items:center!important;width:44px!important;height:44px!important;color:#aea1c9!important;background:transparent!important}
+#logoutButton svg{width:21px;height:21px}
+.content-sidebar{width:276px!important;min-width:240px!important;flex:0 0 276px!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+.user-profile{margin-top:auto!important;flex-shrink:0!important;min-height:78px!important;padding:12px!important;cursor:pointer}
+.user-info{min-width:0!important;flex:1!important;overflow:hidden!important}
+.user-info strong,.user-info span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-actions button{min-width:35px!important;min-height:35px!important;cursor:pointer}
+.nc-community{position:fixed!important;top:28px!important;bottom:0!important;left:72px!important;right:0!important;inset:28px 0 0 72px!important;border:0!important;border-radius:0!important;z-index:1500!important;box-shadow:none!important;overflow:auto!important;padding:18px 22px!important;background:#0e0b18!important}
+.nc-community[hidden]{display:none!important}
+.nc-community-header{padding:14px 18px!important;border-radius:14px!important}
+.nc-community-grid{display:grid!important;grid-template-columns:minmax(150px,190px) minmax(160px,220px) minmax(280px,1fr) minmax(160px,200px)!important;gap:12px!important;min-height:min(520px,65vh)!important}
+.nc-community-main{min-height:370px!important}
+.nc-community-actions{margin-block:12px!important}
+.nc-community input,.nc-community select{font:inherit!important}
+#communityStatus[data-state=error]{color:#ff9a9a!important}
+.nc-community button{transition:background-color .15s,border-color .15s!important}
+#settingsButton{display:grid;place-items:center}
+@media(max-width:1150px){.nc-community-grid{grid-template-columns:160px 180px minmax(240px,1fr)!important}.nc-community-grid .nc-members{grid-column:1/-1!important;max-height:160px!important}}
+@media(max-width:760px){.main-sidebar{width:56px!important;min-width:56px!important;flex-basis:56px!important}.content-sidebar{width:210px!important;min-width:190px!important;flex-basis:210px!important}.nc-community{inset:28px 0 0 56px!important;padding:12px!important}.nc-community-grid{display:flex!important;flex-direction:column!important}.nc-community-grid>*{min-height:110px!important}}

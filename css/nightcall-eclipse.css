@@ -1,0 +1,94 @@
+/* Nightcall 13.6 — focused cleanup for login, brand, community panel and quick actions */
+.auth-page{
+  background:
+    radial-gradient(circle at 78% 12%, rgba(118,85,214,.14), transparent 22%),
+    radial-gradient(circle at 18% 18%, rgba(105,132,255,.09), transparent 18%),
+    #090914;
+}
+.auth-card{
+  width:min(100%, 456px);
+  padding:32px 32px 26px;
+  border-radius:24px;
+  border:1px solid rgba(127,102,194,.28);
+  background:linear-gradient(180deg, rgba(23,20,38,.94), rgba(15,14,26,.96));
+  box-shadow:0 18px 50px rgba(0,0,0,.34);
+}
+.nc-auth-brand-wrap{display:flex;align-items:center;gap:18px;margin-bottom:10px}
+.nc-auth-brand{width:64px;height:64px;flex:0 0 64px;object-fit:cover;border-radius:20px;background:#110f1e;border:1px solid rgba(148,119,230,.28);box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}
+.nc-auth-brand-copy h1{margin:6px 0 8px;font-size:31px;letter-spacing:-.04em;line-height:1.05}
+.nc-auth-brand-copy p{margin:0;color:#b5aec9;line-height:1.6;font-size:14px}
+.nc-auth-eyebrow{display:block;font-size:10px;letter-spacing:.22em;color:#a894e2}
+.auth-card form{margin-top:18px}
+.auth-card label{font-size:13px;color:#c7c3d8}
+.auth-card input{border-radius:12px;border-color:#40385b;background:#0f1020;padding:14px 14px;font-size:14px}
+.auth-card input:focus-visible{outline:2px solid #b491ff;outline-offset:1px;border-color:#6e59ad}
+.auth-card button{border-radius:12px;font-weight:600}
+#authSwitch{display:inline-flex;align-items:center;justify-content:flex-start;padding:0;margin-top:14px;background:none;color:#d5c8ff;border:0;text-decoration:none}
+#authSwitch:hover{text-decoration:underline}
+#authStatus{color:#9c95b6;font-size:12px}
+
+.main-sidebar .logo{background:linear-gradient(180deg,#120f23,#100d1d)!important}
+.main-sidebar .logo img{display:none!important}
+.main-sidebar .logo::before{content:"";display:block;width:34px;height:34px;background:url('../assets/nightcall-mark.png') center/contain no-repeat;filter:drop-shadow(0 8px 18px rgba(91,72,168,.24))}
+.main-navigation .add-button{font-size:0!important;position:relative}
+.main-navigation .add-button::before{content:"+";font-size:28px;line-height:1;color:#d3c7f8;font-weight:400}
+#communityToggle{order:4!important;border:1px solid transparent!important;background:transparent!important;color:#c7bce0!important}
+#communityToggle:hover,#communityToggle.active{background:#211a34!important;border-color:#594477!important;color:#e2d7ff!important;box-shadow:inset 3px 0 #b38fff!important}
+
+.nc-wordmark{display:flex;align-items:center;gap:0}
+.nc-home-guide{display:grid;grid-template-columns:1.4fr 1fr;align-items:center;gap:26px;background:linear-gradient(135deg, rgba(23,18,42,1), rgba(15,14,28,.92));}
+.nc-home-guide-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.nc-quick-action{min-height:54px;border-radius:16px;border:1px solid #302840;background:linear-gradient(180deg,#1a1630,#141222);color:#efe8ff;font:inherit;font-weight:600;cursor:pointer;padding:14px 16px;text-align:left;transition:.15s transform,.15s border-color,.15s background}
+.nc-quick-action:hover{transform:translateY(-1px);border-color:#7d62c8;background:linear-gradient(180deg,#241d43,#18152d)}
+.nc-home-guide-copy p{max-width:520px}
+
+#homePage .nc-home-guide-mark{display:none!important}
+
+.nc-community{padding:22px 26px!important;background:radial-gradient(circle at 82% 0%, rgba(98,74,155,.16), transparent 24%), #0d0b18!important}
+.nc-community-header{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 22px!important;background:linear-gradient(180deg, rgba(26,22,41,.95), rgba(18,16,31,.94));border:1px solid #2c2740;border-radius:18px!important}
+.nc-community-header h2{margin:6px 0 6px!important;font-size:36px!important;letter-spacing:-.04em}
+.nc-community-header p{margin:0;color:#a9a2bb;font-size:13px}
+.nc-community .nc-secondary{min-height:44px;border:1px solid #3a3452;background:#211d31}
+.nc-community-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px!important;margin-top:14px!important}
+.nc-community-actions form{background:#151325;border:1px solid #2c2840;border-radius:16px;padding:14px 14px 12px}
+.nc-community-actions form>div{display:grid!important;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.nc-community-grid{margin-top:14px!important;grid-template-columns:minmax(190px,220px) minmax(210px,260px) minmax(340px,1fr) minmax(190px,220px)!important;gap:14px!important}
+.nc-community-sidebar,.nc-community-main{background:linear-gradient(180deg, rgba(20,18,34,.97), rgba(17,15,29,.98));border:1px solid #2a243d;border-radius:18px;padding:16px!important}
+.nc-community-sidebar h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#9f92c6;margin:0 0 12px}
+.nc-community-list{gap:10px!important}
+.nc-community-server{display:flex;align-items:center;gap:10px;padding:11px 12px!important;border-radius:14px!important;border:1px solid transparent;background:#1b182b;color:#f4f0ff}
+.nc-community-server-badge{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font-weight:700;background:linear-gradient(180deg,#8258de,#5c46a9);color:#fff;flex:0 0 34px}
+.nc-community-server-copy{min-width:0;display:grid;gap:2px}
+.nc-community-server-copy strong,.nc-community-server-copy small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nc-community-server-copy strong{font-size:13px}
+.nc-community-server-copy small{font-size:11px;color:#a59cbf}
+.nc-community-list button[aria-current="true"].nc-community-server{background:#2a2143!important;border-color:#6b53a4!important}
+.nc-channel-item{display:flex;align-items:center;gap:10px;padding:10px 12px!important;border-radius:14px!important;background:#1b182b;color:#efe8ff}
+.nc-channel-glyph{width:26px;height:26px;border-radius:10px;display:grid;place-items:center;background:#29243d;color:#cfbdff;font-size:12px;flex:0 0 26px}
+.nc-channel-copy{display:grid;gap:2px;text-align:left}
+.nc-channel-copy strong{font-size:13px;font-weight:600}
+.nc-channel-copy small{font-size:11px;color:#a59cbf}
+#communityMessages{min-height:420px;height:auto!important;display:flex;flex-direction:column;gap:10px}
+#communityMessages p{padding:12px 14px!important;border-radius:14px;background:#171425;border:1px solid #26203a;border-bottom:0!important}
+.nc-community-empty{display:grid;place-items:center;text-align:center;min-height:260px;color:#b0a8c6;line-height:1.65;padding:22px}
+.nc-community-empty strong{display:block;color:#f0ebff;font-size:19px;margin-bottom:6px}
+#communityInvite{margin:0 0 12px;color:#b2a9ca}
+.nc-admin-form{padding-top:10px;border-top:1px solid #27213a}
+.nc-member-row{padding:10px 0!important}
+#communityStatus{min-height:20px!important;margin:10px 2px 0;font-size:13px}
+#communityStatus[data-state="success"]{color:#97dbb2}
+
+@media(max-width:1120px){
+  .nc-home-guide{grid-template-columns:1fr}
+  .nc-home-guide-actions{grid-template-columns:1fr}
+  .nc-community-actions{grid-template-columns:1fr!important}
+  .nc-community-grid{grid-template-columns:1fr 1fr!important}
+  .nc-community-main,.nc-members{grid-column:1/-1}
+}
+@media(max-width:760px){
+  .nc-community-grid{display:flex!important;flex-direction:column!important}
+  .nc-community-actions form>div{grid-template-columns:1fr}
+  .nc-community-header{flex-direction:column;gap:12px}
+  .auth-card{padding:24px}
+  .nc-auth-brand-wrap{align-items:flex-start}
+}

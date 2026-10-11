@@ -59,7 +59,7 @@ export function createFriendCard(friend) {
   } else {
     const placeholder = document.createElement("span");
     placeholder.className = "friend-avatar-placeholder";
-    placeholder.textContent = "👤";
+    placeholder.textContent = String(friend.name || friend.username || "N").trim().slice(0, 1).toUpperCase();
     avatar.appendChild(placeholder);
   }
   const status = document.createElement("span");
@@ -84,7 +84,7 @@ export function createFriendCard(friend) {
   message.type = "button";
   message.className = "friend-action";
   message.title = "Enviar mensagem";
-  message.textContent = "💬";
+  message.textContent = "Mensagem";
   message.addEventListener("click", function () {
     openConversation(friend);
   });
@@ -92,7 +92,7 @@ export function createFriendCard(friend) {
   more.type = "button";
   more.className = "friend-action";
   more.title = "Mais opções";
-  more.textContent = "⋯";
+  more.textContent = "•••";
   more.addEventListener("click", function () {
     openFriendOptions(friend);
   });

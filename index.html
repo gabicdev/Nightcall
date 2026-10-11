@@ -22,9 +22,15 @@
   <body>
     <main id="authPage" class="auth-page">
       <section class="auth-card" aria-label="Conta Nightcall">
-        <img class="nc-auth-brand" src="assets/nightcall-official.png" alt="Nightcall" />
-        <h1>Bem-vindo ao Nightcall</h1>
-        <p>Entre para conversar.</p>
+        <img src="assets/nightcall-official.png" alt="" hidden aria-hidden="true" />
+        <div class="nc-auth-brand-wrap">
+          <img class="nc-auth-brand" src="assets/nightcall-mark.png" alt="" aria-hidden="true" />
+          <div class="nc-auth-brand-copy">
+            <span class="nc-auth-eyebrow">NOITES MAIS HUMANAS</span>
+            <h1>Entre no Nightcall</h1>
+            <p>Converse, ligue, crie comunidades e compartilhe sua noite.</p>
+          </div>
+        </div>
         <form id="loginForm">
           <label
             >Usuário<input
@@ -86,18 +92,16 @@
         ====================================== -->
 
         <aside class="main-sidebar" aria-label="Navegação principal">
-          <div class="logo" aria-label="Nightcall"><img src="assets/nightcall-official.png" alt="" /></div>
-          <button id="communityToggle" type="button" title="Comunidades" aria-label="Abrir comunidades">🌐</button>
-          <button id="logoutButton" type="button" title="Sair da conta" aria-label="Sair da conta">
-            Sair
-          </button>
+          <div class="logo" aria-label="Nightcall"><img src="assets/nightcall-mark.png" alt="Nightcall" /></div>
+          <button id="communityToggle" class="nc-rail-action" type="button" title="Comunidades" aria-label="Abrir comunidades"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></button>
+          <button id="logoutButton" class="nc-logout" type="button" title="Sair da conta" aria-label="Sair da conta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
 
           <nav class="main-navigation">
             <a href="#" class="nav-button active" title="Início" aria-label="Início"><span class="nc-icon nc-icon-home" aria-hidden="true"></span></a>
 
             <a href="#" class="nav-button" title="Mensagens" aria-label="Mensagens"><span class="nc-icon nc-icon-message" aria-hidden="true"></span></a>
 
-            <a href="#" class="nav-button add-button" title="Adicionar"> + </a>
+            <a href="#" class="nav-button add-button" title="Nova conversa" aria-label="Nova conversa"><span class="nc-icon nc-icon-plus" aria-hidden="true"></span></a>
           </nav>
         </aside>
 
@@ -120,13 +124,13 @@
 
           <nav class="sidebar-navigation">
             <a href="#" class="sidebar-link active">
-              <span class="icon" aria-hidden="true">⌂</span>
+              <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z"/><path d="M9 21v-8h6v8"/></svg></span>
 
               <span> Início </span>
             </a>
 
             <a href="#" class="sidebar-link">
-              <span class="icon" aria-hidden="true">♧</span>
+              <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 6a3 3 0 0 1 0 6M17 15a5 5 0 0 1 4 5"/></svg></span>
 
               <span> Amigos </span>
             </a>
@@ -155,9 +159,7 @@
             ================================== -->
 
           <div class="user-profile">
-            <div class="avatar">
-              <img src="" alt="Minha foto de perfil" id="myAvatar" />
-            </div>
+            <div class="avatar nc-avatar" aria-label="Avatar da conta"><span id="myAvatarFallback" class="nc-avatar-fallback" aria-hidden="true">N</span><img alt="Foto de perfil" id="myAvatar" hidden /></div>
 
             <div class="user-info">
               <strong id="myName"> Usuário </strong>
@@ -170,9 +172,7 @@
 
               
 
-              <button type="button" title="Configurações" id="settingsButton">
-                ⚙
-              </button>
+              <button type="button" title="Configurações" id="settingsButton" aria-label="Configurações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 2l-1.8 1.8a1.8 1.8 0 0 0-2-.36l-.9.38a1.8 1.8 0 0 0-1.1 1.66V21h-3.9v-.52A1.8 1.8 0 0 0 9 18.82l-.9-.38a1.8 1.8 0 0 0-2 .36L4.3 17a1.8 1.8 0 0 0 .36-2l-.38-.9A1.8 1.8 0 0 0 2.62 13H2v-2h.62a1.8 1.8 0 0 0 1.66-1.1l.38-.9a1.8 1.8 0 0 0-.36-2L6.1 5.2a1.8 1.8 0 0 0 2 .36l.9.38A1.8 1.8 0 0 0 10.1 4.28V3h3.9v1.28A1.8 1.8 0 0 0 15.1 5.94l.9-.38a1.8 1.8 0 0 0 2-.36L19.8 7a1.8 1.8 0 0 0-.36 2l.38.9A1.8 1.8 0 0 0 21.48 11H22v2h-.52a1.8 1.8 0 0 0-1.66 1.1Z"/></svg></button>
             </div>
           </div>
         </aside>
@@ -227,13 +227,25 @@
                     ================================== -->
 
               <div class="online-empty" id="onlineEmpty">
-                <div class="empty-icon">◉</div>
+                <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 8h4M19 6v4"/></svg></div>
 
-                <h3>Ninguém está online</h3>
+                <h3>A noite está tranquila por aqui</h3>
 
                 <p>
-                  Quando seus amigos estiverem online, eles aparecerão aqui.
+                  Seus amigos aparecem aqui quando se conectam. Abra Amigos para encontrar alguém e começar uma conversa.
                 </p>
+              </div>
+            </section>
+            <section class="nc-home-guide" aria-label="Acesso rápido">
+              <div class="nc-home-guide-copy">
+                <span class="nc-eyebrow">SEU ESPAÇO</span>
+                <h3>Conexões que importam.</h3>
+                <p>Converse, entre em comunidades e compartilhe a noite — tudo em um só lugar.</p>
+              </div>
+              <div class="nc-home-guide-actions">
+                <button type="button" class="nc-quick-action" data-quick-open="friends">Adicionar amigos</button>
+                <button type="button" class="nc-quick-action" data-quick-open="communities">Abrir comunidades</button>
+                <button type="button" class="nc-quick-action" data-quick-open="messages">Ver mensagens</button>
               </div>
             </section>
           </section>
@@ -272,7 +284,7 @@
                 ================================== -->
 
             <div class="friends-search">
-              <span class="search-icon"> 🔎 </span>
+              <span class="search-icon" aria-hidden="true">⌕</span>
 
               <input
                 type="text"
@@ -320,7 +332,7 @@
                     ================================== -->
 
               <div class="friends-empty visible" id="friendsEmpty">
-                <div class="empty-icon">♡</div>
+                <div class="empty-icon" aria-hidden="true">✧</div>
 
                 <h3>Você ainda não tem amigos</h3>
 
@@ -367,7 +379,7 @@
                 ================================== -->
 
             <div class="messages-search">
-              <span> 🔎 </span>
+              <span aria-hidden="true">⌕</span>
 
               <input
                 type="text"
@@ -393,7 +405,7 @@
                     ================================== -->
 
               <div class="messages-empty visible" id="messagesEmpty">
-                <div class="empty-icon">💬</div>
+                <div class="empty-icon" aria-hidden="true">✉</div>
 
                 <h3>Nenhuma conversa ainda</h3>
 
@@ -524,9 +536,7 @@
               <!-- MINI PERFIL -->
 
               <div class="settings-account-mini">
-                <div class="settings-mini-avatar" id="settingsMiniAvatar">
-                  👤
-                </div>
+                <div class="settings-mini-avatar" id="settingsMiniAvatar">N</div>
 
                 <div>
                   <strong id="settingsMiniName"> Usuário </strong>
@@ -1007,11 +1017,62 @@
     ========================================== -->
     </div>
 <section id="communityRoot" hidden aria-label="Comunidades" class="nc-community">
-  <header class="nc-community-header"><div><span class="nc-eyebrow">NIGHTCALL / COMUNIDADES</span><h2>Comunidades</h2></div><button type="button" id="communityClose" class="nc-secondary">Fechar ✕</button></header>
-  <div class="nc-community-actions"><form id="communityCreate"><label for="communityName">Nova comunidade</label><div><input id="communityName" placeholder="Nome da comunidade" maxlength="50" required><button>Criar</button></div></form><form id="communityJoin"><label for="communityCode">Entrar por convite</label><div><input id="communityCode" placeholder="Código de 12 caracteres" maxlength="12" required><button>Entrar</button></div></form></div>
+  <header class="nc-community-header">
+    <div>
+      <span class="nc-eyebrow">NIGHTCALL / COMUNIDADES</span>
+      <h2>Comunidades</h2>
+      <p>Servidores, canais e membros em um só lugar.</p>
+    </div>
+    <button type="button" id="communityClose" class="nc-secondary" aria-label="Fechar comunidades">Fechar</button>
+  </header>
+  <div class="nc-community-actions">
+    <form id="communityCreate">
+      <label for="communityName">Nova comunidade</label>
+      <div>
+        <input id="communityName" placeholder="Nome da comunidade" maxlength="40" minlength="3" required>
+        <button>Criar</button>
+      </div>
+    </form>
+    <form id="communityJoin">
+      <label for="communityCode">Entrar por convite</label>
+      <div>
+        <input id="communityCode" placeholder="Código de 12 caracteres" maxlength="12" required>
+        <button>Entrar</button>
+      </div>
+    </form>
+  </div>
   <p id="communityStatus" role="status" aria-live="polite"></p>
-  <div class="nc-community-grid"><aside class="nc-community-sidebar"><h3>Servidores</h3><div id="communityList" class="nc-community-list"></div></aside><aside class="nc-community-sidebar"><h3 id="communityTitle">Canais</h3><div id="communityInvite" class="nc-invite"></div><div id="communityChannels" class="nc-community-list"></div><form id="communityChannelCreate" class="nc-admin-form" hidden><h4>Novo canal</h4><input id="communityChannelName" placeholder="nome-do-canal" maxlength="32" pattern="[a-zA-Z0-9_-]+" required><select id="communityChannelKind"><option value="text">Texto</option><option value="voice">Voz</option></select><button>Criar canal</button></form></aside><div class="nc-community-main"><div id="communityMessages" class="nc-community-messages" role="log"></div><form id="communitySend" class="nc-message-form"><input id="communityText" placeholder="Mensagem do canal" maxlength="2000" required><button>Enviar</button></form></div><aside class="nc-community-sidebar nc-members"><h3>Membros</h3><div id="communityMembers" class="nc-community-list"></div></aside></div>
+  <div class="nc-community-grid">
+    <aside class="nc-community-sidebar nc-community-servers">
+      <h3>Servidores</h3>
+      <div id="communityList" class="nc-community-list"></div>
+    </aside>
+    <aside class="nc-community-sidebar nc-community-channels">
+      <div class="nc-channel-panel-header">
+        <h3 id="communityTitle">Selecione uma comunidade</h3>
+        <div id="communityInvite" class="nc-invite"></div>
+      </div>
+      <div id="communityChannels" class="nc-community-list"></div>
+      <form id="communityChannelCreate" class="nc-admin-form" hidden>
+        <h4>Novo canal</h4>
+        <input id="communityChannelName" placeholder="nome-do-canal" maxlength="32" pattern="[a-zA-Z0-9_-]+" required>
+        <select id="communityChannelKind"><option value="text">Texto</option><option value="voice">Voz</option></select>
+        <button>Criar canal</button>
+      </form>
+    </aside>
+    <div class="nc-community-main">
+      <div id="communityMessages" class="nc-community-messages" role="log"></div>
+      <form id="communitySend" class="nc-message-form">
+        <input id="communityText" placeholder="Mensagem do canal" maxlength="2000" required>
+        <button>Enviar</button>
+      </form>
+    </div>
+    <aside class="nc-community-sidebar nc-members">
+      <h3>Membros</h3>
+      <div id="communityMembers" class="nc-community-list"></div>
+    </aside>
+  </div>
 </section>
-    <link rel="stylesheet" href="css/communities.css"><link rel="stylesheet" href="css/nightcall-design.css"><link rel="stylesheet" href="css/nightcall-refinement.css"><link rel="stylesheet" href="css/nightcall-nocturne.css"><script type="module" src="js/app.js"></script><script defer src="js/ux-6.js"></script>
+    <link rel="stylesheet" href="css/communities.css"><link rel="stylesheet" href="css/nightcall-design.css"><link rel="stylesheet" href="css/nightcall-refinement.css"><link rel="stylesheet" href="css/nightcall-nocturne.css"><link rel="stylesheet" href="css/nightcall-identity.css"><link rel="stylesheet" href="css/nightcall-repair.css"><link rel="stylesheet" href="css/nightcall-eclipse.css"><link rel="stylesheet" href="css/nightcall-atelier.css"><script type="module" src="js/app.js"></script><script defer src="js/ux-6.js"></script>
   </body>
 </html>

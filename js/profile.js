@@ -37,6 +37,8 @@ export function updateProfilePreview() {
   if (avatar && avatarPreview) {
     avatarPreview.src = avatar;
     avatarPreview.classList.add("visible");
+    avatarPreview.onerror = () => { avatarPreview.classList.remove("visible"); avatarPreview.style.display = "none"; if (avatarPlaceholder) avatarPlaceholder.style.display = "inline"; };
+    avatarPreview.onload = () => { avatarPreview.style.display = "block"; };
     if (avatarPlaceholder) {
       avatarPlaceholder.style.display = "none";
     }

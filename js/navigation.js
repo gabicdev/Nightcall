@@ -61,12 +61,18 @@ export function loadCurrentUser() {
   if (myUsername) {
     myUsername.textContent = currentUser.username;
   }
+  const fallbackAvatar = document.getElementById("myAvatarFallback");
+  if (fallbackAvatar) fallbackAvatar.textContent = (currentUser.name || "N").trim().charAt(0).toUpperCase();
   if (myAvatar) {
     if (currentUser.avatar) {
       myAvatar.src = currentUser.avatar;
+      myAvatar.hidden = false;
       myAvatar.style.display = "block";
+      myAvatar.onerror = () => { myAvatar.hidden = true; myAvatar.style.display = "none"; };
     } else {
       myAvatar.removeAttribute("src");
+      myAvatar.hidden = true;
+      myAvatar.style.display = "none";
     }
   }
 }
@@ -145,7 +151,7 @@ export function updateActiveNavigation() {
   }
 }
 export function openAddMenu() {
-  console.log("Menu de adicionar aberto.");
+  document.getElementById("communityToggle")?.click();
 }
 export function toggleMicrophone() {
   appState.microphoneEnabled = !appState.microphoneEnabled;
@@ -166,6 +172,7 @@ export function openSettings(section = "profile") {
     return;
   }
   overlay.classList.add("open");
+  updateSettingsMiniProfile();
   overlay.setAttribute("aria-hidden", "false");
   document.body.classList.add("settings-open");
   if (typeof openSection === "function") {
@@ -198,7 +205,7 @@ export function updateSettingsMiniProfile() {
     image.alt = "";
     miniAvatar.appendChild(image);
   } else {
-    miniAvatar.textContent = "👤";
+    miniAvatar.textContent = String(currentUser.name || "N").trim().slice(0, 1).toUpperCase();
   }
 }
 export function updateOnlineCount() {
@@ -265,16 +272,20 @@ export function initializeNavigation() {
       }
     });
   });
-  profileButtons.forEach(function (button, index) {
-    button.addEventListener("click", function () {
-      if (index === 0) {
-        toggleMicrophone();
-      } else if (index === 1) {
-        toggleHeadphones();
-      } else if (index === 2) {
-        openSettings();
-      }
-    });
+  document.getElementById("settingsButton")?.addEventListener("click", () => openSettings("profile"));
+  document.querySelector(".user-profile")?.addEventListener("click", () => openSettings("profile"));
+  document.querySelectorAll('[data-quick-open="friends"]').forEach((button) => button.addEventListener('click', () => showFriends()));
+  document.querySelectorAll('[data-quick-open="messages"]').forEach((button) => button.addEventListener('click', () => showMessages()));
+  document.querySelector(".add-message")?.addEventListener("click", () => showFriends());
+  document.getElementById("settingsOverlay")?.addEventListener("click", (event) => {
+    if (event.target.id === "settingsOverlay") closeSettings();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeSettings();
+      const community = document.getElementById("communityRoot");
+      if (community && !community.hidden) document.getElementById("communityClose")?.click();
+    }
   });
   closeSettingsButton = document.getElementById("closeSettingsButton");
   if (closeSettingsButton) {

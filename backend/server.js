@@ -355,17 +355,18 @@ export function createServer({
         }
         if (path === '/api/communities' && req.method === 'POST') {
           const {name} = await body(req);
-          if(typeof name !== 'string' || !name.trim() || name.trim().length>50) return reply(res,400,{error:'Nome inválido (1–50 caracteres).'});
+          const normalizedName = typeof name === 'string' ? name.trim().replace(/\s+/g,' ') : '';
+          if(!normalizedName || normalizedName.length < 3 || normalizedName.length > 40) return reply(res,400,{error:'Nome inválido (3–40 caracteres).'});
           const id=randomUUID(), code=randomUUID().replaceAll('-','').slice(0,12), now=Date.now();
           db.exec('BEGIN');
           try {
-            db.prepare('INSERT INTO communities VALUES (?,?,?,?,?)').run(id,name.trim(),user.id,code,now);
+            db.prepare('INSERT INTO communities VALUES (?,?,?,?,?)').run(id,normalizedName,user.id,code,now);
             db.prepare('INSERT INTO community_members VALUES (?,?,?,?)').run(id,user.id,'owner',now);
             db.prepare('INSERT INTO community_channels VALUES (?,?,?,?,?)').run(randomUUID(),id,'geral','text',now);
             db.prepare('INSERT INTO community_channels VALUES (?,?,?,?,?)').run(randomUUID(),id,'voz-geral','voice',now);
             db.exec('COMMIT');
           } catch(e){db.exec('ROLLBACK');throw e;}
-          return reply(res,201,{community:{id,name:name.trim(),ownerId:user.id,inviteCode:code,role:'owner'}});
+          return reply(res,201,{community:{id,name:normalizedName,ownerId:user.id,inviteCode:code,role:'owner'}});
         }
         if(path === '/api/communities/join' && req.method === 'POST') {
           const {code}=await body(req);
